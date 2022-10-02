@@ -20,9 +20,9 @@ class InterviewPlanningApplicationTests {
   @Test
   void interviewerSlotMainScenario() {
     var slot = interviewerService.createSlot(
-            "09:00",
-            "18:00",
-            "WEDNESDAY");
+        "09:00",
+        "18:00",
+        "WEDNESDAY");
     assertThat(slot).isNotNull();
   }
 }
