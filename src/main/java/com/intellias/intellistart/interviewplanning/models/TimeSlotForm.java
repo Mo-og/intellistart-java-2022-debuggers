@@ -1,4 +1,4 @@
-package com.intellias.intellistart.interviewplanning.services;
+package com.intellias.intellistart.interviewplanning.models;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -8,11 +8,12 @@ import lombok.Data;
  * Slot form.
  */
 @Data
-public class InterviewerSlotForm {
+public class TimeSlotForm {
 
   private DayOfWeek dayOfWeek;
   private LocalTime from;
   private LocalTime to;
+  private int weekNum;
 
   /**
    * Constructor.
@@ -21,20 +22,22 @@ public class InterviewerSlotForm {
    * @param from      start time
    * @param to        end time
    */
-  public InterviewerSlotForm(DayOfWeek dayOfWeek, LocalTime from, LocalTime to) {
+  public TimeSlotForm(DayOfWeek dayOfWeek, LocalTime from, LocalTime to, int weekNum) {
     this.dayOfWeek = dayOfWeek;
     this.from = from;
     this.to = to;
+    this.weekNum = weekNum;
   }
 
   /**
    * Builder.
    */
-  public static class InterviewerSlotFormBuilder {
+  public static class TimeSlotFormBuilder {
 
     private DayOfWeek dayOfWeek;
     private LocalTime from;
     private LocalTime to;
+    private int weekNum;
 
     /**
      * Builder start time of slot.
@@ -42,7 +45,7 @@ public class InterviewerSlotForm {
      * @param from start time of slot
      * @return builder
      */
-    public InterviewerSlotFormBuilder from(String from) {
+    public TimeSlotFormBuilder from(String from) {
       String[] fromStrings = from.split(":");
       this.from = LocalTime.of(Integer.parseInt(fromStrings[0]), Integer.parseInt(fromStrings[1]));
       return this;
@@ -54,25 +57,30 @@ public class InterviewerSlotForm {
      * @param to end time of clot
      * @return builder
      */
-    public InterviewerSlotFormBuilder to(String to) {
+    public TimeSlotFormBuilder to(String to) {
       String[] toStrings = to.split(":");
       this.to = LocalTime.of(Integer.parseInt(toStrings[0]), Integer.parseInt(toStrings[1]));
       return this;
     }
 
-    public InterviewerSlotFormBuilder dayOfWeek(String day) {
+    public TimeSlotFormBuilder dayOfWeek(String day) {
       this.dayOfWeek = DayOfWeek.valueOf(day.toUpperCase());
       return this;
     }
 
-    public InterviewerSlotForm build() {
-      return new InterviewerSlotForm(dayOfWeek, from, to);
+    public TimeSlotFormBuilder weekNum(int weekNum) {
+      this.weekNum = weekNum;
+      return this;
+    }
+
+    public TimeSlotForm build() {
+      return new TimeSlotForm(dayOfWeek, from, to, weekNum);
     }
 
   }
 
-  public static InterviewerSlotFormBuilder builder() {
-    return new InterviewerSlotFormBuilder();
+  public static TimeSlotFormBuilder builder() {
+    return new TimeSlotFormBuilder();
   }
 
 }
