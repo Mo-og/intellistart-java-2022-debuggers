@@ -1,7 +1,7 @@
 package com.intellias.intellistart.interviewplanning.services;
 
 import com.intellias.intellistart.interviewplanning.models.Booking;
-import com.intellias.intellistart.interviewplanning.models.TimeSlot;
+import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class BookingService {
 
-  private BookingRepository bookingRepository;
+  private final BookingRepository bookingRepository;
 
   @Autowired
   public BookingService(BookingRepository bookingRepository) {
@@ -26,8 +26,8 @@ public class BookingService {
    * @param interviewerSlot interviewer Slot
    * @return booking
    */
-  public Booking createBooking(TimeSlot candidateSlot,
-      TimeSlot interviewerSlot) {
+  public Booking createBooking(InterviewerTimeSlot candidateSlot,
+                               InterviewerTimeSlot interviewerSlot) {
     //Todo calculate possible time
     //return bookingRepository.save(new Booking(candidateSlot, interviewerSlot));
     return new Booking();

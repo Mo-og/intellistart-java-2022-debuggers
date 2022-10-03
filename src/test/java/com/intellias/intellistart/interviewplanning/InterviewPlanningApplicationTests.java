@@ -2,7 +2,7 @@ package com.intellias.intellistart.interviewplanning;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.intellias.intellistart.interviewplanning.models.TimeSlot;
+import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.services.BookingService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import com.intellias.intellistart.interviewplanning.services.UserService;
@@ -36,7 +36,7 @@ class InterviewPlanningApplicationTests {
 
   @Test
   void createBookingTest() {
-    assertThat(bookingService.createBooking(new TimeSlot(), new TimeSlot())).isNotNull();
+    assertThat(bookingService.createBooking(new InterviewerTimeSlot(), new InterviewerTimeSlot())).isNotNull();
   }
 
   @Test

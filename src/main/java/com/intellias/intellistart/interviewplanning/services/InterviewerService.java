@@ -1,7 +1,7 @@
 package com.intellias.intellistart.interviewplanning.services;
 
-import com.intellias.intellistart.interviewplanning.models.TimeSlot;
-import com.intellias.intellistart.interviewplanning.models.TimeSlotForm;
+import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
+import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlotForm;
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,14 +18,13 @@ public class InterviewerService {
    * @param dayOfWeek day
    * @return slot
    */
-  public TimeSlot createSlot(String from, String to, String dayOfWeek, int weekNum) {
-    return new TimeSlot(TimeSlotForm.builder()
-        .from(from)
-        .to(to)
-        .dayOfWeek(dayOfWeek)
-        .weekNum(weekNum)
-        .build());
+  public InterviewerTimeSlot createSlot(String from, String to, String dayOfWeek, int weekNum) {
+    return new InterviewerTimeSlot(InterviewerTimeSlotForm.builder()
+      .from(from)
+      .to(to)
+      .dayOfWeek(dayOfWeek)
+      .weekNum(weekNum)
+      .build());
   }
-
 
 }

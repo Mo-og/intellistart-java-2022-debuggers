@@ -12,7 +12,7 @@ import lombok.Data;
 @Entity
 @Data
 
-public class TimeSlot {
+public class InterviewerTimeSlot {
 
   @Id
   private Long id;
@@ -27,12 +27,12 @@ public class TimeSlot {
    *
    * @param form form
    */
-  public TimeSlot(TimeSlotForm form) {
+  public InterviewerTimeSlot(InterviewerTimeSlotForm form) {
     from = form.getFrom();
     to = form.getTo();
     dayOfWeek = form.getDayOfWeek();
   }
 
-  public TimeSlot() {
+  public InterviewerTimeSlot() {
   }
 }

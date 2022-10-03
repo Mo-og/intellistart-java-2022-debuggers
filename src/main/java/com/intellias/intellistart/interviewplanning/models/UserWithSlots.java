@@ -13,13 +13,13 @@ import lombok.Data;
 public class UserWithSlots extends User {
 
   @OneToMany()
-  private List<TimeSlot> slots;
+  private List<InterviewerTimeSlot> slots;
 
-  public void addSlot(TimeSlot slot) {
+  public void addSlot(InterviewerTimeSlot slot) {
     //TODO: validate
   }
 
-  public void removeSlot(TimeSlot slot) {
+  public void removeSlot(InterviewerTimeSlot slot) {
     //TODO: validate
   }
 

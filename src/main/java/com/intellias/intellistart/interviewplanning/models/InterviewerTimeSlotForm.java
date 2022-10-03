@@ -8,7 +8,7 @@ import lombok.Data;
  * Slot form.
  */
 @Data
-public class TimeSlotForm {
+public class InterviewerTimeSlotForm {
 
   private DayOfWeek dayOfWeek;
   private LocalTime from;
@@ -22,7 +22,7 @@ public class TimeSlotForm {
    * @param from      start time
    * @param to        end time
    */
-  public TimeSlotForm(DayOfWeek dayOfWeek, LocalTime from, LocalTime to, int weekNum) {
+  public InterviewerTimeSlotForm(DayOfWeek dayOfWeek, LocalTime from, LocalTime to, int weekNum) {
     this.dayOfWeek = dayOfWeek;
     this.from = from;
     this.to = to;
@@ -73,8 +73,8 @@ public class TimeSlotForm {
       return this;
     }
 
-    public TimeSlotForm build() {
-      return new TimeSlotForm(dayOfWeek, from, to, weekNum);
+    public InterviewerTimeSlotForm build() {
+      return new InterviewerTimeSlotForm(dayOfWeek, from, to, weekNum);
     }
 
   }
