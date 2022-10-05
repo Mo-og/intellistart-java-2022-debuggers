@@ -28,7 +28,7 @@ public class Booking {
   private LocalTime to;
   private BookingStatus status;
   @ManyToOne
-  private InterviewerTimeSlot candidateSlot;
+  private CandidateTimeSlot candidateSlot;
 
   @ManyToOne
   private InterviewerTimeSlot interviewerSlot;
@@ -41,7 +41,7 @@ public class Booking {
    * @param candidateSlot   candidate slot
    * @param interviewerSlot interviewer slot
    */
-  public Booking(LocalTime from, LocalTime to, InterviewerTimeSlot candidateSlot,
+  public Booking(LocalTime from, LocalTime to, CandidateTimeSlot candidateSlot,
                  InterviewerTimeSlot interviewerSlot) {
     //TODO: better way to create booking
     this.from = from;
@@ -57,7 +57,7 @@ public class Booking {
    * @param candidateSlot   candidate slot
    * @param interviewerSlot interviewer slot
    */
-  public Booking(InterviewerTimeSlot candidateSlot, InterviewerTimeSlot interviewerSlot) {
+  public Booking(CandidateTimeSlot candidateSlot, InterviewerTimeSlot interviewerSlot) {
     this.candidateSlot = candidateSlot;
     this.interviewerSlot = interviewerSlot;
     status = BookingStatus.NEW;

@@ -1,5 +1,6 @@
 package com.intellias.intellistart.interviewplanning;
 
+import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.UserRole;
@@ -38,7 +39,7 @@ class InterviewPlanningApplicationTests {
   @Test
   @Transactional
   void createBookingTest() {
-    assertThat(bookingService.createBooking(new InterviewerTimeSlot(), new InterviewerTimeSlot())).isNotNull();
+    assertThat(bookingService.createBooking(new CandidateTimeSlot(), new InterviewerTimeSlot())).isNotNull();
   }
 
   @Test
