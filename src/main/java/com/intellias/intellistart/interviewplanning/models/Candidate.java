@@ -28,6 +28,12 @@ public class Candidate extends User {
     //todo implements this
   }
 
+  /**
+   * Add booking to set of bookings,
+   * and remove from timeslots list.
+   *
+   * @param booking booking
+   */
   public void addBooking(Booking booking) {
     bookings.add(booking);
     timeSlots.remove(booking.getId());
