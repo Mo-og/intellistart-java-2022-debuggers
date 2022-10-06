@@ -4,6 +4,9 @@ import java.time.LocalTime;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Class where was validated and corrected time from and to.
+ */
 @Getter
 @Setter
 public class Period {
