@@ -5,11 +5,19 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Interviewer.
+ */
 public class Interviewer extends User {
 
   private final Map<Long, InterviewerTimeSlot> timeSlots;
   private final Set<Booking> bookings;
 
+  /**
+   * Constructor.
+   *
+   * @param email interviewer email
+   */
   public Interviewer(String email) {
     super(email, UserRole.INTERVIEWER);
     timeSlots = new HashMap<>();
@@ -25,7 +33,7 @@ public class Interviewer extends User {
     //todo check this
   }
 
-  public void editSlot(long slotID) {
+  public void editSlot(long slotId) {
     //todo implements this
   }
 
