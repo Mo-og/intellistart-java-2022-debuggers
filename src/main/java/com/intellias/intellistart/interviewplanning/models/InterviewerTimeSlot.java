@@ -27,12 +27,17 @@ public class InterviewerTimeSlot {
   /**
    * Constructor.
    *
-   * @param form form
+   * @param from    start time
+   * @param to      end time
+   * @param day     day of week
+   * @param weekNum week number
    */
-  public InterviewerTimeSlot(InterviewerTimeSlotForm form) {
-    from = form.getFrom();
-    to = form.getTo();
-    dayOfWeek = form.getDayOfWeek();
+  public InterviewerTimeSlot(String from, String to, String day, int weekNum) {
+    Period period = new Period(from, to);
+    dayOfWeek = DayOfWeek.valueOf(day.toUpperCase());
+    this.from = period.getFrom();
+    this.to = period.getTo();
+    this.weekNum = weekNum;
   }
 
   public InterviewerTimeSlot() {

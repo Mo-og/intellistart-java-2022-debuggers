@@ -30,9 +30,10 @@ public class CandidateTimeSlot {
    * @param to   end time
    */
   public CandidateTimeSlot(String date, String from, String to) {
+    Period period = new Period(from, to);
     this.date = LocalDate.parse(date);
-    this.from = LocalTime.parse(from);
-    this.to = LocalTime.parse(to);
+    this.from = period.getFrom();
+    this.to = period.getTo();
   }
 
   public CandidateTimeSlot() {
