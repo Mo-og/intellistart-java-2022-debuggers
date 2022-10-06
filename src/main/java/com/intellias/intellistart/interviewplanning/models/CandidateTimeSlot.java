@@ -3,6 +3,7 @@ package com.intellias.intellistart.interviewplanning.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Random;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -32,7 +33,7 @@ public class CandidateTimeSlot {
   @SequenceGenerator(name = "cnd_seq", sequenceName = "candidate_slot_sequence", allocationSize = 5)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cnd_seq")
   @Column(nullable = false)
-  private Long id;
+  private final Long id;
   @Column(name = "from_time")
   private LocalTime from;
   @Column(name = "to_time")
@@ -47,6 +48,7 @@ public class CandidateTimeSlot {
    * @param to   end time
    */
   public CandidateTimeSlot(String date, String from, String to) {
+    id = new Random().nextLong();
     Period period = new Period(from, to);
     this.date = LocalDate.parse(date);
     this.from = period.getFrom();
@@ -54,6 +56,7 @@ public class CandidateTimeSlot {
   }
 
   public CandidateTimeSlot() {
+    id = null;
   }
 
   @Transactional
