@@ -12,7 +12,7 @@ import lombok.Data;
 @Entity
 public class UserWithSlots extends User {
 
-  @OneToMany()
+  @OneToMany
   private List<InterviewerTimeSlot> slots;
 
   public void addSlot(InterviewerTimeSlot slot) {

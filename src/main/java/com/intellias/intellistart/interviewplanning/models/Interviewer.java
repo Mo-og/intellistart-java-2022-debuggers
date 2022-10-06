@@ -1,17 +1,20 @@
 package com.intellias.intellistart.interviewplanning.models;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 
 /**
  * Interviewer.
  */
+@Entity
 public class Interviewer extends User {
 
-  private final Map<Long, InterviewerTimeSlot> timeSlots;
-  private final Set<Booking> bookings;
+  @OneToMany
+  private Set<InterviewerTimeSlot> timeSlots;
+  @OneToMany
+  private Set<Booking> bookings;
 
   /**
    * Constructor.
@@ -20,8 +23,10 @@ public class Interviewer extends User {
    */
   public Interviewer(String email) {
     super(email, UserRole.INTERVIEWER);
-    timeSlots = new HashMap<>();
-    bookings = new HashSet<>();
+  }
+
+  public Interviewer() {
+
   }
 
   public void addSlot(InterviewerTimeSlot slot) {
@@ -37,7 +42,7 @@ public class Interviewer extends User {
     //todo implements this
   }
 
-  public HashMap<Long, InterviewerTimeSlot> getSlots() {
-    return new HashMap<>(timeSlots);
+  public Set<InterviewerTimeSlot> getSlots() {
+    return new HashSet<>(timeSlots);
   }
 }

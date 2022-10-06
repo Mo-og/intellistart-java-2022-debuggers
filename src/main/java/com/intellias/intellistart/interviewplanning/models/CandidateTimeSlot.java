@@ -4,7 +4,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import lombok.Data;
 
 /**
@@ -15,6 +18,9 @@ import lombok.Data;
 public class CandidateTimeSlot {
 
   @Id
+  @SequenceGenerator(name = "cnd_seq", sequenceName = "candidate_slot_sequence", allocationSize = 5)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cnd_seq")
+  @Column(nullable = false)
   private Long id;
   @Column(name = "from_time")
   private LocalTime from;
