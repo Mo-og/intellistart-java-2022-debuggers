@@ -24,8 +24,6 @@ public class Candidate extends User {
    */
   public Candidate(String email) {
     super(email, UserRole.CANDIDATE);
-    timeSlots = new HashSet<>();
-    bookings = new HashSet<>();
   }
 
   public Candidate() {
@@ -43,7 +41,6 @@ public class Candidate extends User {
    */
   public void addBooking(Booking booking) {
     bookings.add(booking);
-    timeSlots.remove(booking.getCandidateSlot());
   }
 
   /**
