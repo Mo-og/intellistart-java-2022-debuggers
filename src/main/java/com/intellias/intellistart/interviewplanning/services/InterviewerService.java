@@ -1,14 +1,14 @@
 package com.intellias.intellistart.interviewplanning.services;
 
-import com.intellias.intellistart.interviewplanning.exceptions.InterviewerNotFoundException;
 import com.intellias.intellistart.interviewplanning.models.Interviewer;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerRepository;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.NoSuchElementException;
 import java.util.Set;
-import javax.persistence.EntityNotFoundException;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,19 +35,17 @@ public class InterviewerService {
   }
 
   /**
-   * Create slot for interview. Interviewer can create slot for next week.
+   * Crete slot for interview. Interviewer can create slot for next week.
    *
-   * @param interviewerId       id of interviewer to bind slot to
-   * @param interviewerTimeSlot slot to validate and save
+   * @param from start time
+   * @param to   end time
+   * @param day  day of week
    * @return slot
    */
-  public InterviewerTimeSlot createSlot(Long interviewerId,
-      InterviewerTimeSlot interviewerTimeSlot) {
-    //todo validation of slot
-    Interviewer interviewer = interviewerRepository.getReferenceById(interviewerId);
-    interviewerTimeSlot.setInterviewer(interviewer);
-    return interviewerTimeSlotRepository.saveAndFlush(interviewerTimeSlot);
-
+  public InterviewerTimeSlot createSlot(String from, String to, String day, int weekNum) {
+    // validate from, to, day, weekNum
+    // check if current time is by end of Friday (00:00) of current week
+    return interviewerTimeSlotRepository.save(new InterviewerTimeSlot(from, to, day, weekNum));
   }
 
   /**
@@ -67,9 +65,16 @@ public class InterviewerService {
    * @return time slots of requested interviewer for current week and future weeks
    */
   public Set<InterviewerTimeSlot> getRelevantInterviewerSlots(Long interviewerId) {
-    return interviewerTimeSlotRepository
-        .getInterviewerTimeSlotForInterviewerIdAndWeekGreaterOrEqual(
-            interviewerId, WeekService.getCurrentWeekNum());
+    Interviewer interviewer = interviewerRepository.getReferenceById(interviewerId);
+    if (interviewer == null) {
+      //todo make custom exception
+      throw new NoSuchElementException("No user found by given id");
+    }
+    //todo get instead filtered slots from database
+    return interviewer.getSlots().stream()
+        .filter(interviewerTimeSlot ->
+            interviewerTimeSlot.getWeekNum() >= UtilService.getCurrentWeekNum())
+        .collect(Collectors.toSet());
   }
 
   /**
@@ -91,19 +96,4 @@ public class InterviewerService {
     slot.setWeekNum(weekNum);
     return interviewerTimeSlotRepository.save(slot);
   }
-
-  /**
-   * Gets interviewer from database by id and throws an exception if none found.
-   *
-   * @param id interviewer id to look for
-   * @return interviewer stored by given id
-   */
-  public Interviewer getById(Long id) {
-    try {
-      return interviewerRepository.getReferenceById(id);
-    } catch (EntityNotFoundException e) {
-      throw new InterviewerNotFoundException(id);
-    }
-  }
-
 }
