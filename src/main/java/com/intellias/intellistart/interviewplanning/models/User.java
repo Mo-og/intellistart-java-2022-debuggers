@@ -22,7 +22,7 @@ import org.hibernate.Hibernate;
 @Setter
 @ToString
 @RequiredArgsConstructor
-@Table(name = "WEBUSER")
+@Table(name = "COORDINATOR")
 public class User {
 
   @Id
@@ -59,5 +59,12 @@ public class User {
   @Override
   public int hashCode() {
     return getClass().hashCode();
+  }
+
+  /**
+   * User role.
+   */
+  public enum UserRole {
+    INTERVIEWER, CANDIDATE, COORDINATOR
   }
 }
