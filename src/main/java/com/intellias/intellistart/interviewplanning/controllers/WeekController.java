@@ -15,8 +15,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class WeekController {
 
+  private final CoordinatorService coordinatorService;
+
+  /**
+   * Constructor.
+   *
+   * @param coordinatorService coordinator service
+   */
   @Autowired
-  private CoordinatorService coordinatorService;
+  public WeekController(CoordinatorService coordinatorService) {
+    this.coordinatorService = coordinatorService;
+  }
 
   @GetMapping("/weeks/current")
   public WeekNum getCurrentWeekNum() {
