@@ -78,7 +78,7 @@ public class CoordinatorService {
    */
   public Map<DayOfWeek, List<CandidateTimeSlot>> getCandidateTimeSlotsByWeekId(int weekId) {
     return candidateTimeSlotRepository.findAll().stream()
-        .filter(slot -> UtilService.getWeekNumByDate(slot.getDate()) == weekId)
+        .filter(slot -> WeekService.getWeekNumByDate(slot.getDate()) == weekId)
         .collect(Collectors.groupingBy(slot -> slot.getDate().getDayOfWeek()));
   }
 
