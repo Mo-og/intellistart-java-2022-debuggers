@@ -1,6 +1,10 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
+<<<<<<< HEAD
 import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
+=======
+import com.intellias.intellistart.interviewplanning.exceptions.InterviewerNotFoundException;
+>>>>>>> 1832b1d (:construction: Basic interviewer api skeleton)
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +33,7 @@ public class CustomExceptionHandler {
   }
 
   /**
-   * Interviewer not found exception handler.
+   * ApplicationError exception handler.
    *
    * @return response with error code according to API requirements
    */
