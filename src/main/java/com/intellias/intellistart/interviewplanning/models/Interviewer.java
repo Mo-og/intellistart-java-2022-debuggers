@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Interviewer.
@@ -29,8 +30,9 @@ public class Interviewer extends User {
 
   }
 
+  @Transactional
   public void addSlot(InterviewerTimeSlot slot) {
-    //todo implements this
+    timeSlots.add(slot);
   }
 
   public void addBooking(Booking booking) {

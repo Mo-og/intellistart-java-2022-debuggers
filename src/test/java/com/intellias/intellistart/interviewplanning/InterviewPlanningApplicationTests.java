@@ -1,5 +1,7 @@
 package com.intellias.intellistart.interviewplanning;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.User;
@@ -11,8 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 class InterviewPlanningApplicationTests {
@@ -26,15 +26,6 @@ class InterviewPlanningApplicationTests {
   @Autowired
   private UserService userService;
 
-  @Test
-  void interviewerSlotMainScenario() {
-    var slot = interviewerService.createSlot(
-      "09:00",
-      "18:00",
-      "WEDNESDAY",
-      1);
-    assertThat(slot).isNotNull();
-  }
 
   @Test
   @Transactional
