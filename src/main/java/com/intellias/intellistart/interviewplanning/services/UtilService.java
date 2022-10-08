@@ -1,5 +1,6 @@
 package com.intellias.intellistart.interviewplanning.services;
 
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
@@ -19,5 +20,9 @@ public class UtilService {
 
   public static int getNextWeekNum() {
     return getCurrentWeekNum() + 1;
+  }
+
+  public static int getWeekNumByDate(LocalDate date) {
+    return date.get(ChronoField.ALIGNED_WEEK_OF_YEAR) + date.get(ChronoField.YEAR) * 100;
   }
 }
