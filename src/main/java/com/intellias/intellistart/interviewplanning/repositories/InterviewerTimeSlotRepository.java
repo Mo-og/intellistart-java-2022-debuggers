@@ -14,15 +14,13 @@ public interface InterviewerTimeSlotRepository extends JpaRepository<Interviewer
 
   @Query("select slot "
       + "from InterviewerTimeSlot slot "
-      + "inner join Interviewer i on i.id=?1  "
-      + "where slot.weekNum >=?2 ")
+      + "where slot.weekNum >=?2 and slot.interviewer.id=?1")
   Set<InterviewerTimeSlot> getInterviewerTimeSlotForInterviewerIdAndWeekGreaterOrEqual(
       Long interviewerId, int weekNum);
 
   @Query("select slot "
       + "from InterviewerTimeSlot slot "
-      + "inner join Interviewer i on i.id=?1  "
-      + "where slot.weekNum =?2 ")
+      + "where slot.weekNum =?2 and slot.interviewer.id=?1")
   Set<InterviewerTimeSlot> getInterviewerTimeSlotForInterviewerIdAndWeekNum(
       Long interviewerId, int weekNum);
 }

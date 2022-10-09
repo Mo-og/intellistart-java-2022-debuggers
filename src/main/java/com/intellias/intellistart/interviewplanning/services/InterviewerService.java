@@ -45,9 +45,8 @@ public class InterviewerService {
       InterviewerTimeSlot interviewerTimeSlot) {
     //todo validation of slot
     Interviewer interviewer = interviewerRepository.getReferenceById(interviewerId);
-    InterviewerTimeSlot slot = interviewerTimeSlotRepository.saveAndFlush(interviewerTimeSlot);
-    interviewer.addSlot(slot);
-    return slot;
+    interviewerTimeSlot.setInterviewer(interviewer);
+    return interviewerTimeSlotRepository.saveAndFlush(interviewerTimeSlot);
 
   }
 
@@ -100,13 +99,11 @@ public class InterviewerService {
    * @return interviewer stored by given id
    */
   public Interviewer getById(Long id) {
-    Interviewer interviewer;
     try {
-      interviewer = interviewerRepository.getReferenceById(id);
+      return interviewerRepository.getReferenceById(id);
     } catch (EntityNotFoundException e) {
-      throw new InterviewerNotFoundException();
+      throw new InterviewerNotFoundException(id);
     }
-    return interviewer;
   }
 
 }
