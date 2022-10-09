@@ -1,19 +1,21 @@
 package com.intellias.intellistart.interviewplanning.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
-import org.springframework.transaction.annotation.Transactional;
+import javax.persistence.Table;
 
 /**
  * Interviewer.
  */
 @Entity
+@Table(name = "INTERVIEWER")
 public class Interviewer extends User {
 
-  @OneToMany
-  private Set<InterviewerTimeSlot> timeSlots;
+
+  @JsonIgnore
   @OneToMany
   private Set<Booking> bookings;
 
@@ -30,12 +32,15 @@ public class Interviewer extends User {
 
   }
 
-  @Transactional
-  public void addSlot(InterviewerTimeSlot slot) {
-    timeSlots.add(slot);
-  }
-
+  /**
+   * To be replaced by addInterviewer() in booking class.
+   *
+   * @param booking param
+   */
   public void addBooking(Booking booking) {
+    if (booking == null) {
+      bookings = new HashSet<>();
+    }
     bookings.add(booking);
     //todo check this
   }
@@ -44,7 +49,4 @@ public class Interviewer extends User {
     //todo implements this
   }
 
-  public Set<InterviewerTimeSlot> getSlots() {
-    return new HashSet<>(timeSlots);
-  }
 }
