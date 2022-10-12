@@ -7,9 +7,9 @@ import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import javax.persistence.EntityNotFoundException;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * User service.
@@ -40,9 +40,10 @@ public class UserService {
     return userRepository.save(new User(email, role));
   }
 
-  @Transactional
   public User create(String email) {
-    return userRepository.save(new User(email, UserRole.CANDIDATE));
+    User user = new User(email, UserRole.CANDIDATE);
+    System.out.println(user);
+    return userRepository.save(user);
   }
 
   public User save(User user) {
@@ -57,7 +58,7 @@ public class UserService {
    */
   public User getById(Long id) {
     try {
-      return userRepository.getReferenceById(id);
+      return (User) Hibernate.unproxy(userRepository.getReferenceById(id));
     } catch (EntityNotFoundException e) {
       throw new UserNotFoundException(id);
     }

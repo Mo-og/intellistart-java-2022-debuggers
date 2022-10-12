@@ -39,11 +39,10 @@ class InterviewPlanningApplicationTests {
     assertThat(bookingService.getBooking(1L)).isNotNull();
   }
 
-  //todo check if broken or wrong
-/*    @Test
+  @Test
   void addUserTest() {
     assertThat(userService.create("abc@gmail.com")).isNotNull();
-  }*/
+  }
 
   @Test
   @Transactional
