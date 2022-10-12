@@ -31,7 +31,7 @@ import org.hibernate.Hibernate;
 public class User {
 
   @Id
-  @SequenceGenerator(name = "user_seq", sequenceName = "user_sequence", allocationSize = 5)
+  @SequenceGenerator(name = "user_seq", sequenceName = "USER_SEQUENCE", allocationSize = 5)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
   @Column(nullable = false)
   private Long id;
