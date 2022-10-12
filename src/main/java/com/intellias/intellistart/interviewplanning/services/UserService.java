@@ -41,7 +41,9 @@ public class UserService {
   }
 
   public User create(String email) {
-    return userRepository.save(new User(email, UserRole.CANDIDATE));
+    User user = new User(email, UserRole.CANDIDATE);
+    System.out.println(user);
+    return userRepository.save(user);
   }
 
   public User save(User user) {
