@@ -1,11 +1,14 @@
 package com.intellias.intellistart.interviewplanning.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import lombok.Getter;
@@ -23,6 +26,8 @@ import org.hibernate.Hibernate;
 @ToString
 @RequiredArgsConstructor
 @Table(name = "COORDINATOR")
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
 
   @Id
@@ -42,6 +47,10 @@ public class User {
   public User(String email, UserRole userRole) {
     this.email = email;
     this.userRole = userRole;
+  }
+
+  public String getEmail() {
+    return email;
   }
 
   @Override

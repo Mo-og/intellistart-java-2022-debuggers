@@ -3,7 +3,7 @@ package com.intellias.intellistart.interviewplanning.controllers;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.intellias.intellistart.interviewplanning.services.CoordinatorService;
 import com.intellias.intellistart.interviewplanning.services.CoordinatorService.Dashboard;
-import com.intellias.intellistart.interviewplanning.services.UtilService;
+import com.intellias.intellistart.interviewplanning.services.WeekService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,12 +29,12 @@ public class WeekController {
 
   @GetMapping("/weeks/current")
   public WeekNum getCurrentWeekNum() {
-    return new WeekNum(UtilService.getCurrentWeekNum());
+    return new WeekNum(WeekService.getCurrentWeekNum());
   }
 
   @GetMapping("/weeks/next")
   public WeekNum getNextWeekNum() {
-    return new WeekNum(UtilService.getNextWeekNum());
+    return new WeekNum(WeekService.getNextWeekNum());
   }
 
   @GetMapping("/weeks/{weekId}/dashboard")

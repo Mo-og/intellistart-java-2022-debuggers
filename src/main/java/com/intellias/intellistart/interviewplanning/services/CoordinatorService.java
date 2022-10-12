@@ -8,7 +8,7 @@ import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
 import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSlotRepository;
-import com.intellias.intellistart.interviewplanning.repositories.TimeSlotRepository;
+import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CoordinatorService {
 
-  private final TimeSlotRepository interviewerTimeSlotRepository;
+  private final InterviewerTimeSlotRepository interviewerTimeSlotRepository;
   private final CandidateTimeSlotRepository candidateTimeSlotRepository;
   private final BookingRepository bookingRepository;
 
@@ -35,7 +35,7 @@ public class CoordinatorService {
    * @param bookingRepository             booking repository
    */
   @Autowired
-  public CoordinatorService(TimeSlotRepository interviewerTimeSlotRepository,
+  public CoordinatorService(InterviewerTimeSlotRepository interviewerTimeSlotRepository,
       CandidateTimeSlotRepository candidateTimeSlotRepository,
       BookingRepository bookingRepository) {
     this.interviewerTimeSlotRepository = interviewerTimeSlotRepository;
@@ -78,7 +78,7 @@ public class CoordinatorService {
    */
   public Map<DayOfWeek, List<CandidateTimeSlot>> getCandidateTimeSlotsByWeekId(int weekId) {
     return candidateTimeSlotRepository.findAll().stream()
-        .filter(slot -> UtilService.getWeekNumByDate(slot.getDate()) == weekId)
+        .filter(slot -> WeekService.getWeekNumByDate(slot.getDate()) == weekId)
         .collect(Collectors.groupingBy(slot -> slot.getDate().getDayOfWeek()));
   }
 
