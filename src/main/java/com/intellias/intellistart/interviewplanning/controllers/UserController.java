@@ -6,7 +6,6 @@ import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import com.intellias.intellistart.interviewplanning.services.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,13 +31,13 @@ public class UserController {
 
   @GetMapping("/interviewers/{interviewerId}")
   public User getInterviewerById(@PathVariable Long interviewerId) {
-    return (User) Hibernate.unproxy(interviewerService.getById(interviewerId));
+    return interviewerService.getById(interviewerId);
   }
 
   //to be removed
   @GetMapping("/users/{id}")
   public User getUser(@PathVariable Long id) {
-    return (User) Hibernate.unproxy(userService.getById(id));
+    return userService.getById(id);
   }
 
   //to be removed

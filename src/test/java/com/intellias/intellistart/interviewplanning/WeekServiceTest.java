@@ -19,6 +19,15 @@ class WeekServiceTest {
   }
 
   @Test
+  void testGetNextWeekForLastDateOfYearIsFirstWeekOfNextYear() {
+    var date = LocalDate.of(2022, 12, 31);
+    var a = WeekService.getWeekNumByDate(date);
+    var b = WeekService.getWeekNumByDate(date.plusWeeks(1));
+    log.debug(a + " != " + b);
+    assertThat(a).isNotEqualTo(b);
+  }
+
+  @Test
   void testGetNextSameAsGetFromDateWeekLater() {
     var a = WeekService.getNextWeekNum();
     var b = WeekService.getWeekNumByDate(LocalDate.now().plusWeeks(1));

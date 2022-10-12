@@ -9,6 +9,7 @@ import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Set;
 import javax.persistence.EntityNotFoundException;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -67,6 +68,9 @@ public class InterviewerService {
    * @return time slots of requested interviewer for current week and future weeks
    */
   public Set<InterviewerTimeSlot> getRelevantInterviewerSlots(Long interviewerId) {
+    if (!interviewerRepository.existsById(interviewerId)) {
+      throw new InterviewerNotFoundException(interviewerId);
+    }
     return interviewerTimeSlotRepository
         .getInterviewerTimeSlotForInterviewerIdAndWeekGreaterOrEqual(
             interviewerId, WeekService.getCurrentWeekNum());
@@ -100,7 +104,7 @@ public class InterviewerService {
    */
   public Interviewer getById(Long id) {
     try {
-      return interviewerRepository.getReferenceById(id);
+      return (Interviewer) Hibernate.unproxy(interviewerRepository.getReferenceById(id));
     } catch (EntityNotFoundException e) {
       throw new InterviewerNotFoundException(id);
     }
