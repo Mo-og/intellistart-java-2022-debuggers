@@ -47,6 +47,7 @@ public class ApplicationErrorException extends RuntimeException {
    */
   public enum ErrorCode {
     INTERVIEWER_NOT_FOUND(HttpStatus.NOT_FOUND, "interviewer_not_found"),
+    CANDIDATE_NOT_FOUND(HttpStatus.NOT_FOUND, "candidate_not_found"),
     SLOT_NOT_FOUND(HttpStatus.NOT_FOUND, "slot_not_found"),
     SLOT_IS_OVERLAPPING(HttpStatus.CONFLICT, "slot_is_overlapping"),
     INVALID_BOUNDARIES(HttpStatus.BAD_REQUEST, "invalid_boundaries"),
