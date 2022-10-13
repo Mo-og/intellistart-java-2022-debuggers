@@ -39,4 +39,15 @@ public class CustomExceptionHandler {
     return new ResponseEntity<>(exception, exception.getHttpStatus());
   }
 
+  /**
+   * Candidate not found exception handler.
+   *
+   * @return response with error code according to API requirements
+   */
+  @ExceptionHandler(ApplicationErrorException.class)
+  public ResponseEntity<ApplicationErrorException> candidateNotFound(
+          ApplicationErrorException exception) {
+    return new ResponseEntity<>(exception, exception.getHttpStatus());
+  }
+
 }
