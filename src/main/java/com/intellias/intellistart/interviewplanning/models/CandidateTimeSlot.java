@@ -1,5 +1,6 @@
 package com.intellias.intellistart.interviewplanning.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import javax.persistence.Column;
@@ -7,15 +8,25 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Candidate time slot.
  */
 @Entity
-@Data
+@Getter
+@Setter
+@ToString
 public class CandidateTimeSlot {
+
+  @ManyToOne
+  @JsonIgnore
+  Candidate candidate;
 
   @Id
   @SequenceGenerator(name = "cnd_seq", sequenceName = "candidate_slot_sequence", allocationSize = 5)
@@ -44,4 +55,10 @@ public class CandidateTimeSlot {
 
   public CandidateTimeSlot() {
   }
+
+  @Transactional
+  public void setCandidate(Candidate candidate) {
+    this.candidate = candidate;
+  }
+
 }
