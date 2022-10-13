@@ -11,8 +11,10 @@ import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSl
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -63,10 +65,11 @@ public class CoordinatorService {
    * @param weekId number of the week
    * @return Map with interviewers slots grouped by days
    */
-  public Map<DayOfWeek, List<InterviewerTimeSlot>> getInterviewerTimeSlotsByWeekId(int weekId) {
+  public Map<DayOfWeek, TreeSet<InterviewerTimeSlot>> getInterviewerTimeSlotsByWeekId(int weekId) {
     return interviewerTimeSlotRepository.findAll().stream()
         .filter(slot -> slot.getWeekNum() == weekId)
-        .collect(Collectors.groupingBy(InterviewerTimeSlot::getDayOfWeek));
+        .collect(Collectors.groupingBy(InterviewerTimeSlot::getDayOfWeek, Collectors.toCollection(
+            () -> new TreeSet<>(Comparator.comparing(InterviewerTimeSlot::getFrom)))));
   }
 
   /**
@@ -76,10 +79,12 @@ public class CoordinatorService {
    * @param weekId number of the week
    * @return Map with candidates slots grouped by days
    */
-  public Map<DayOfWeek, List<CandidateTimeSlot>> getCandidateTimeSlotsByWeekId(int weekId) {
+  public Map<DayOfWeek, TreeSet<CandidateTimeSlot>> getCandidateTimeSlotsByWeekId(int weekId) {
     return candidateTimeSlotRepository.findAll().stream()
         .filter(slot -> WeekService.getWeekNumByDate(slot.getDate()) == weekId)
-        .collect(Collectors.groupingBy(slot -> slot.getDate().getDayOfWeek()));
+        .collect(
+            Collectors.groupingBy(slot -> slot.getDate().getDayOfWeek(), Collectors.toCollection(
+                () -> new TreeSet<>(Comparator.comparing(CandidateTimeSlot::getFrom)))));
   }
 
   /**
@@ -88,10 +93,11 @@ public class CoordinatorService {
    * @param weekId number of the week
    * @return Map with bookings grouped by days
    */
-  public Map<DayOfWeek, List<Booking>> getBookingsByWeekId(int weekId) {
+  public Map<DayOfWeek, TreeSet<Booking>> getBookingsByWeekId(int weekId) {
     return bookingRepository.findAll().stream()
         .filter(booking -> booking.getInterviewerSlot().getWeekNum() == weekId)
-        .collect(Collectors.groupingBy(booking -> booking.getInterviewerSlot().getDayOfWeek()));
+        .collect(Collectors.groupingBy(booking -> booking.getInterviewerSlot().getDayOfWeek(),
+            Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Booking::getFrom)))));
   }
 
   public boolean updateInterviewerTimeSlot() {
@@ -139,9 +145,9 @@ public class CoordinatorService {
    */
   public static class Dashboard {
 
-    private final Map<DayOfWeek, List<InterviewerTimeSlot>> interviewerTimeSlots;
-    private final Map<DayOfWeek, List<CandidateTimeSlot>> candidateTimeSlots;
-    private final Map<DayOfWeek, List<Booking>> bookings;
+    private final Map<DayOfWeek, TreeSet<InterviewerTimeSlot>> interviewerTimeSlots;
+    private final Map<DayOfWeek, TreeSet<CandidateTimeSlot>> candidateTimeSlots;
+    private final Map<DayOfWeek, TreeSet<Booking>> bookings;
 
     /**
      * Constructor.
@@ -150,26 +156,26 @@ public class CoordinatorService {
      * @param candidateTimeSlots   map with candidates slots grouped by days
      * @param bookings             map with bookings grouped by days
      */
-    public Dashboard(Map<DayOfWeek, List<InterviewerTimeSlot>> interviewerTimeSlots,
-        Map<DayOfWeek, List<CandidateTimeSlot>> candidateTimeSlots,
-        Map<DayOfWeek, List<Booking>> bookings) {
+    public Dashboard(Map<DayOfWeek, TreeSet<InterviewerTimeSlot>> interviewerTimeSlots,
+        Map<DayOfWeek, TreeSet<CandidateTimeSlot>> candidateTimeSlots,
+        Map<DayOfWeek, TreeSet<Booking>> bookings) {
       this.interviewerTimeSlots = interviewerTimeSlots;
       this.candidateTimeSlots = candidateTimeSlots;
       this.bookings = bookings;
     }
 
     @JsonGetter("weekInterviewerSlots")
-    public Map<DayOfWeek, List<InterviewerTimeSlot>> getInterviewerTimeSlots() {
+    public Map<DayOfWeek, TreeSet<InterviewerTimeSlot>> getInterviewerTimeSlots() {
       return interviewerTimeSlots;
     }
 
     @JsonGetter("weekCandidateSlots")
-    public Map<DayOfWeek, List<CandidateTimeSlot>> getCandidateTimeSlots() {
+    public Map<DayOfWeek, TreeSet<CandidateTimeSlot>> getCandidateTimeSlots() {
       return candidateTimeSlots;
     }
 
     @JsonGetter("weekBookings")
-    public Map<DayOfWeek, List<Booking>> getBookings() {
+    public Map<DayOfWeek, TreeSet<Booking>> getBookings() {
       return bookings;
     }
   }
