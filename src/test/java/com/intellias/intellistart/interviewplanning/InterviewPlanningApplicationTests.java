@@ -9,6 +9,7 @@ import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.services.BookingService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import com.intellias.intellistart.interviewplanning.services.UserService;
+import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,8 +31,8 @@ class InterviewPlanningApplicationTests {
   @Test
   @Transactional
   void createBookingTest() {
-    assertThat(bookingService.createBooking(new CandidateTimeSlot(),
-        new InterviewerTimeSlot())).isNotNull();
+    assertThat(bookingService.createBooking(LocalTime.now(),LocalTime.now(),new CandidateTimeSlot(),
+        new InterviewerTimeSlot(),"sub","desc")).isNotNull();
   }
 
   @Test
