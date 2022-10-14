@@ -26,7 +26,9 @@ public class Booking {
   private LocalTime from;
   @Column(name = "to_time")
   private LocalTime to;
+  @Column(name = "booking_sub")
   private String subject;
+  @Column(name = "booking_desc")
   private String description;
   @ManyToOne
   private CandidateTimeSlot candidateSlot;
