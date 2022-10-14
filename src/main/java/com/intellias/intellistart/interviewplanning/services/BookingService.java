@@ -1,6 +1,5 @@
 package com.intellias.intellistart.interviewplanning.services;
 
-import ch.qos.logback.core.util.Loader;
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
@@ -23,24 +22,38 @@ public class BookingService {
   }
 
   /**
-   * CreateBook.
+   * Create booking.
    *
+   * @param from            start time
+   * @param to              end time
    * @param candidateSlot   candidate slot
-   * @param interviewerSlot interviewer Slot
-   * @return booking
+   * @param interviewerSlot interviewer slot
+   * @param subject         subject
+   * @param description     description of this booking
+   * @return created booking
    */
-  public Booking createBooking(CandidateTimeSlot candidateSlot,
-      InterviewerTimeSlot interviewerSlot) {
-    //Todo calculate possible time
-    return bookingRepository.save(new Booking(candidateSlot, interviewerSlot));
-  }
-
   public Booking createBooking(LocalTime from, LocalTime to, CandidateTimeSlot candidateSlot,
-      InterviewerTimeSlot interviewerSlot) {
+      InterviewerTimeSlot interviewerSlot, String subject, String description) {
     //Todo calculate possible time
-    return bookingRepository.save(new Booking(from, to, candidateSlot, interviewerSlot));
+    return bookingRepository.save(
+        new Booking(from, to, candidateSlot, interviewerSlot, subject, description));
   }
 
+  /**
+   * Update existing booking.
+   *
+   * @param id booking id
+   * @param newBooking object with data to update
+   * @return booking with new parameters
+   */
+  public Booking updateBooking(long id, Booking newBooking) {
+    Booking booking = bookingRepository.getReferenceById(id);
+    booking.setFrom(newBooking.getFrom());
+    booking.setTo(newBooking.getTo());
+    booking.setSubject(newBooking.getSubject());
+    booking.setDescription(newBooking.getDescription());
+    return booking;
+  }
 
   public Booking saveBooking(Booking booking) {
     return bookingRepository.save(booking);
