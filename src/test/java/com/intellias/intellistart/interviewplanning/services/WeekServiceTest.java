@@ -1,8 +1,7 @@
-package com.intellias.intellistart.interviewplanning;
+package com.intellias.intellistart.interviewplanning.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.intellias.intellistart.interviewplanning.services.WeekService;
 import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
