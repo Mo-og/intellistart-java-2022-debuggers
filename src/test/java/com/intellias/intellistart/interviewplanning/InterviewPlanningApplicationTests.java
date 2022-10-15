@@ -26,7 +26,6 @@ class InterviewPlanningApplicationTests {
   @Autowired
   private UserService userService;
 
-
   @Test
   @Transactional
   void createBookingTest() {
