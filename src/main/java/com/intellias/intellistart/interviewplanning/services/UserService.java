@@ -1,11 +1,13 @@
 package com.intellias.intellistart.interviewplanning.services;
 
-import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundException;
+import com.intellias.intellistart.interviewplanning.exceptions.CoordinatorNotFoundException;
+import com.intellias.intellistart.interviewplanning.models.Candidate;
 import com.intellias.intellistart.interviewplanning.models.Interviewer;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
+import com.intellias.intellistart.interviewplanning.repositories.CandidateRepository;
+import com.intellias.intellistart.interviewplanning.repositories.CoordinatorRepository;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerRepository;
-import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import javax.persistence.EntityNotFoundException;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +19,24 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
-  private final UserRepository userRepository;
+  private final CoordinatorRepository coordinatorRepository;
   private final InterviewerRepository interviewerRepository;
+  private final CandidateRepository candidateRepository;
 
+  /**
+   * Main constructor.
+   *
+   * @param coordinatorRepository coordinatorRepository to inject into service
+   * @param interviewerRepository interviewerRepository to inject into service
+   * @param candidateRepository   candidateRepository to inject into service
+   */
   @Autowired
-  public UserService(UserRepository repository, InterviewerRepository interviewerRepository) {
-    this.userRepository = repository;
+  public UserService(CoordinatorRepository coordinatorRepository,
+      InterviewerRepository interviewerRepository,
+      CandidateRepository candidateRepository) {
+    this.coordinatorRepository = coordinatorRepository;
     this.interviewerRepository = interviewerRepository;
+    this.candidateRepository = candidateRepository;
   }
 
   /**
@@ -34,18 +47,32 @@ public class UserService {
    * @return user with generated id
    */
   public User create(String email, UserRole role) {
-    if (role == UserRole.INTERVIEWER) {
-      return interviewerRepository.save(new Interviewer(email));
+    switch (role) {
+      case INTERVIEWER:
+        return interviewerRepository.save(new Interviewer(email));
+      case COORDINATOR:
+        return coordinatorRepository.save(new User(email, role));
+      case CANDIDATE:
+        return candidateRepository.save(new Candidate(email));
+      default:
+        throw new IllegalArgumentException("Illegal role");
     }
-    return userRepository.save(new User(email, role));
   }
 
-  public User create(String email) {
-    return userRepository.save(new User(email, UserRole.CANDIDATE));
+  public Candidate create(String email) {
+    return candidateRepository.save(new Candidate(email));
   }
 
-  public User save(User user) {
-    return userRepository.save(user);
+  public User save(User coordinator) {
+    return coordinatorRepository.save(coordinator);
+  }
+
+  public User save(Interviewer interviewer) {
+    return interviewerRepository.save(interviewer);
+  }
+
+  public User save(Candidate candidate) {
+    return candidateRepository.save(candidate);
   }
 
   /**
@@ -54,16 +81,25 @@ public class UserService {
    * @param id user id
    * @return user with any role
    */
-  public User getById(Long id) {
+  public User getCoordinatorById(Long id) {
     try {
-      return (User) Hibernate.unproxy(userRepository.getReferenceById(id));
+      return (User) Hibernate.unproxy(coordinatorRepository.getReferenceById(id));
     } catch (EntityNotFoundException e) {
-      throw new UserNotFoundException(id);
+      throw new CoordinatorNotFoundException(id);
     }
   }
 
-  public void removeUser(Long id) {
-    userRepository.deleteById(id);
+  /**
+   * Removes coordinator from database if id is valid or throws CoordinatorNotFoundException.
+   *
+   * @param id id to delete by
+   */
+  public void removeCoordinatorById(Long id) {
+    try {
+      coordinatorRepository.deleteById(id);
+    } catch (EntityNotFoundException e) {
+      throw new CoordinatorNotFoundException(id);
+    }
   }
 
 }

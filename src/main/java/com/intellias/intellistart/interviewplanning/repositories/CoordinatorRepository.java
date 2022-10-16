@@ -8,5 +8,6 @@ import org.springframework.stereotype.Repository;
  * Save users.
  */
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface CoordinatorRepository extends JpaRepository<User, Long> {
+
 }

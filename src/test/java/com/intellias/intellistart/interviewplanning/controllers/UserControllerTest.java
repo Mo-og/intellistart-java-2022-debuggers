@@ -12,8 +12,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.intellias.intellistart.interviewplanning.exceptions.InterviewerNotFoundException;
+import com.intellias.intellistart.interviewplanning.models.Candidate;
 import com.intellias.intellistart.interviewplanning.models.Interviewer;
-import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerRepository;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
@@ -39,19 +39,19 @@ class UserControllerTest {
   @MockBean
   private InterviewerRepository interviewerRepository;
   private static final String email = "test.interviewer@gmail.com";
-  private static final User testUser = new User(email, UserRole.INTERVIEWER);
+  private static final Candidate testCandidate = new Candidate(email);
   private static final Interviewer testInterviewer = new Interviewer(email);
 
   static {
-    testUser.setId(1L);
+    testCandidate.setId(1L);
     testInterviewer.setId(1L);
   }
 
 
   @Test
   void testCreateUser() {
-    when(userService.create(email)).thenReturn(testUser);
-    checkResponseOk(post("/users"), json(email), json(testUser), this.mockMvc);
+    when(userService.create(email)).thenReturn(testCandidate);
+    checkResponseOk(post("/users"), json(email), json(testCandidate), this.mockMvc);
   }
 
   @Test
@@ -90,8 +90,8 @@ class UserControllerTest {
 
   @Test
   void testGetUser() {
-    when(userService.getById(1L)).thenReturn(testUser);
+    when(userService.getCoordinatorById(1L)).thenReturn(testCandidate);
     checkResponseOk(get("/users/{id}", 1),
-        null, json(testUser), this.mockMvc);
+        null, json(testCandidate), this.mockMvc);
   }
 }

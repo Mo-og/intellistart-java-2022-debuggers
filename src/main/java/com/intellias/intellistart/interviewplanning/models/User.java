@@ -62,7 +62,10 @@ public class User {
       return false;
     }
     User user = (User) o;
-    return id != null && Objects.equals(id, user.id);
+    if (id != null) {
+      return Objects.equals(id, user.id);
+    }
+    return Objects.equals(email, user.email) && userRole == user.userRole;
   }
 
   @Override
