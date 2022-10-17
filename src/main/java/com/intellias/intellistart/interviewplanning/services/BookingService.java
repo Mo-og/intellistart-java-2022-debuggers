@@ -1,10 +1,7 @@
 package com.intellias.intellistart.interviewplanning.services;
 
 import com.intellias.intellistart.interviewplanning.models.Booking;
-import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
-import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
-import java.time.LocalTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,28 +18,15 @@ public class BookingService {
     this.bookingRepository = bookingRepository;
   }
 
-  /**
-   * Create booking.
-   *
-   * @param from            start time
-   * @param to              end time
-   * @param candidateSlot   candidate slot
-   * @param interviewerSlot interviewer slot
-   * @param subject         subject
-   * @param description     description of this booking
-   * @return created booking
-   */
-  public Booking createBooking(LocalTime from, LocalTime to, CandidateTimeSlot candidateSlot,
-      InterviewerTimeSlot interviewerSlot, String subject, String description) {
+  public Booking createBooking(Booking booking) {
     //Todo calculate possible time
-    return bookingRepository.save(
-        new Booking(from, to, candidateSlot, interviewerSlot, subject, description));
+    return bookingRepository.save(booking);
   }
 
   /**
    * Update existing booking.
    *
-   * @param id booking id
+   * @param id         booking id
    * @param newBooking object with data to update
    * @return booking with new parameters
    */
