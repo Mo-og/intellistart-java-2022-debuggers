@@ -26,7 +26,8 @@ public class Booking {
   private LocalTime from;
   @Column(name = "to_time")
   private LocalTime to;
-  private BookingStatus status;
+  private String subject;
+  private String description;
   @ManyToOne
   private CandidateTimeSlot candidateSlot;
 
@@ -40,36 +41,20 @@ public class Booking {
    * @param to              end time
    * @param candidateSlot   candidate slot
    * @param interviewerSlot interviewer slot
+   * @param subject         subject
+   * @param description     description of this booking
    */
   public Booking(LocalTime from, LocalTime to, CandidateTimeSlot candidateSlot,
-                 InterviewerTimeSlot interviewerSlot) {
+      InterviewerTimeSlot interviewerSlot, String subject, String description) {
     //TODO: better way to create booking
     this.from = from;
     this.to = to;
     this.candidateSlot = candidateSlot;
     this.interviewerSlot = interviewerSlot;
-    status = BookingStatus.NEW;
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param candidateSlot   candidate slot
-   * @param interviewerSlot interviewer slot
-   */
-  public Booking(CandidateTimeSlot candidateSlot, InterviewerTimeSlot interviewerSlot) {
-    this.candidateSlot = candidateSlot;
-    this.interviewerSlot = interviewerSlot;
-    status = BookingStatus.NEW;
+    this.subject = subject;
+    this.description = description;
   }
 
   public Booking() {
-  }
-
-  /**
-   * Booking statuses. Default is NEW.
-   */
-  public enum BookingStatus {
-    NEW, CHANGED, PRE_BOOKED, BOOKED, DELETED
   }
 }
