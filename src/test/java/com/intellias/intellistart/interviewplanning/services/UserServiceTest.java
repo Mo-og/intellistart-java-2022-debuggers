@@ -26,12 +26,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class UserServiceTest {
 
   public static final String CANDIDATE_EMAIL = "test.candidate@test.com";
-  public static final String INTERVIEWER_EMAIL = "test.interviewer@test.com";
   public static final String COORDINATOR_EMAIL = "test.coordinator@test.com";
   private static final Candidate newCandidate = new Candidate(CANDIDATE_EMAIL);
   private static final Candidate candidate = new Candidate(CANDIDATE_EMAIL);
-  private static final Interviewer newInterviewer = new Interviewer(INTERVIEWER_EMAIL);
-  private static final Interviewer interviewer = new Interviewer(INTERVIEWER_EMAIL);
+  private static final Interviewer newInterviewer = new Interviewer(
+      InterviewerServiceTest.INTERVIEWER_EMAIL);
+  private static final Interviewer interviewer = new Interviewer(
+      InterviewerServiceTest.INTERVIEWER_EMAIL);
   private static final User newCoordinator = new User(COORDINATOR_EMAIL,
       UserRole.COORDINATOR);
   private static final User coordinator = new User(COORDINATOR_EMAIL,
@@ -84,7 +85,8 @@ class UserServiceTest {
     when(mockedInterviewerRepository
         .save(newInterviewer))
         .thenReturn(interviewer);
-    var savedInterviewer = service.create(INTERVIEWER_EMAIL, UserRole.INTERVIEWER);
+    var savedInterviewer = service.create(InterviewerServiceTest.INTERVIEWER_EMAIL,
+        UserRole.INTERVIEWER);
     assertEquals(interviewer.getId(), savedInterviewer.getId());
     assertEquals(interviewer.getUserRole(), savedInterviewer.getUserRole());
     assertEquals(interviewer.getEmail(), savedInterviewer.getEmail());
