@@ -42,7 +42,7 @@ public class WeekController {
     return coordinatorService.getWeekDashboard(weekId);
   }
 
-  private static class WeekNum {
+  static class WeekNum {
 
     private final int num;
 

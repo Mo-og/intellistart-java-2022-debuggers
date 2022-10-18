@@ -46,27 +46,20 @@ public class ApplicationErrorException extends RuntimeException {
    * API error codes enum that delivers necessary statuses.
    */
   public enum ErrorCode {
-    INTERVIEWER_NOT_FOUND(HttpStatus.NOT_FOUND, "interviewer_not_found"),
     CANDIDATE_NOT_FOUND(HttpStatus.NOT_FOUND, "candidate_not_found"),
+    INTERVIEWER_NOT_FOUND(HttpStatus.NOT_FOUND, "interviewer_not_found"),
+    COORDINATOR_NOT_FOUND(HttpStatus.NOT_FOUND, "coordinator_not_found"),
     SLOT_NOT_FOUND(HttpStatus.NOT_FOUND, "slot_not_found"),
     SLOT_IS_OVERLAPPING(HttpStatus.CONFLICT, "slot_is_overlapping"),
     INVALID_BOUNDARIES(HttpStatus.BAD_REQUEST, "invalid_boundaries"),
     INVALID_DAY_OF_WEEK(HttpStatus.BAD_REQUEST, "invalid_day_of_week"),
     CANNOT_EDIT_THIS_WEEK(HttpStatus.METHOD_NOT_ALLOWED, "cannot_edit_this_week");
-    private final String code;
-    private final HttpStatus httpStatus;
+    public final String code;
+    public final HttpStatus httpStatus;
 
     ErrorCode(HttpStatus httpStatus, String code) {
       this.code = code;
       this.httpStatus = httpStatus;
-    }
-
-    public String getCode() {
-      return code;
-    }
-
-    public HttpStatus getHttpStatus() {
-      return httpStatus;
     }
   }
 
