@@ -1,10 +1,10 @@
 package com.intellias.intellistart.interviewplanning.services;
 
 import com.intellias.intellistart.interviewplanning.exceptions.InterviewerNotFoundException;
-import com.intellias.intellistart.interviewplanning.models.Interviewer;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
-import com.intellias.intellistart.interviewplanning.repositories.InterviewerRepository;
+import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
+import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Set;
@@ -20,19 +20,19 @@ import org.springframework.stereotype.Service;
 public class InterviewerService {
 
   private final InterviewerTimeSlotRepository interviewerTimeSlotRepository;
-  private final InterviewerRepository interviewerRepository;
+  private final UserRepository userRepository;
 
   /**
    * Constructor.
    *
    * @param interviewerTimeSlotRepository time slot repository bean
-   * @param interviewerRepository         interviewer repository bean
+   * @param userRepository                user repository bean
    */
   @Autowired
   public InterviewerService(InterviewerTimeSlotRepository interviewerTimeSlotRepository,
-      InterviewerRepository interviewerRepository) {
+      UserRepository userRepository) {
     this.interviewerTimeSlotRepository = interviewerTimeSlotRepository;
-    this.interviewerRepository = interviewerRepository;
+    this.userRepository = userRepository;
   }
 
   /**
@@ -45,7 +45,7 @@ public class InterviewerService {
   public InterviewerTimeSlot createSlot(Long interviewerId,
       InterviewerTimeSlot interviewerTimeSlot) {
     //todo validation of slot
-    Interviewer interviewer = interviewerRepository.getReferenceById(interviewerId);
+    User interviewer = userRepository.getReferenceById(interviewerId);
     interviewerTimeSlot.setInterviewer(interviewer);
     return interviewerTimeSlotRepository.saveAndFlush(interviewerTimeSlot);
 
@@ -68,7 +68,7 @@ public class InterviewerService {
    * @return time slots of requested interviewer for current week and future weeks
    */
   public Set<InterviewerTimeSlot> getRelevantInterviewerSlots(Long interviewerId) {
-    if (!interviewerRepository.existsById(interviewerId)) {
+    if (!userRepository.existsById(interviewerId)) {
       throw new InterviewerNotFoundException(interviewerId);
     }
     return interviewerTimeSlotRepository
@@ -102,9 +102,9 @@ public class InterviewerService {
    * @param id interviewer id to look for
    * @return interviewer stored by given id
    */
-  public Interviewer getById(Long id) {
+  public User getById(Long id) {
     try {
-      return (Interviewer) Hibernate.unproxy(interviewerRepository.getReferenceById(id));
+      return (User) Hibernate.unproxy(userRepository.getReferenceById(id));
     } catch (EntityNotFoundException e) {
       throw new InterviewerNotFoundException(id);
     }

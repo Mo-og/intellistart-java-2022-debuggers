@@ -35,7 +35,8 @@ public class InterviewerTimeSlot {
   private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("HH:mm");
   @ManyToOne
   @JsonIgnore
-  Interviewer interviewer;
+  User interviewer;
+
   @Id
   @SequenceGenerator(name = "interv_seq", sequenceName = "interviewer_slot_seq", allocationSize = 5)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "interv_seq")
@@ -65,7 +66,7 @@ public class InterviewerTimeSlot {
   }
 
   @Transactional
-  public void setInterviewer(Interviewer interviewer) {
+  public void setInterviewer(User interviewer) {
     this.interviewer = interviewer;
   }
 

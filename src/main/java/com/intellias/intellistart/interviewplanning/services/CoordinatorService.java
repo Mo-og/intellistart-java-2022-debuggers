@@ -3,7 +3,6 @@ package com.intellias.intellistart.interviewplanning.services;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
-import com.intellias.intellistart.interviewplanning.models.Interviewer;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
@@ -112,7 +111,7 @@ public class CoordinatorService {
     return true;
   }
 
-  public List<Interviewer> getAllInterviewers() {
+  public List<User> getAllInterviewers() {
     return new ArrayList<>();
   }
 
