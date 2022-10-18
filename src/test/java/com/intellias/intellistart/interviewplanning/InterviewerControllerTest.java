@@ -17,7 +17,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.intellias.intellistart.interviewplanning.controllers.UserController;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
-import com.intellias.intellistart.interviewplanning.repositories.InterviewerRepository;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import com.intellias.intellistart.interviewplanning.services.UserService;
 import java.nio.charset.StandardCharsets;
@@ -49,8 +48,6 @@ class InterviewerControllerTest {
   private InterviewerService interviewerService;
   @MockBean
   private UserService userService;
-  @MockBean
-  private InterviewerRepository interviewerRepository;
 
   @SneakyThrows
   private static String json(Object o) {
