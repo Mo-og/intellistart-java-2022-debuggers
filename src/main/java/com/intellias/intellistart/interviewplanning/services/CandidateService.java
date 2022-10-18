@@ -2,10 +2,10 @@ package com.intellias.intellistart.interviewplanning.services;
 
 import com.intellias.intellistart.interviewplanning.exceptions.CandidateNotFoundException;
 import com.intellias.intellistart.interviewplanning.exceptions.TimeSlotNotFoundException;
-import com.intellias.intellistart.interviewplanning.models.Candidate;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
-import com.intellias.intellistart.interviewplanning.repositories.CandidateRepository;
+import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSlotRepository;
+import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import java.util.Set;
 import javax.persistence.EntityNotFoundException;
 import org.hibernate.Hibernate;
@@ -19,19 +19,19 @@ import org.springframework.stereotype.Service;
 public class CandidateService {
 
   private final CandidateTimeSlotRepository candidateTimeSlotRepository;
-  private final CandidateRepository candidateRepository;
+  private final UserRepository userRepository;
 
   /**
    * Constructor.
    *
    * @param candidateTimeSlotRepository time slot repository bean
-   * @param candidateRepository         candidate repository bean
+   * @param userRepository              user repository bean
    */
   @Autowired
   public CandidateService(CandidateTimeSlotRepository candidateTimeSlotRepository,
-      CandidateRepository candidateRepository) {
+      UserRepository userRepository) {
     this.candidateTimeSlotRepository = candidateTimeSlotRepository;
-    this.candidateRepository = candidateRepository;
+    this.userRepository = userRepository;
   }
 
 
@@ -45,7 +45,7 @@ public class CandidateService {
   public CandidateTimeSlot createSlot(Long candidateId,
       CandidateTimeSlot candidateTimeSlot) {
     //todo validation of slot
-    Candidate candidate = candidateRepository.getReferenceById(candidateId);
+    User candidate = userRepository.getReferenceById(candidateId);
     candidateTimeSlot.setCandidate(candidate);
     return candidateTimeSlotRepository.saveAndFlush(candidateTimeSlot);
 
@@ -68,7 +68,7 @@ public class CandidateService {
    * @return time slots of requested candidate for current week and future weeks
    */
   public Set<CandidateTimeSlot> getRelevantCandidateSlots(Long candidateId) {
-    if (!candidateRepository.existsById(candidateId)) {
+    if (!userRepository.existsById(candidateId)) {
       throw new CandidateNotFoundException(candidateId);
     }
     return candidateTimeSlotRepository
@@ -101,9 +101,9 @@ public class CandidateService {
    * @param id candidate id to look for
    * @return candidate stored by given id
    */
-  public Candidate getById(Long id) {
+  public User getById(Long id) {
     try {
-      return (Candidate) Hibernate.unproxy(candidateRepository.getReferenceById(id));
+      return (User) Hibernate.unproxy(userRepository.getReferenceById(id));
     } catch (EntityNotFoundException e) {
       throw new CandidateNotFoundException(id);
     }

@@ -26,7 +26,7 @@ public class CandidateTimeSlot {
 
   @ManyToOne
   @JsonIgnore
-  Candidate candidate;
+  User candidate;
 
   @Id
   @SequenceGenerator(name = "cnd_seq", sequenceName = "candidate_slot_sequence", allocationSize = 5)
@@ -57,7 +57,7 @@ public class CandidateTimeSlot {
   }
 
   @Transactional
-  public void setCandidate(Candidate candidate) {
+  public void setCandidate(User candidate) {
     this.candidate = candidate;
   }
 
