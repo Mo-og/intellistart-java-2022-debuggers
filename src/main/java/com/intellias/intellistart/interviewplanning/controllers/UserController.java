@@ -43,10 +43,10 @@ public class UserController {
   //to be removed
   @PostMapping("/users")
   public User postUser(@RequestBody TextNode email) {
-    return userService.create(email.asText());
+    return userService.create(email.asText(), UserRole.CANDIDATE);
   }
 
-  //to be removed (?)
+  //to be removed
   @PostMapping("/interviewers")
   public User postInterviewer(@RequestBody TextNode email) {
     return userService.create(email.asText(), UserRole.INTERVIEWER);
