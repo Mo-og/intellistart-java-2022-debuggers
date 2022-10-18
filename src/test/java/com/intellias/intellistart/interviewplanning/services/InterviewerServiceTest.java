@@ -1,8 +1,9 @@
 package com.intellias.intellistart.interviewplanning.services;
 
-import com.intellias.intellistart.interviewplanning.models.Interviewer;
-import com.intellias.intellistart.interviewplanning.repositories.InterviewerRepository;
+import com.intellias.intellistart.interviewplanning.models.User;
+import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
+import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -12,8 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class InterviewerServiceTest {
 
   public static final String INTERVIEWER_EMAIL = "test.interviewer@test.com";
-  private static final Interviewer newInterviewer = new Interviewer(INTERVIEWER_EMAIL);
-  private static final Interviewer interviewer = new Interviewer(INTERVIEWER_EMAIL);
+  private static final User newInterviewer = new User(INTERVIEWER_EMAIL, UserRole.INTERVIEWER);
+  private static final User interviewer = new User(INTERVIEWER_EMAIL, UserRole.INTERVIEWER);
 
   static {
     interviewer.setId(1L);
@@ -22,23 +23,12 @@ class InterviewerServiceTest {
   @Mock
   private InterviewerTimeSlotRepository mockedInterviewerTimeSlotRepository;
   @Mock
-  private InterviewerRepository mockedInterviewerRepository;
+  private UserRepository userRepository;
   private InterviewerService service;
 
   @BeforeEach
   void setService() {
     service = new InterviewerService(mockedInterviewerTimeSlotRepository,
-        mockedInterviewerRepository);
+        userRepository);
   }
-
-/*  @Test
-  void testCreateCandidateByEmail() {
-    when(mockedCandidateRepository
-        .save(newCandidate))
-        .thenReturn(candidate);
-    var createdCandidate = service.create(CANDIDATE_EMAIL);
-    assertEquals(candidate.getId(), createdCandidate.getId());
-    assertEquals(candidate.getUserRole(), createdCandidate.getUserRole());
-    assertEquals(candidate.getEmail(), createdCandidate.getEmail());
-  }*/
 }

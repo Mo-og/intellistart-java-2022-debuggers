@@ -8,13 +8,9 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import com.intellias.intellistart.interviewplanning.exceptions.CoordinatorNotFoundException;
-import com.intellias.intellistart.interviewplanning.models.Candidate;
-import com.intellias.intellistart.interviewplanning.models.Interviewer;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
-import com.intellias.intellistart.interviewplanning.repositories.CandidateRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
-import com.intellias.intellistart.interviewplanning.repositories.InterviewerRepository;
 import javax.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,12 +23,12 @@ class UserServiceTest {
 
   public static final String CANDIDATE_EMAIL = "test.candidate@test.com";
   public static final String COORDINATOR_EMAIL = "test.coordinator@test.com";
-  private static final Candidate newCandidate = new Candidate(CANDIDATE_EMAIL);
-  private static final Candidate candidate = new Candidate(CANDIDATE_EMAIL);
-  private static final Interviewer newInterviewer = new Interviewer(
-      InterviewerServiceTest.INTERVIEWER_EMAIL);
-  private static final Interviewer interviewer = new Interviewer(
-      InterviewerServiceTest.INTERVIEWER_EMAIL);
+  private static final User newCandidate = new User(CANDIDATE_EMAIL, UserRole.CANDIDATE);
+  private static final User candidate = new User(CANDIDATE_EMAIL, UserRole.CANDIDATE);
+  private static final User newInterviewer = new User(
+      InterviewerServiceTest.INTERVIEWER_EMAIL, UserRole.INTERVIEWER);
+  private static final User interviewer = new User(
+      InterviewerServiceTest.INTERVIEWER_EMAIL, UserRole.INTERVIEWER);
   private static final User newCoordinator = new User(COORDINATOR_EMAIL,
       UserRole.COORDINATOR);
   private static final User coordinator = new User(COORDINATOR_EMAIL,
@@ -45,25 +41,20 @@ class UserServiceTest {
   }
 
   @Mock
-  UserRepository mockedCoordinatorRepository;
-  @Mock
-  InterviewerRepository mockedInterviewerRepository;
-  @Mock
-  CandidateRepository mockedCandidateRepository;
+  UserRepository userRepository;
   private UserService service;
 
   @BeforeEach
   void setService() {
-    service = new UserService(mockedCoordinatorRepository, mockedInterviewerRepository,
-        mockedCandidateRepository);
+    service = new UserService(userRepository);
   }
 
   @Test
   void testCreateCandidateByEmail() {
-    when(mockedCandidateRepository
+    when(userRepository
         .save(newCandidate))
         .thenReturn(candidate);
-    var createdCandidate = service.create(CANDIDATE_EMAIL);
+    var createdCandidate = service.create(CANDIDATE_EMAIL, UserRole.CANDIDATE);
     assertEquals(candidate.getId(), createdCandidate.getId());
     assertEquals(candidate.getUserRole(), createdCandidate.getUserRole());
     assertEquals(candidate.getEmail(), createdCandidate.getEmail());
@@ -71,7 +62,7 @@ class UserServiceTest {
 
   @Test
   void testCreateCandidateByRole() {
-    when(mockedCandidateRepository
+    when(userRepository
         .save(newCandidate))
         .thenReturn(candidate);
     var createdCandidate = service.create(CANDIDATE_EMAIL, UserRole.CANDIDATE);
@@ -82,7 +73,7 @@ class UserServiceTest {
 
   @Test
   void testCreateInterviewerByRole() {
-    when(mockedInterviewerRepository
+    when(userRepository
         .save(newInterviewer))
         .thenReturn(interviewer);
     var savedInterviewer = service.create(InterviewerServiceTest.INTERVIEWER_EMAIL,
@@ -94,7 +85,7 @@ class UserServiceTest {
 
   @Test
   void testCreateCoordinatorByRole() {
-    when(mockedCoordinatorRepository
+    when(userRepository
         .save(newCoordinator))
         .thenReturn(coordinator);
     var savedCoordinator = service.create(COORDINATOR_EMAIL, UserRole.COORDINATOR);
@@ -105,7 +96,7 @@ class UserServiceTest {
 
   @Test
   void testSaveCandidateCorrectly() {
-    when(mockedCandidateRepository
+    when(userRepository
         .save(candidate))
         .thenReturn(candidate);
     var savedCandidate = service.save(candidate);
@@ -116,7 +107,7 @@ class UserServiceTest {
 
   @Test
   void testSaveInterviewerCorrectly() {
-    when(mockedInterviewerRepository
+    when(userRepository
         .save(interviewer))
         .thenReturn(interviewer);
     var savedInterviewer = service.save(interviewer);
@@ -127,7 +118,7 @@ class UserServiceTest {
 
   @Test
   void testSaveCoordinatorCorrectly() {
-    when(mockedCoordinatorRepository
+    when(userRepository
         .save(coordinator))
         .thenReturn(coordinator);
     var savedCoordinator = service.save(coordinator);
@@ -138,7 +129,7 @@ class UserServiceTest {
 
   @Test
   void testGetById() {
-    when(mockedCoordinatorRepository
+    when(userRepository
         .getReferenceById(1L))
         .thenReturn(coordinator);
     var coordinatorById = service.getCoordinatorById(1L);
@@ -149,7 +140,7 @@ class UserServiceTest {
 
   @Test
   void testGetByWrongId() {
-    when(mockedCoordinatorRepository
+    when(userRepository
         .getReferenceById(-1L))
         .thenThrow(new EntityNotFoundException());
     assertThrows(CoordinatorNotFoundException.class, () -> service.getCoordinatorById(-1L));
@@ -157,13 +148,13 @@ class UserServiceTest {
 
   @Test
   void testRemoveByWrongId() {
-    doThrow(new EntityNotFoundException()).when(mockedCoordinatorRepository).deleteById(-1L);
+    doThrow(new EntityNotFoundException()).when(userRepository).deleteById(-1L);
     assertThrows(CoordinatorNotFoundException.class, () -> service.removeCoordinatorById(-1L));
   }
 
   @Test
   void testRemoveById() {
-    doNothing().when(mockedCoordinatorRepository).deleteById(1L);
+    doNothing().when(userRepository).deleteById(1L);
     assertDoesNotThrow(() -> service.removeCoordinatorById(1L));
   }
 }
