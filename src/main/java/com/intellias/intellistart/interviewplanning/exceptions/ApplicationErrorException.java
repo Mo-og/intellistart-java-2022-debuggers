@@ -46,6 +46,7 @@ public class ApplicationErrorException extends RuntimeException {
    * API error codes enum that delivers necessary statuses.
    */
   public enum ErrorCode {
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "user_not_found"),
     CANDIDATE_NOT_FOUND(HttpStatus.NOT_FOUND, "candidate_not_found"),
     INTERVIEWER_NOT_FOUND(HttpStatus.NOT_FOUND, "interviewer_not_found"),
     COORDINATOR_NOT_FOUND(HttpStatus.NOT_FOUND, "coordinator_not_found"),
