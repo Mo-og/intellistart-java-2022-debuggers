@@ -77,6 +77,36 @@ public class InterviewerService {
   }
 
   /**
+   * Provides time slots for given user for next week.
+   *
+   * @param interviewerId id of interviewer to get slots from
+   * @return time slots of requested interviewer for next week
+   */
+  public Set<InterviewerTimeSlot> getNextWeekInterviewerSlots(Long interviewerId) {
+    if (!userRepository.existsById(interviewerId)) {
+      throw new InterviewerNotFoundException(interviewerId);
+    }
+    return interviewerTimeSlotRepository
+        .getInterviewerTimeSlotForInterviewerIdAndWeekNum(
+            interviewerId, WeekService.getNextWeekNum());
+  }
+
+  /**
+   * Provides time slots for given user for current week.
+   *
+   * @param interviewerId id of interviewer to get slots from
+   * @return time slots of requested interviewer for current week
+   */
+  public Set<InterviewerTimeSlot> getCurrentWeekInterviewerSlots(Long interviewerId) {
+    if (!userRepository.existsById(interviewerId)) {
+      throw new InterviewerNotFoundException(interviewerId);
+    }
+    return interviewerTimeSlotRepository
+        .getInterviewerTimeSlotForInterviewerIdAndWeekNum(
+            interviewerId, WeekService.getCurrentWeekNum());
+  }
+
+  /**
    * Update slot by id.
    *
    * @param id      slot id
