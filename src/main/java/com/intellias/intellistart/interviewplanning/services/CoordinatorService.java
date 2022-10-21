@@ -1,18 +1,22 @@
 package com.intellias.intellistart.interviewplanning.services;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.intellias.intellistart.interviewplanning.exceptions.CoordinatorNotFoundException;
+import com.intellias.intellistart.interviewplanning.exceptions.InterviewerNotFoundException;
+import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundException;
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.User;
+import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
 import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
+import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import java.time.DayOfWeek;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +31,7 @@ public class CoordinatorService {
   private final InterviewerTimeSlotRepository interviewerTimeSlotRepository;
   private final CandidateTimeSlotRepository candidateTimeSlotRepository;
   private final BookingRepository bookingRepository;
+  private final UserRepository userRepository;
 
   /**
    * Constructor.
@@ -34,14 +39,16 @@ public class CoordinatorService {
    * @param interviewerTimeSlotRepository interviewer time slot repository
    * @param candidateTimeSlotRepository   candidate time slot repository
    * @param bookingRepository             booking repository
+   * @param userRepository                user repository
    */
   @Autowired
   public CoordinatorService(InterviewerTimeSlotRepository interviewerTimeSlotRepository,
       CandidateTimeSlotRepository candidateTimeSlotRepository,
-      BookingRepository bookingRepository) {
+      BookingRepository bookingRepository, UserRepository userRepository) {
     this.interviewerTimeSlotRepository = interviewerTimeSlotRepository;
     this.candidateTimeSlotRepository = candidateTimeSlotRepository;
     this.bookingRepository = bookingRepository;
+    this.userRepository = userRepository;
   }
 
   /**
@@ -99,44 +106,55 @@ public class CoordinatorService {
             Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Booking::getFrom)))));
   }
 
-  public boolean updateInterviewerTimeSlot() {
-    return true;
+  /**
+   * Grant the user the specified role by email.
+   *
+   * @param email user email
+   * @param role  which will be granted
+   * @return user with the granted role
+   */
+  public User grantRole(String email, UserRole role) {
+    if (userRepository.updateRoleByEmail(email, role) == 0) {
+      throw new UserNotFoundException(email);
+    }
+    return userRepository.getUserByEmail(email);
   }
 
-  public boolean grantInterviewerRole() {
-    return true;
+  /**
+   * Revoke the interviewer role by email.
+   *
+   * @param id user id
+   * @return user with revoked role
+   */
+  public User revokeInterviewerRole(long id) {
+    User user = userRepository.getUserByIdWithRole(id, UserRole.INTERVIEWER);
+    if (user == null) {
+      throw new InterviewerNotFoundException(id);
+    }
+    return grantRole(user.getEmail(), UserRole.CANDIDATE);
   }
 
-  public boolean revokeInterviewerRole() {
-    return true;
+  /**
+   * Revoke the coordinator role by email.
+   *
+   * @param id user id
+   * @return user with revoked role
+   */
+  public User revokeCoordinatorRole(long id) {
+    User user = userRepository.getUserByIdWithRole(id, UserRole.COORDINATOR);
+    if (user == null) {
+      throw new CoordinatorNotFoundException(id);
+    }
+    return grantRole(user.getEmail(), UserRole.CANDIDATE);
   }
 
-  public List<User> getAllInterviewers() {
-    return new ArrayList<>();
-  }
-
-  public boolean grantCoordinatorRole() {
-    return true;
-  }
-
-  public boolean revokeCoordinatorRole() {
-    return true;
-  }
-
-  public List<User> getAllCoordinators() {
-    return new ArrayList<>();
-  }
-
-  public Booking createBooking() {
-    return new Booking();
-  }
-
-  public boolean updateBooking() {
-    return true;
-  }
-
-  public boolean deleteBooking() {
-    return true;
+  /**
+   * Provides all users with the specified role.
+   *
+   * @return set of users with specified role
+   */
+  public Set<User> getUsersWithRole(UserRole role) {
+    return userRepository.getUsersWithRole(role);
   }
 
   /**
