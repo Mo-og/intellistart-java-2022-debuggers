@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.intellias.intellistart.interviewplanning.exceptions.InterviewerNotFoundException;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
+import com.intellias.intellistart.interviewplanning.services.CoordinatorService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import com.intellias.intellistart.interviewplanning.services.UserService;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,8 @@ class UserControllerTest {
   private MockMvc mockMvc;
   @MockBean
   private InterviewerService interviewerService;
+  @MockBean
+  private CoordinatorService coordinatorService;
   @MockBean
   private UserService userService;
   private static final String email = "test.interviewer@gmail.com";
