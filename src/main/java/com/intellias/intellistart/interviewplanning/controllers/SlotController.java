@@ -34,4 +34,10 @@ public class SlotController {
       @PathVariable Long interviewerId) {
     return interviewerService.createSlot(interviewerId, interviewerTimeSlot);
   }
+
+  @PostMapping("/interviewers/{interviewerId}/slots/{slotId}")
+  public InterviewerTimeSlot updateInterviewerTimeSlot(@PathVariable long interviewerId,
+      @PathVariable long slotId, @RequestBody InterviewerTimeSlot interviewerTimeSlot) {
+    return interviewerService.updateSlot(interviewerId, slotId, interviewerTimeSlot);
+  }
 }
