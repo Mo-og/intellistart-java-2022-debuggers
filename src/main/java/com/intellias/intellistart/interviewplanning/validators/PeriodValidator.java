@@ -20,9 +20,9 @@ public class PeriodValidator {
     LocalTime toTime = LocalTime.parse(to);
 
     return toTime.minusMinutes(89).isAfter(fromTime)
-        || (toTime.getMinute() - fromTime.getMinute()) % 30 != 0
-        || fromTime.isBefore(LocalTime.of(8, 0))
-        || toTime.isAfter(LocalTime.of(22, 0));
+        && Math.abs(toTime.getMinute() - fromTime.getMinute()) % 30 == 0
+        && fromTime.isAfter(LocalTime.of(7, 59))
+        && toTime.isBefore(LocalTime.of(22, 1));
   }
 
   /**
