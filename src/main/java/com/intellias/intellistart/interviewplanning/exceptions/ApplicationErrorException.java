@@ -52,7 +52,7 @@ public class ApplicationErrorException extends RuntimeException {
     COORDINATOR_NOT_FOUND(HttpStatus.NOT_FOUND, "coordinator_not_found"),
     SLOT_NOT_FOUND(HttpStatus.NOT_FOUND, "slot_not_found"),
     SLOT_IS_OVERLAPPING(HttpStatus.CONFLICT, "slot_is_overlapping"),
-    INVALID_BOUNDARIES(HttpStatus.BAD_REQUEST, "invalid_boundaries"),
+    INVALID_PERIOD(HttpStatus.BAD_REQUEST, "invalid_boundaries"),
     INVALID_DAY_OF_WEEK(HttpStatus.BAD_REQUEST, "invalid_day_of_week"),
     CANNOT_EDIT_THIS_WEEK(HttpStatus.METHOD_NOT_ALLOWED, "cannot_edit_this_week");
     public final String code;
