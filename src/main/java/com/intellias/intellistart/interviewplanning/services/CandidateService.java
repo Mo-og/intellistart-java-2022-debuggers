@@ -57,7 +57,7 @@ public class CandidateService {
    * @param id slot id
    * @return slotById
    */
-  public CandidateTimeSlot getSlot(long id) {
+  public CandidateTimeSlot getSlot(Long id) {
     return candidateTimeSlotRepository.getReferenceById(id);
   }
 
@@ -82,7 +82,7 @@ public class CandidateService {
    * @param slotId slot id
    * @param slot   candidate time slot
    */
-  public CandidateTimeSlot updateSlot(long slotId, CandidateTimeSlot slot) {
+  public CandidateTimeSlot updateSlot(Long slotId, CandidateTimeSlot slot) {
     // validate from, to, date
     // check if current time is by end of Friday (00:00) of current week
     if (!candidateTimeSlotRepository.existsById(slotId)) {
@@ -101,7 +101,7 @@ public class CandidateService {
    * @param id candidate id to look for
    * @return candidate stored by given id
    */
-  public User getUserById(Long id) {
+  public User getById(Long id) {
     try {
       return (User) Hibernate.unproxy(userRepository.getReferenceById(id));
     } catch (EntityNotFoundException e) {

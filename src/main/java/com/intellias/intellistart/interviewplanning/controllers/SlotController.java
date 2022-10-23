@@ -40,13 +40,13 @@ public class SlotController {
   }
 
   @PostMapping("/interviewers/{interviewerId}/slots/{slotId}")
-  public InterviewerTimeSlot updateInterviewerTimeSlot(@PathVariable long interviewerId,
+  public InterviewerTimeSlot updateInterviewerTimeSlot(@PathVariable Long interviewerId,
       @PathVariable long slotId, @RequestBody InterviewerTimeSlot interviewerTimeSlot) {
     return interviewerService.updateSlot(interviewerId, slotId, interviewerTimeSlot);
   }
 
   @PostMapping("/candidates/current/slots/{slotId}")
-  public CandidateTimeSlot updateCandidateTimeSlot(@PathVariable long slotId,
+  public CandidateTimeSlot updateCandidateTimeSlot(@PathVariable Long slotId,
       @RequestBody CandidateTimeSlot candidateTimeSlot) {
     return candidateService.updateSlot(slotId, candidateTimeSlot);
   }

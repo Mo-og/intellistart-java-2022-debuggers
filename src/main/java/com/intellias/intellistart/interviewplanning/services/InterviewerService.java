@@ -5,8 +5,6 @@ import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
-import java.time.DayOfWeek;
-import java.time.LocalTime;
 import java.util.Set;
 import javax.persistence.EntityNotFoundException;
 import org.hibernate.Hibernate;
@@ -82,7 +80,7 @@ public class InterviewerService {
    * @param interviewerTimeSlot slot
    * @return updated slot
    */
-  public InterviewerTimeSlot updateSlot(long interviewerId, long slotId,
+  public InterviewerTimeSlot updateSlot(Long interviewerId, Long slotId,
       InterviewerTimeSlot interviewerTimeSlot) {
     // validate from, to, day, weekNum
     // check if current time is by end of Friday (00:00) of current week
