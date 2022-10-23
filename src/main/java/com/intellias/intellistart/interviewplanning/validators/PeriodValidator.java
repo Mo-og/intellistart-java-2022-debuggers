@@ -32,7 +32,7 @@ public class PeriodValidator {
    * @param to   end time
    * @throws InvalidPeriodException if period is invalid
    */
-  public static void validate(String from, String to) throws InvalidPeriodException {
+  public static void validate(String from, String to) {
     if (!isValid(from, to)) {
       throw new InvalidPeriodException(from, to);
     }
