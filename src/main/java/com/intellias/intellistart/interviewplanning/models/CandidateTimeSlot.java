@@ -1,6 +1,7 @@
 package com.intellias.intellistart.interviewplanning.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.intellias.intellistart.interviewplanning.validators.PeriodValidator;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import javax.persistence.Column;
@@ -47,10 +48,10 @@ public class CandidateTimeSlot {
    * @param to   end time
    */
   public CandidateTimeSlot(String date, String from, String to) {
-    Period period = new Period(from, to);
+    PeriodValidator.validate(from, to);
     this.date = LocalDate.parse(date);
-    this.from = period.getFrom();
-    this.to = period.getTo();
+    this.from = LocalTime.parse(from);
+    this.to = LocalTime.parse(to);
   }
 
   public CandidateTimeSlot() {
