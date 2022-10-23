@@ -79,16 +79,16 @@ public class CandidateService {
   /**
    * Update slot by id.
    *
-   * @param candidateId slot id
-   * @param slot        candidate time slot
+   * @param slotId slot id
+   * @param slot   candidate time slot
    */
-  public CandidateTimeSlot updateSlot(long candidateId, CandidateTimeSlot slot) {
+  public CandidateTimeSlot updateSlot(long slotId, CandidateTimeSlot slot) {
     // validate from, to, date
     // check if current time is by end of Friday (00:00) of current week
-    if (!candidateTimeSlotRepository.existsById(candidateId)) {
-      throw new TimeSlotNotFoundException(candidateId);
+    if (!candidateTimeSlotRepository.existsById(slotId)) {
+      throw new TimeSlotNotFoundException(slotId);
     }
-    CandidateTimeSlot timeSlot = candidateTimeSlotRepository.getReferenceById(candidateId);
+    CandidateTimeSlot timeSlot = candidateTimeSlotRepository.getReferenceById(slotId);
     timeSlot.setFrom(slot.getFrom());
     timeSlot.setTo(slot.getTo());
     timeSlot.setDate(slot.getDate());
@@ -101,7 +101,7 @@ public class CandidateService {
    * @param id candidate id to look for
    * @return candidate stored by given id
    */
-  public User getById(Long id) {
+  public User getUserById(Long id) {
     try {
       return (User) Hibernate.unproxy(userRepository.getReferenceById(id));
     } catch (EntityNotFoundException e) {

@@ -1,6 +1,8 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
+import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
+import com.intellias.intellistart.interviewplanning.services.CandidateService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class SlotController {
 
   private final InterviewerService interviewerService;
+  private final CandidateService candidateService;
 
   @Autowired
-  public SlotController(InterviewerService interviewerService) {
+  public SlotController(InterviewerService interviewerService, CandidateService candidateService) {
     this.interviewerService = interviewerService;
+    this.candidateService = candidateService;
   }
 
   @GetMapping("/interviewers/{interviewerId}/slots")
@@ -39,5 +43,11 @@ public class SlotController {
   public InterviewerTimeSlot updateInterviewerTimeSlot(@PathVariable long interviewerId,
       @PathVariable long slotId, @RequestBody InterviewerTimeSlot interviewerTimeSlot) {
     return interviewerService.updateSlot(interviewerId, slotId, interviewerTimeSlot);
+  }
+
+  @PostMapping("/candidates/current/slots/{slotId}")
+  public CandidateTimeSlot updateCandidateTimeSlot(@PathVariable long slotId,
+      @RequestBody CandidateTimeSlot candidateTimeSlot) {
+    return candidateService.updateSlot(slotId, candidateTimeSlot);
   }
 }
