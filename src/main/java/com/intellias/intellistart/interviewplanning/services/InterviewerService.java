@@ -54,7 +54,7 @@ public class InterviewerService {
    * @param id slot id
    * @return slotById
    */
-  public InterviewerTimeSlot getSlot(long id) {
+  public InterviewerTimeSlot getSlotById(Long id) {
     return interviewerTimeSlotRepository.getReferenceById(id);
   }
 
@@ -85,7 +85,7 @@ public class InterviewerService {
     // validate from, to, day, weekNum
     // check if current time is by end of Friday (00:00) of current week
     User interviewer = userRepository.getReferenceById(interviewerId);
-    InterviewerTimeSlot slot = getSlot(slotId);
+    InterviewerTimeSlot slot = getSlotById(slotId);
     slot.setFrom(interviewerTimeSlot.getFrom());
     slot.setTo(interviewerTimeSlot.getTo());
     slot.setDayOfWeek(interviewerTimeSlot.getDayOfWeek());

@@ -32,10 +32,6 @@ public class WebSecurityConfig {
         .authorizeHttpRequests(requests -> requests
             .anyRequest().permitAll() //for now allow everyone
         )
-        .formLogin(form -> form
-            .loginPage("/login")
-            .permitAll()
-        )
         .logout(LogoutConfigurer::permitAll);
 
     return http.build();

@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
-public abstract class Utils {
+public abstract class TestUtils {
 
   private static final ObjectWriter jsonWriter;
 
