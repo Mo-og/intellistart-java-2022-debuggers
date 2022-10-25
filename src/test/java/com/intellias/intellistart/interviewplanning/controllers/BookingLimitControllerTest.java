@@ -10,7 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundException;
 import com.intellias.intellistart.interviewplanning.exceptions.WeekEditException;
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
-import com.intellias.intellistart.interviewplanning.models.dto.BookingLimitRequest;
+import com.intellias.intellistart.interviewplanning.controllers.dto.BookingLimitDto;
 import com.intellias.intellistart.interviewplanning.services.BookingLimitService;
 import com.intellias.intellistart.interviewplanning.services.WeekService;
 import java.util.List;
@@ -43,34 +43,34 @@ public class BookingLimitControllerTest {
       notExistingUserId,
       nextWeekNum,
       limit + 1);
-  private static final BookingLimitRequest bookingLimitRequest = new BookingLimitRequest(limit,
+  private static final BookingLimitDto BOOKING_LIMIT_DTO = new BookingLimitDto(limit,
       nextWeekNum);
 
   @Test
   void testSetBookingLimit() {
-    when(bookingLimitService.saveBookingLimit(existingUserId, bookingLimitRequest))
+    when(bookingLimitService.saveBookingLimit(existingUserId, BOOKING_LIMIT_DTO))
         .thenReturn(bookingLimit);
     checkResponseOk(
         post("/interviewers/{interviewerId}/bookingLimits", existingUserId),
-        json(bookingLimitRequest),
+        json(BOOKING_LIMIT_DTO),
         json(bookingLimit),
         this.mockMvc);
   }
 
   @Test
   void testSetBookingLimitWeekException() {
-    when(bookingLimitService.saveBookingLimit(existingUserId, bookingLimitRequest))
+    when(bookingLimitService.saveBookingLimit(existingUserId, BOOKING_LIMIT_DTO))
         .thenThrow(new WeekEditException(existingUserId + ""));
     assertThrows(WeekEditException.class,
-        () -> bookingLimitService.saveBookingLimit(existingUserId, bookingLimitRequest));
+        () -> bookingLimitService.saveBookingLimit(existingUserId, BOOKING_LIMIT_DTO));
   }
 
   @Test
   void testSetBookingLimitUserException() {
-    when(bookingLimitService.saveBookingLimit(existingUserId, bookingLimitRequest))
+    when(bookingLimitService.saveBookingLimit(existingUserId, BOOKING_LIMIT_DTO))
         .thenThrow(new UserNotFoundException(notExistingUserId + ""));
     assertThrows(UserNotFoundException.class,
-        () -> bookingLimitService.saveBookingLimit(existingUserId, bookingLimitRequest));
+        () -> bookingLimitService.saveBookingLimit(existingUserId, BOOKING_LIMIT_DTO));
   }
 
   @Test
