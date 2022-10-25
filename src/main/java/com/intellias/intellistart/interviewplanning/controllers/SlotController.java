@@ -54,13 +54,11 @@ public class SlotController {
 
   @GetMapping("/interviewers/{interviewerId}/slots/weeks/current")
   public Set<InterviewerTimeSlot> getCurrentWeekInterviewerSlots(@PathVariable Long interviewerId) {
-    return interviewerService.getSlotsWithBookingsByWeekId(interviewerId,
-        WeekService.getCurrentWeekNum());
+    return interviewerService.getSlotsByWeekId(interviewerId, WeekService.getCurrentWeekNum());
   }
 
   @GetMapping("/interviewers/{interviewerId}/slots/weeks/next")
   public Set<InterviewerTimeSlot> getNextWeekInterviewerSlots(@PathVariable Long interviewerId) {
-    return interviewerService.getSlotsWithBookingsByWeekId(interviewerId,
-        WeekService.getNextWeekNum());
+    return interviewerService.getSlotsByWeekId(interviewerId, WeekService.getNextWeekNum());
   }
 }
