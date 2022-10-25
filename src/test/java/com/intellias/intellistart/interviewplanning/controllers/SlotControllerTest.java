@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
+import com.intellias.intellistart.interviewplanning.services.CandidateService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import java.util.HashSet;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,8 @@ class SlotControllerTest {
   private MockMvc mockMvc;
   @MockBean
   private InterviewerService interviewerService;
+  @MockBean
+  private CandidateService service;
 
   @Test
   void testPostInterviewerSlots() {
