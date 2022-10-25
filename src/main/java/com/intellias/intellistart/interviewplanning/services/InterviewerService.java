@@ -72,8 +72,24 @@ public class InterviewerService {
       throw new InterviewerNotFoundException(interviewerId);
     }
     return interviewerTimeSlotRepository
-        .getInterviewerTimeSlotForInterviewerIdAndWeekGreaterOrEqual(
+        .findByInterviewerIdAndWeekNumGreaterThanEqual(
             interviewerId, WeekService.getCurrentWeekNum());
+  }
+
+  /**
+   * Provides time slots with bookings for the specified user and week.
+   *
+   * @param interviewerId id of interviewer to get slots from
+   * @param weekId        id of week
+   * @return set of time slots with bookings
+   */
+  public Set<InterviewerTimeSlot> getSlotsWithBookingsByWeekId(Long interviewerId, int weekId) {
+    if (!userRepository.existsById(interviewerId)) {
+      throw new InterviewerNotFoundException(interviewerId);
+    }
+    return interviewerTimeSlotRepository
+        .findByInterviewerIdAndWeekNum(
+            interviewerId, weekId);
   }
 
   /**
@@ -109,5 +125,4 @@ public class InterviewerService {
       throw new InterviewerNotFoundException(id);
     }
   }
-
 }

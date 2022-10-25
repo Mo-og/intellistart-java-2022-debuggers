@@ -114,10 +114,10 @@ public class CoordinatorService {
    * @return user with the granted role
    */
   public User grantRole(String email, UserRole role) {
-    if (userRepository.updateRoleByEmail(email, role) == 0) {
-      throw new UserNotFoundException(email);
-    }
-    return userRepository.getUserByEmail(email);
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new UserNotFoundException(email));
+    user.setRole(role);
+    return userRepository.save(user);
   }
 
   /**
@@ -127,10 +127,8 @@ public class CoordinatorService {
    * @return user with revoked role
    */
   public User revokeInterviewerRole(long id) {
-    User user = userRepository.getUserByIdWithRole(id, UserRole.INTERVIEWER);
-    if (user == null) {
-      throw new InterviewerNotFoundException(id);
-    }
+    User user = userRepository.findByIdAndRole(id, UserRole.INTERVIEWER)
+        .orElseThrow(() -> new InterviewerNotFoundException(id));
     return grantRole(user.getEmail(), UserRole.CANDIDATE);
   }
 
@@ -141,10 +139,8 @@ public class CoordinatorService {
    * @return user with revoked role
    */
   public User revokeCoordinatorRole(long id) {
-    User user = userRepository.getUserByIdWithRole(id, UserRole.COORDINATOR);
-    if (user == null) {
-      throw new CoordinatorNotFoundException(id);
-    }
+    User user = userRepository.findByIdAndRole(id, UserRole.COORDINATOR)
+        .orElseThrow(() -> new CoordinatorNotFoundException(id));
     return grantRole(user.getEmail(), UserRole.CANDIDATE);
   }
 
@@ -154,7 +150,7 @@ public class CoordinatorService {
    * @return set of users with specified role
    */
   public Set<User> getUsersWithRole(UserRole role) {
-    return userRepository.getUsersWithRole(role);
+    return userRepository.findByRole(role);
   }
 
   /**
