@@ -74,11 +74,11 @@ public class InterviewerService {
   }
 
   /**
-   * Provides time slots with bookings for the specified user and week.
+   * Provides time slots with bookings for the specified interviewer and week.
    *
-   * @param interviewerId id of interviewer to get slots from
+   * @param interviewerId id of interviewer
    * @param weekId        id of week
-   * @return set of time slots with bookings
+   * @return set of time slots
    */
   public Set<InterviewerTimeSlot> getSlotsWithBookingsByWeekId(Long interviewerId, int weekId) {
     if (!userRepository.existsById(interviewerId)) {

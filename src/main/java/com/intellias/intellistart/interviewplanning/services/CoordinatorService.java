@@ -110,7 +110,7 @@ public class CoordinatorService {
    * Grant the user the specified role by email.
    *
    * @param email user email
-   * @param role  which will be granted
+   * @param role  user role
    * @return user with the granted role
    */
   public User grantRole(String email, UserRole role) {
@@ -121,24 +121,24 @@ public class CoordinatorService {
   }
 
   /**
-   * Revoke the interviewer role by email.
+   * Revoke the interviewer role by id.
    *
    * @param id user id
    * @return user with revoked role
    */
-  public User revokeInterviewerRole(long id) {
+  public User revokeInterviewerRole(Long id) {
     User user = userRepository.findByIdAndRole(id, UserRole.INTERVIEWER)
         .orElseThrow(() -> new InterviewerNotFoundException(id));
     return grantRole(user.getEmail(), UserRole.CANDIDATE);
   }
 
   /**
-   * Revoke the coordinator role by email.
+   * Revoke the coordinator role by id.
    *
    * @param id user id
    * @return user with revoked role
    */
-  public User revokeCoordinatorRole(long id) {
+  public User revokeCoordinatorRole(Long id) {
     User user = userRepository.findByIdAndRole(id, UserRole.COORDINATOR)
         .orElseThrow(() -> new CoordinatorNotFoundException(id));
     return grantRole(user.getEmail(), UserRole.CANDIDATE);
@@ -147,6 +147,7 @@ public class CoordinatorService {
   /**
    * Provides all users with the specified role.
    *
+   * @param role user role
    * @return set of users with specified role
    */
   public Set<User> getUsersWithRole(UserRole role) {

@@ -71,7 +71,7 @@ public class UserController {
   }
 
   @DeleteMapping("/users/interviewers/{interviewerId}")
-  public User revokeInterviewerRole(@PathVariable long interviewerId) {
+  public User revokeInterviewerRole(@PathVariable Long interviewerId) {
     return coordinatorService.revokeInterviewerRole(interviewerId);
   }
 
@@ -86,7 +86,7 @@ public class UserController {
   }
 
   @DeleteMapping("/users/coordinators/{coordinatorId}")
-  public User revokeCoordinatorRole(@PathVariable long coordinatorId) {
+  public User revokeCoordinatorRole(@PathVariable Long coordinatorId) {
     return coordinatorService.revokeCoordinatorRole(coordinatorId);
   }
 
