@@ -56,7 +56,7 @@ class UserServiceTest {
         .thenReturn(candidate);
     var createdCandidate = service.create(CANDIDATE_EMAIL, UserRole.CANDIDATE);
     assertEquals(candidate.getId(), createdCandidate.getId());
-    assertEquals(candidate.getUserRole(), createdCandidate.getUserRole());
+    assertEquals(candidate.getRole(), createdCandidate.getRole());
     assertEquals(candidate.getEmail(), createdCandidate.getEmail());
   }
 
@@ -67,7 +67,7 @@ class UserServiceTest {
         .thenReturn(candidate);
     var createdCandidate = service.create(CANDIDATE_EMAIL, UserRole.CANDIDATE);
     assertEquals(candidate.getId(), createdCandidate.getId());
-    assertEquals(candidate.getUserRole(), createdCandidate.getUserRole());
+    assertEquals(candidate.getRole(), createdCandidate.getRole());
     assertEquals(candidate.getEmail(), createdCandidate.getEmail());
   }
 
@@ -79,7 +79,7 @@ class UserServiceTest {
     var savedInterviewer = service.create(InterviewerServiceTest.INTERVIEWER_EMAIL,
         UserRole.INTERVIEWER);
     assertEquals(interviewer.getId(), savedInterviewer.getId());
-    assertEquals(interviewer.getUserRole(), savedInterviewer.getUserRole());
+    assertEquals(interviewer.getRole(), savedInterviewer.getRole());
     assertEquals(interviewer.getEmail(), savedInterviewer.getEmail());
   }
 
@@ -90,7 +90,7 @@ class UserServiceTest {
         .thenReturn(coordinator);
     var savedCoordinator = service.create(COORDINATOR_EMAIL, UserRole.COORDINATOR);
     assertEquals(coordinator.getId(), savedCoordinator.getId());
-    assertEquals(coordinator.getUserRole(), savedCoordinator.getUserRole());
+    assertEquals(coordinator.getRole(), savedCoordinator.getRole());
     assertEquals(coordinator.getEmail(), savedCoordinator.getEmail());
   }
 
@@ -101,7 +101,7 @@ class UserServiceTest {
         .thenReturn(candidate);
     var savedCandidate = service.save(candidate);
     assertEquals(candidate.getId(), savedCandidate.getId());
-    assertEquals(candidate.getUserRole(), savedCandidate.getUserRole());
+    assertEquals(candidate.getRole(), savedCandidate.getRole());
     assertEquals(candidate.getEmail(), savedCandidate.getEmail());
   }
 
@@ -112,7 +112,7 @@ class UserServiceTest {
         .thenReturn(interviewer);
     var savedInterviewer = service.save(interviewer);
     assertEquals(interviewer.getId(), savedInterviewer.getId());
-    assertEquals(interviewer.getUserRole(), savedInterviewer.getUserRole());
+    assertEquals(interviewer.getRole(), savedInterviewer.getRole());
     assertEquals(interviewer.getEmail(), savedInterviewer.getEmail());
   }
 
@@ -123,7 +123,7 @@ class UserServiceTest {
         .thenReturn(coordinator);
     var savedCoordinator = service.save(coordinator);
     assertEquals(coordinator.getId(), savedCoordinator.getId());
-    assertEquals(coordinator.getUserRole(), savedCoordinator.getUserRole());
+    assertEquals(coordinator.getRole(), savedCoordinator.getRole());
     assertEquals(coordinator.getEmail(), savedCoordinator.getEmail());
   }
 
@@ -134,7 +134,7 @@ class UserServiceTest {
         .thenReturn(coordinator);
     var coordinatorById = service.getCoordinatorById(1L);
     assertEquals(coordinator.getId(), coordinatorById.getId());
-    assertEquals(coordinator.getUserRole(), coordinatorById.getUserRole());
+    assertEquals(coordinator.getRole(), coordinatorById.getRole());
     assertEquals(coordinator.getEmail(), coordinatorById.getEmail());
   }
 
