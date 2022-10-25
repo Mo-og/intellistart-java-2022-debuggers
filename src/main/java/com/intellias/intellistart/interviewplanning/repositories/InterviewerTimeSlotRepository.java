@@ -11,9 +11,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface InterviewerTimeSlotRepository extends JpaRepository<InterviewerTimeSlot, Long> {
 
-  Set<InterviewerTimeSlot> findByInterviewerIdAndWeekNumGreaterThanEqual(
-      Long id, int weekNum);
+  Set<InterviewerTimeSlot> findByInterviewerIdAndWeekNumGreaterThanEqual(Long id, int weekNum);
 
-  Set<InterviewerTimeSlot> findByInterviewerIdAndWeekNum(
-      Long id, int weekNum);
+  Set<InterviewerTimeSlot> findByInterviewerIdAndWeekNum(Long id, int weekNum);
 }
