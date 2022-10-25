@@ -2,6 +2,7 @@ package com.intellias.intellistart.interviewplanning.controllers;
 
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
+import com.intellias.intellistart.interviewplanning.services.WeekService;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,5 +34,17 @@ public class SlotController {
       @RequestBody InterviewerTimeSlot interviewerTimeSlot,
       @PathVariable Long interviewerId) {
     return interviewerService.createSlot(interviewerId, interviewerTimeSlot);
+  }
+
+  @GetMapping("/interviewers/{interviewerId}/slots/weeks/current")
+  public Set<InterviewerTimeSlot> getCurrentWeekInterviewerSlots(@PathVariable Long interviewerId) {
+    return interviewerService.getSlotsWithBookingsByWeekId(interviewerId,
+        WeekService.getCurrentWeekNum());
+  }
+
+  @GetMapping("/interviewers/{interviewerId}/slots/weeks/next")
+  public Set<InterviewerTimeSlot> getNextWeekInterviewerSlots(@PathVariable Long interviewerId) {
+    return interviewerService.getSlotsWithBookingsByWeekId(interviewerId,
+        WeekService.getNextWeekNum());
   }
 }
