@@ -39,7 +39,7 @@ class UserControllerTest {
   private CoordinatorService coordinatorService;
   @MockBean
   private UserService userService;
-  private static final String email = "test.interviewer@gmail.com";
+  private static final String email = "test.user@gmail.com";
   private static final User testCandidate = new User(email, UserRole.CANDIDATE);
   private static final User testCoordinator = new User(email, UserRole.COORDINATOR);
   private static final User testInterviewer = new User(email, UserRole.INTERVIEWER);

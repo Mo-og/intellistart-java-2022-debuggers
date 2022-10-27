@@ -25,7 +25,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class InterviewerServiceTest {
 
   public static final String INTERVIEWER_EMAIL = "test.interviewer@test.com";
-  private static final User newInterviewer = new User(INTERVIEWER_EMAIL, UserRole.INTERVIEWER);
   private static final User interviewer = new User(INTERVIEWER_EMAIL, UserRole.INTERVIEWER);
   private static final InterviewerTimeSlot timeSlot = new InterviewerTimeSlot("09:00",
       "18:00", "Mon", 202210);
