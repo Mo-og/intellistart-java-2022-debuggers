@@ -36,17 +36,17 @@ public class User {
   @Column(nullable = false)
   private Long id;
   private String email;
-  private UserRole userRole;
+  private UserRole role;
 
   /**
    * User.
    *
    * @param email    mail
-   * @param userRole role
+   * @param role role
    */
-  public User(String email, UserRole userRole) {
+  public User(String email, UserRole role) {
     this.email = email;
-    this.userRole = userRole;
+    this.role = role;
   }
 
   @Override
@@ -61,7 +61,7 @@ public class User {
     if (id != null) {
       return Objects.equals(id, user.id);
     }
-    return Objects.equals(email, user.email) && userRole == user.userRole;
+    return Objects.equals(email, user.email) && role == user.role;
   }
 
   @Override

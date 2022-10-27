@@ -3,6 +3,7 @@ package com.intellias.intellistart.interviewplanning.services;
 import com.intellias.intellistart.interviewplanning.exceptions.InterviewerNotFoundException;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.User;
+import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import java.util.Set;
@@ -69,8 +70,23 @@ public class InterviewerService {
       throw new InterviewerNotFoundException(interviewerId);
     }
     return interviewerTimeSlotRepository
-        .getInterviewerTimeSlotForInterviewerIdAndWeekGreaterOrEqual(
+        .findByInterviewerIdAndWeekNumGreaterThanEqual(
             interviewerId, WeekService.getCurrentWeekNum());
+  }
+
+  /**
+   * Returns interviewer time slots for the specified week.
+   *
+   * @param interviewerId id of interviewer
+   * @param weekId        id of week
+   * @return a set of interviewer time slots
+   * @throws InterviewerNotFoundException if no interviewer is found
+   */
+  public Set<InterviewerTimeSlot> getSlotsByWeekId(Long interviewerId, int weekId) {
+    if (!userRepository.existsByIdAndRole(interviewerId, UserRole.INTERVIEWER)) {
+      throw new InterviewerNotFoundException(interviewerId);
+    }
+    return interviewerTimeSlotRepository.findByInterviewerIdAndWeekNum(interviewerId, weekId);
   }
 
   /**
@@ -107,5 +123,4 @@ public class InterviewerService {
       throw new InterviewerNotFoundException(id);
     }
   }
-
 }
