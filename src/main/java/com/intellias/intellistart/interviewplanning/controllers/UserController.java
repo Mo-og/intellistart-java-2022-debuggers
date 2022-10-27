@@ -50,7 +50,7 @@ public class UserController {
   //to be removed
   @GetMapping("/users/{id}")
   public User getUser(@PathVariable Long id) {
-    return userService.getCoordinatorById(id);
+    return userService.getUserById(id);
   }
 
   //to be removed
