@@ -44,7 +44,7 @@ public class UserService {
    * @param id user id
    * @return user with any role
    */
-  public User getCoordinatorById(Long id) {
+  public User getUserById(Long id) {
     try {
       return (User) Hibernate.unproxy(userRepository.getReferenceById(id));
     } catch (EntityNotFoundException e) {
@@ -57,7 +57,7 @@ public class UserService {
    *
    * @param id id to delete by
    */
-  public void removeCoordinatorById(Long id) {
+  public void removeUserById(Long id) {
     try {
       userRepository.deleteById(id);
     } catch (EntityNotFoundException e) {
