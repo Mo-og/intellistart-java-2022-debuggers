@@ -37,7 +37,7 @@ public class BookingLimitControllerTest {
       limit);
 
   @Test
-  void testAllOk() {
+  void testSetBookingLimit() {
     when(bookingLimitService.setBookingLimit(limit, existingUserId, nextWeekNum))
         .thenReturn(bookingLimit);
     checkResponseOk(
@@ -51,7 +51,7 @@ public class BookingLimitControllerTest {
   }
 
   @Test
-  void testWeekException() {
+  void testSetBookingLimitWeekException() {
     when(bookingLimitService.setBookingLimit(limit, existingUserId, currentWeekNum))
         .thenThrow(new WeekEditException(existingUserId + ""));
     assertThrows(WeekEditException.class,
@@ -59,7 +59,7 @@ public class BookingLimitControllerTest {
   }
 
   @Test
-  void testUserException() {
+  void testSetBookingLimitUserException() {
     when(bookingLimitService.setBookingLimit(limit, notExistingUserId, nextWeekNum))
         .thenThrow(new UserNotFoundException(notExistingUserId + ""));
     assertThrows(UserNotFoundException.class,
