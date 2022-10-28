@@ -43,7 +43,7 @@ public class BookingLimitService {
     if (bookingLimit != null) {
       bookingLimit.setBookingLimit(limit);
     } else {
-      bookingLimit = new BookingLimit(interviewerId, weekNum, 0);
+      bookingLimit = new BookingLimit(interviewerId, weekNum, limit);
     }
 
     return bookingLimitRepository.save(bookingLimit);

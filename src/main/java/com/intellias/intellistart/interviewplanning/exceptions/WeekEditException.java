@@ -16,7 +16,7 @@ public class WeekEditException extends ApplicationErrorException {
    * @param interviewerId interviewer's id
    */
   public WeekEditException(int weekNum, long interviewerId) {
-    this("cannot edit bookings limit for user with id: "
+    this("Cannot edit bookings limit for user with id: "
         + interviewerId
         + " in week: "
         + weekNum);
