@@ -34,7 +34,7 @@ public class SlotController {
   }
 
   @GetMapping("/candidate/{candidateId}/slots")
-  public Set<CandidateTimeSlot> getAllCamdidateSlots(@PathVariable Long candidateId) {
+  public Set<CandidateTimeSlot> getAllCandidateSlots(@PathVariable Long candidateId) {
     return candidateService.getRelevantCandidateSlots(candidateId);
   }
 
