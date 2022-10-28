@@ -46,10 +46,21 @@ public class SlotController {
     return interviewerService.updateSlot(interviewerId, slotId, interviewerTimeSlot);
   }
 
+  @PostMapping("/candidates/current/slots")
+  public CandidateTimeSlot createCandidateTimeSlot(@PathVariable Long candidateId,
+      @RequestBody CandidateTimeSlot candidateTimeSlot) {
+    return candidateService.createSlot(candidateId, candidateTimeSlot);
+  }
+
   @PostMapping("/candidates/current/slots/{slotId}")
   public CandidateTimeSlot updateCandidateTimeSlot(@PathVariable Long slotId,
       @RequestBody CandidateTimeSlot candidateTimeSlot) {
     return candidateService.updateSlot(slotId, candidateTimeSlot);
+  }
+
+  @GetMapping("/candidates/current/slots")
+  public Set<CandidateTimeSlot> getListOfAllCandidateSlots(@PathVariable Long candidateId) {
+    return candidateService.getRelevantCandidateSlots(candidateId);
   }
 
   @GetMapping("/interviewers/{interviewerId}/slots/weeks/current")
