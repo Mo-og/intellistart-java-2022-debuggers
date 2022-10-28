@@ -15,6 +15,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.transaction.annotation.Transactional;
 
+
 /**
  * Candidate time slot.
  */

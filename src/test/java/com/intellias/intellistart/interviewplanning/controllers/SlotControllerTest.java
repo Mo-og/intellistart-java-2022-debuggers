@@ -6,7 +6,9 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
+import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
+import com.intellias.intellistart.interviewplanning.services.CandidateService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import java.util.HashSet;
 import org.junit.jupiter.api.Test;
@@ -23,14 +25,22 @@ class SlotControllerTest {
   private static final InterviewerTimeSlot timeSlot =
       new InterviewerTimeSlot("08:00", "10:00", "WEDNESDAY", 202240);
 
+  private static final CandidateTimeSlot candidateTimeSlot =
+      new CandidateTimeSlot("2022-09-10", "08:00", "10:00");
+
   static {
     timeSlot.setId(1L);
+    candidateTimeSlot.setId(2L);
   }
 
   @Autowired
   private MockMvc mockMvc;
+
   @MockBean
   private InterviewerService interviewerService;
+
+  @MockBean
+  private CandidateService candidateService;
 
   @Test
   void testPostInterviewerSlots() {
