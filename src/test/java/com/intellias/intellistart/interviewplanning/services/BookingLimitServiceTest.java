@@ -3,6 +3,7 @@ package com.intellias.intellistart.interviewplanning.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundException;
@@ -10,6 +11,7 @@ import com.intellias.intellistart.interviewplanning.exceptions.WeekEditException
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
 import com.intellias.intellistart.interviewplanning.repositories.BookingLimitRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,6 +41,10 @@ public class BookingLimitServiceTest {
       existingUserId,
       nextWeekNum,
       limit);
+  private static final BookingLimit bookingLimit2 = new BookingLimit(
+      notExistingUserId,
+      nextWeekNum,
+      limit + 2);
 
   @Test
   void testSetBooking() {
@@ -87,5 +93,31 @@ public class BookingLimitServiceTest {
     assertEquals(bookingLimit.getId(), newBookingLimit.getId());
     assertEquals(bookingLimit.getInterviewerId(), newBookingLimit.getInterviewerId());
     assertEquals(bookingLimit.getBookingLimit(), newBookingLimit.getBookingLimit());
+  }
+
+  @Test
+  void testGetWeekBookingLimits() {
+    when(bookingLimitService.getWeekBookingLimits(nextWeekNum))
+        .thenReturn(List.of(bookingLimit, bookingLimit2));
+    assertEquals(bookingLimitService.getWeekBookingLimits(nextWeekNum),
+        List.of(bookingLimit, bookingLimit2));
+  }
+
+  @Test
+  void testGetBookingLimitOk() {
+    lenient().when(userRepository.existsById(existingUserId))
+        .thenReturn(true);
+    when(bookingLimitRepository.findByInterviewerIdAndWeekNum(existingUserId, nextWeekNum))
+        .thenReturn(bookingLimit);
+    assertEquals(bookingLimitService.getBookingLimit(existingUserId, nextWeekNum),
+        bookingLimit);
+  }
+
+  @Test
+  void testGetBookingLimitThrowUserException() {
+    when(userRepository.existsById(existingUserId))
+        .thenReturn(false);
+    assertThrows(UserNotFoundException.class,
+        () -> bookingLimitService.getBookingLimit(existingUserId, nextWeekNum));
   }
 }
