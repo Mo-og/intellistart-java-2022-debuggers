@@ -5,6 +5,7 @@ import com.intellias.intellistart.interviewplanning.exceptions.WeekEditException
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
 import com.intellias.intellistart.interviewplanning.repositories.BookingLimitRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,5 +48,16 @@ public class BookingLimitService {
     }
 
     return bookingLimitRepository.save(bookingLimit);
+  }
+
+  public List<BookingLimit> getWeekBookingLimits(Integer weekNum) {
+    return bookingLimitRepository.findAllByWeekNum(weekNum);
+  }
+
+  public BookingLimit getBookingLimit(Long interviewerId, Integer weekNum) {
+    if (!userRepository.existsById(interviewerId)) {
+      throw new UserNotFoundException(interviewerId + "");
+    }
+    return bookingLimitRepository.findByInterviewerIdAndWeekNum(interviewerId, weekNum);
   }
 }
