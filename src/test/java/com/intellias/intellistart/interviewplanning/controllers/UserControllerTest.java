@@ -84,7 +84,7 @@ class UserControllerTest {
 
   @Test
   void testRevokeInterviewerRole() {
-    when(coordinatorService.revokeInterviewerRole(1)).thenReturn(testCandidate);
+    when(coordinatorService.revokeInterviewerRole(1L)).thenReturn(testCandidate);
     checkResponseOk(delete("/users/interviewers/{interviewerId}", 1L),
         null, json(testCandidate), mockMvc);
   }
@@ -107,7 +107,7 @@ class UserControllerTest {
 
   @Test
   void testRevokeCoordinatorRole() {
-    when(coordinatorService.revokeCoordinatorRole(1)).thenReturn(testCandidate);
+    when(coordinatorService.revokeCoordinatorRole(1L)).thenReturn(testCandidate);
     checkResponseOk(delete("/users/coordinators/{coordinatorId}", 1),
         null, json(testCandidate), mockMvc);
   }

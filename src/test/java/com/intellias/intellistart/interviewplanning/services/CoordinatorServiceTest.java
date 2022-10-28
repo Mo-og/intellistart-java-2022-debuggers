@@ -2,6 +2,7 @@ package com.intellias.intellistart.interviewplanning.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.intellias.intellistart.interviewplanning.exceptions.CoordinatorNotFoundException;
@@ -23,6 +24,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import org.junit.jupiter.api.BeforeEach;
@@ -150,9 +152,9 @@ class CoordinatorServiceTest {
 
   @Test
   void testGrantRole() {
-    when(userRepository.updateRoleByEmail("interviewer@gmail.com", UserRole.INTERVIEWER))
-        .thenReturn(1);
-    when(userRepository.getUserByEmail("interviewer@gmail.com"))
+    when(userRepository.findByEmail("interviewer@gmail.com"))
+        .thenReturn(Optional.of(interviewer));
+    when(userRepository.save(interviewer))
         .thenReturn(interviewer);
     var result =
         service.grantRole("interviewer@gmail.com", UserRole.INTERVIEWER);
@@ -161,49 +163,49 @@ class CoordinatorServiceTest {
 
   @Test
   void testGrantRoleInvalidUser() {
-    when(userRepository.updateRoleByEmail("invalid@gmail.com", UserRole.INTERVIEWER))
-        .thenReturn(0);
+    when(userRepository.findByEmail("invalid@gmail.com"))
+        .thenReturn(Optional.empty());
     assertThrows(UserNotFoundException.class,
         () -> service.grantRole("invalid@gmail.com", UserRole.INTERVIEWER));
   }
 
   @Test
   void testRevokeInterviewerRole() {
-    when(userRepository.updateRoleByEmail("interviewer@gmail.com", UserRole.CANDIDATE))
-        .thenReturn(1);
-    when(userRepository.getUserByEmail("interviewer@gmail.com"))
-        .thenReturn(candidate);
+    when(userRepository.save(any()))
+        .thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
+    when(userRepository.findByEmail("interviewer@gmail.com"))
+        .thenReturn(Optional.of(new User()));
 
-    when(userRepository.getUserByIdWithRole(1L, UserRole.INTERVIEWER))
-        .thenReturn(interviewer);
-    assertEquals(candidate,
-        service.revokeInterviewerRole(1L));
+    when(userRepository.findByIdAndRole(1L, UserRole.INTERVIEWER))
+        .thenReturn(Optional.of(interviewer));
+    assertEquals(UserRole.CANDIDATE,
+        service.revokeInterviewerRole(1L).getRole());
   }
 
   @Test
   void testRevokeInterviewerRoleWrongId() {
-    when(userRepository.getUserByIdWithRole(-1L, UserRole.INTERVIEWER))
-        .thenReturn(null);
+    when(userRepository.findByIdAndRole(-1L, UserRole.INTERVIEWER))
+        .thenReturn(Optional.empty());
     assertThrows(InterviewerNotFoundException.class,
         () -> service.revokeInterviewerRole(-1L));
   }
 
   @Test
   void testRevokeCoordinatorRole() {
-    when(userRepository.getUserByIdWithRole(1L, UserRole.COORDINATOR))
-        .thenReturn(coordinator);
-    when(userRepository.updateRoleByEmail(coordinator.getEmail(), UserRole.CANDIDATE))
-        .thenReturn(1);
-    when(userRepository.getUserByEmail(coordinator.getEmail()))
-        .thenReturn(candidate);
+    when(userRepository.findByIdAndRole(1L, UserRole.COORDINATOR))
+        .thenReturn(Optional.of(coordinator));
+    when(userRepository.findByEmail(coordinator.getEmail()))
+        .thenReturn(Optional.of(candidate));
+    when(userRepository.save(any()))
+        .thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
     assertEquals(candidate,
         service.revokeCoordinatorRole(1L));
   }
 
   @Test
   void testRevokeCoordinatorRoleWrongId() {
-    when(userRepository.getUserByIdWithRole(-1L, UserRole.COORDINATOR))
-        .thenReturn(null);
+    when(userRepository.findByIdAndRole(-1L, UserRole.COORDINATOR))
+        .thenReturn(Optional.empty());
     assertThrows(CoordinatorNotFoundException.class,
         () -> service.revokeCoordinatorRole(-1L));
   }
@@ -211,7 +213,7 @@ class CoordinatorServiceTest {
   @Test
   void testGetUsersWithRole() {
     Set<User> set = Set.of(interviewer);
-    when(userRepository.getUsersWithRole(UserRole.INTERVIEWER)).thenReturn(set);
+    when(userRepository.findByRole(UserRole.INTERVIEWER)).thenReturn(set);
     assertEquals(set, service.getUsersWithRole(UserRole.INTERVIEWER));
   }
 }

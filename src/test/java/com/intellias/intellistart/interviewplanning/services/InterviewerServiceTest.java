@@ -79,7 +79,7 @@ class InterviewerServiceTest {
         .existsById(1L))
         .thenReturn(true);
     when(interviewerTimeSlotRepository
-        .getInterviewerTimeSlotForInterviewerIdAndWeekGreaterOrEqual(1L,
+        .findByInterviewerIdAndWeekNumGreaterThanEqual(1L,
             WeekService.getCurrentWeekNum()))
         .thenReturn(set);
     var retrievedSet = interviewerService.getRelevantInterviewerSlots(1L);
