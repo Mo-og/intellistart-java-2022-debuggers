@@ -54,6 +54,13 @@ public class BookingLimitService {
     return bookingLimitRepository.findAllByWeekNum(weekNum);
   }
 
+  /**
+   * Receive BookingLimit of interviewer by weekNum.
+   *
+   * @param interviewerId interviewer's id
+   * @param weekNum       week number
+   * @return BookingLimit
+   */
   public BookingLimit getBookingLimit(Long interviewerId, Integer weekNum) {
     if (!userRepository.existsById(interviewerId)) {
       throw new UserNotFoundException(interviewerId + "");

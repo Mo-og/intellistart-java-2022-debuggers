@@ -12,5 +12,6 @@ import org.springframework.stereotype.Repository;
 public interface BookingLimitRepository extends JpaRepository<BookingLimit, Long> {
 
   BookingLimit findByInterviewerIdAndWeekNum(Long interviewerId, Integer weekNum);
+
   List<BookingLimit> findAllByWeekNum(Integer weekNum);
 }

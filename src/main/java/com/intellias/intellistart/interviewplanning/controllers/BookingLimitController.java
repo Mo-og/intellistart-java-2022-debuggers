@@ -35,7 +35,7 @@ public class BookingLimitController {
   }
 
   @GetMapping("/interviewers/bookingLimits/user")
-  public BookingLimit getBookingLimit(@RequestParam Long interviewerId, Integer weekNum){
-    return bookingLimitService.getBookingLimit(interviewerId,weekNum);
+  public BookingLimit getBookingLimit(@RequestParam Long interviewerId, Integer weekNum) {
+    return bookingLimitService.getBookingLimit(interviewerId, weekNum);
   }
 }
