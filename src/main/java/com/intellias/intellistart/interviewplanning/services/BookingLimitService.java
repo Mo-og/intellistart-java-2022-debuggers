@@ -3,6 +3,7 @@ package com.intellias.intellistart.interviewplanning.services;
 import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundException;
 import com.intellias.intellistart.interviewplanning.exceptions.WeekEditException;
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
+import com.intellias.intellistart.interviewplanning.models.dto.BookingLimitResponse;
 import com.intellias.intellistart.interviewplanning.repositories.BookingLimitRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import java.util.List;
@@ -67,4 +68,10 @@ public class BookingLimitService {
     }
     return bookingLimitRepository.findByInterviewerIdAndWeekNum(interviewerId, weekNum);
   }
+
+  public BookingLimitResponse getUserWeekBookingLimit(Long interviewerId, Integer weekNum) {
+    BookingLimit bookingLimit = getBookingLimit(interviewerId, weekNum);
+    return new BookingLimitResponse(bookingLimit.getBookingLimit());
+  }
+
 }

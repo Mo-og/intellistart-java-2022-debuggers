@@ -1,6 +1,7 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
+import com.intellias.intellistart.interviewplanning.models.dto.BookingLimitResponse;
 import com.intellias.intellistart.interviewplanning.services.BookingLimitService;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,8 +35,14 @@ public class BookingLimitController {
     return bookingLimitService.getWeekBookingLimits(weekNum);
   }
 
-  @GetMapping("/interviewers/bookingLimits/user")
+  @GetMapping("/interviewers/bookingLimits/week/user")
   public BookingLimit getBookingLimit(@RequestParam Long interviewerId, Integer weekNum) {
     return bookingLimitService.getBookingLimit(interviewerId, weekNum);
+  }
+
+  @GetMapping("/interviewers/bookingLimits/week/user/limit")
+  public BookingLimitResponse getUserWeekBookingLimit(@RequestParam Long interviewerId,
+      Integer weekNum) {
+    return bookingLimitService.getUserWeekBookingLimit(interviewerId, weekNum);
   }
 }
