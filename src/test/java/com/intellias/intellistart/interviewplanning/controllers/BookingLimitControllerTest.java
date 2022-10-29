@@ -4,6 +4,7 @@ import static com.intellias.intellistart.interviewplanning.Utils.checkResponseOk
 import static com.intellias.intellistart.interviewplanning.Utils.json;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundException;
@@ -11,6 +12,7 @@ import com.intellias.intellistart.interviewplanning.exceptions.WeekEditException
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
 import com.intellias.intellistart.interviewplanning.services.BookingLimitService;
 import com.intellias.intellistart.interviewplanning.services.WeekService;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -33,8 +35,14 @@ public class BookingLimitControllerTest {
   private static final Long existingUserId = 1L;
   private static final Long notExistingUserId = 2L;
 
-  private static final BookingLimit bookingLimit = new BookingLimit(existingUserId, nextWeekNum,
+  private static final BookingLimit bookingLimit = new BookingLimit(
+      existingUserId,
+      nextWeekNum,
       limit);
+  private static final BookingLimit bookingLimit2 = new BookingLimit(
+      notExistingUserId,
+      nextWeekNum,
+      limit + 1);
 
   @Test
   void testSetBookingLimit() {
@@ -64,5 +72,30 @@ public class BookingLimitControllerTest {
         .thenThrow(new UserNotFoundException(notExistingUserId + ""));
     assertThrows(UserNotFoundException.class,
         () -> bookingLimitService.setBookingLimit(limit, notExistingUserId, nextWeekNum));
+  }
+
+  @Test
+  void testGetWeekBookingLimits() {
+    when(bookingLimitService.getWeekBookingLimits(nextWeekNum))
+        .thenReturn(List.of(bookingLimit, bookingLimit2));
+    checkResponseOk(
+        get("/interviewers/bookingLimits/week")
+            .param("weekNum", "202244"),
+        null,
+        json(List.of(bookingLimit, bookingLimit2)),
+        this.mockMvc);
+  }
+
+  @Test
+  void testGetBookingLimit() {
+    when(bookingLimitService.getBookingLimit(existingUserId, nextWeekNum))
+        .thenReturn(bookingLimit);
+    checkResponseOk(
+        get("/interviewers/bookingLimits/user")
+            .param("interviewerId", "1")
+            .param("weekNum", "202244"),
+        null,
+        json(bookingLimit),
+        this.mockMvc);
   }
 }
