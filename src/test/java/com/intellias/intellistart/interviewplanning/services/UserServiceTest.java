@@ -132,7 +132,7 @@ class UserServiceTest {
     when(userRepository
         .getReferenceById(1L))
         .thenReturn(coordinator);
-    var coordinatorById = service.getCoordinatorById(1L);
+    var coordinatorById = service.getUserById(1L);
     assertEquals(coordinator.getId(), coordinatorById.getId());
     assertEquals(coordinator.getRole(), coordinatorById.getRole());
     assertEquals(coordinator.getEmail(), coordinatorById.getEmail());
@@ -143,18 +143,18 @@ class UserServiceTest {
     when(userRepository
         .getReferenceById(-1L))
         .thenThrow(new EntityNotFoundException());
-    assertThrows(CoordinatorNotFoundException.class, () -> service.getCoordinatorById(-1L));
+    assertThrows(CoordinatorNotFoundException.class, () -> service.getUserById(-1L));
   }
 
   @Test
   void testRemoveByWrongId() {
     doThrow(new EntityNotFoundException()).when(userRepository).deleteById(-1L);
-    assertThrows(CoordinatorNotFoundException.class, () -> service.removeCoordinatorById(-1L));
+    assertThrows(CoordinatorNotFoundException.class, () -> service.removeUserById(-1L));
   }
 
   @Test
   void testRemoveById() {
     doNothing().when(userRepository).deleteById(1L);
-    assertDoesNotThrow(() -> service.removeCoordinatorById(1L));
+    assertDoesNotThrow(() -> service.removeUserById(1L));
   }
 }

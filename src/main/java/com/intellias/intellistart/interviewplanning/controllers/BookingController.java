@@ -2,8 +2,6 @@ package com.intellias.intellistart.interviewplanning.controllers;
 
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.services.BookingService;
-import com.intellias.intellistart.interviewplanning.services.CandidateService;
-import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,23 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class BookingController {
 
   private final BookingService bookingService;
-  private final InterviewerService interviewerService;
-  private final CandidateService candidateService;
 
   /**
    * Constructor.
    *
-   * @param bookingService     booking service
-   * @param interviewerService interviewer service
-   * @param candidateService   candidate service
+   * @param bookingService booking service
    */
   @Autowired
-  public BookingController(BookingService bookingService,
-      InterviewerService interviewerService,
-      CandidateService candidateService) {
+  public BookingController(BookingService bookingService) {
     this.bookingService = bookingService;
-    this.interviewerService = interviewerService;
-    this.candidateService = candidateService;
   }
 
   @PostMapping("/bookings")
