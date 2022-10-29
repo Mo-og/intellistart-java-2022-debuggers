@@ -1,7 +1,7 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
-import static com.intellias.intellistart.interviewplanning.Utils.checkResponseOk;
-import static com.intellias.intellistart.interviewplanning.Utils.json;
+import static com.intellias.intellistart.interviewplanning.TestUtils.checkResponseOk;
+import static com.intellias.intellistart.interviewplanning.TestUtils.json;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
