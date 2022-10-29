@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundException;
 import com.intellias.intellistart.interviewplanning.exceptions.WeekEditException;
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
+import com.intellias.intellistart.interviewplanning.models.dto.BookingLimitResponse;
 import com.intellias.intellistart.interviewplanning.repositories.BookingLimitRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import java.util.List;
@@ -45,6 +46,7 @@ public class BookingLimitServiceTest {
       notExistingUserId,
       nextWeekNum,
       limit + 2);
+  private static final BookingLimitResponse bookingLimitResponse = new BookingLimitResponse(5);
 
   @Test
   void testSetBooking() {
@@ -119,5 +121,16 @@ public class BookingLimitServiceTest {
         .thenReturn(false);
     assertThrows(UserNotFoundException.class,
         () -> bookingLimitService.getBookingLimit(existingUserId, nextWeekNum));
+  }
+
+  @Test
+  void testGetUserWeekBookingLimit() {
+    lenient().when(userRepository.existsById(existingUserId))
+        .thenReturn(true);
+    lenient().when(
+            bookingLimitRepository.findByInterviewerIdAndWeekNum(existingUserId, nextWeekNum))
+        .thenReturn(bookingLimit);
+    assertEquals(bookingLimitService.getUserWeekBookingLimit(existingUserId, nextWeekNum),
+        bookingLimitResponse);
   }
 }

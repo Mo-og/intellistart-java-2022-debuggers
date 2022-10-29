@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundException;
 import com.intellias.intellistart.interviewplanning.exceptions.WeekEditException;
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
+import com.intellias.intellistart.interviewplanning.models.dto.BookingLimitResponse;
 import com.intellias.intellistart.interviewplanning.services.BookingLimitService;
 import com.intellias.intellistart.interviewplanning.services.WeekService;
 import java.util.List;
@@ -43,6 +44,8 @@ public class BookingLimitControllerTest {
       notExistingUserId,
       nextWeekNum,
       limit + 1);
+  private static final BookingLimitResponse bookingLimitResponseDTO
+      = new BookingLimitResponse(10);
 
   @Test
   void testSetBookingLimit() {
@@ -91,11 +94,24 @@ public class BookingLimitControllerTest {
     when(bookingLimitService.getBookingLimit(existingUserId, nextWeekNum))
         .thenReturn(bookingLimit);
     checkResponseOk(
-        get("/interviewers/bookingLimits/user")
+        get("/interviewers/bookingLimits/week/user")
             .param("interviewerId", "1")
             .param("weekNum", "202244"),
         null,
         json(bookingLimit),
+        this.mockMvc);
+  }
+
+  @Test
+  void testGetUserWeekBookingLimit() {
+    when(bookingLimitService.getUserWeekBookingLimit(existingUserId, nextWeekNum))
+        .thenReturn(bookingLimitResponseDTO);
+    checkResponseOk(
+        get("/interviewers/bookingLimits/week/user/limit")
+            .param("interviewerId", "1")
+            .param("weekNum", "202244"),
+        null,
+        json(bookingLimitResponseDTO),
         this.mockMvc);
   }
 }
