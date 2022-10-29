@@ -9,7 +9,7 @@ import static org.mockito.Mockito.when;
 import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundException;
 import com.intellias.intellistart.interviewplanning.exceptions.WeekEditException;
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
-import com.intellias.intellistart.interviewplanning.models.dto.BookingLimitResponse;
+import com.intellias.intellistart.interviewplanning.models.dto.BookingLimitRequest;
 import com.intellias.intellistart.interviewplanning.repositories.BookingLimitRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import java.util.List;
@@ -46,7 +46,10 @@ public class BookingLimitServiceTest {
       notExistingUserId,
       nextWeekNum,
       limit + 2);
-  private static final BookingLimitResponse bookingLimitResponse = new BookingLimitResponse(5);
+  private static final BookingLimitRequest bookingLimitRequest = new BookingLimitRequest(limit,
+      nextWeekNum);
+  private static final BookingLimitRequest badBookingLimitRequest = new BookingLimitRequest(limit,
+      0);
 
   @Test
   void testSetBooking() {
@@ -57,8 +60,8 @@ public class BookingLimitServiceTest {
     when(bookingLimitRepository.save(bookingLimit))
         .thenReturn(bookingLimit);
 
-    BookingLimit newBookingLimit = bookingLimitService.setBookingLimit(limit, existingUserId,
-        nextWeekNum);
+    BookingLimit newBookingLimit = bookingLimitService.setBookingLimit(existingUserId,
+        bookingLimitRequest);
     assertEquals(bookingLimit.getId(), newBookingLimit.getId());
     assertEquals(bookingLimit.getInterviewerId(), newBookingLimit.getInterviewerId());
     assertEquals(bookingLimit.getBookingLimit(), newBookingLimit.getBookingLimit());
@@ -66,11 +69,10 @@ public class BookingLimitServiceTest {
 
   @Test
   void testSetBookingThrowUserException() {
-    when(userRepository.existsById(notExistingUserId))
+    lenient().when(userRepository.existsById(notExistingUserId))
         .thenReturn(false);
     assertThrows(UserNotFoundException.class,
-        () -> bookingLimitService.setBookingLimit(limit, notExistingUserId,
-            nextWeekNum));
+        () -> bookingLimitService.setBookingLimit(existingUserId, bookingLimitRequest));
   }
 
   @Test
@@ -78,7 +80,7 @@ public class BookingLimitServiceTest {
     when(userRepository.existsById(existingUserId))
         .thenReturn(true);
     assertThrows(WeekEditException.class,
-        () -> bookingLimitService.setBookingLimit(limit, existingUserId, 0));
+        () -> bookingLimitService.setBookingLimit(existingUserId, badBookingLimitRequest));
   }
 
   @Test
@@ -90,8 +92,8 @@ public class BookingLimitServiceTest {
     when(bookingLimitRepository.save(any()))
         .thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
 
-    BookingLimit newBookingLimit = bookingLimitService.setBookingLimit(limit, existingUserId,
-        nextWeekNum);
+    BookingLimit newBookingLimit = bookingLimitService.setBookingLimit(existingUserId,
+        bookingLimitRequest);
     assertEquals(bookingLimit.getId(), newBookingLimit.getId());
     assertEquals(bookingLimit.getInterviewerId(), newBookingLimit.getInterviewerId());
     assertEquals(bookingLimit.getBookingLimit(), newBookingLimit.getBookingLimit());
@@ -121,16 +123,5 @@ public class BookingLimitServiceTest {
         .thenReturn(false);
     assertThrows(UserNotFoundException.class,
         () -> bookingLimitService.getBookingLimit(existingUserId, nextWeekNum));
-  }
-
-  @Test
-  void testGetUserWeekBookingLimit() {
-    lenient().when(userRepository.existsById(existingUserId))
-        .thenReturn(true);
-    lenient().when(
-            bookingLimitRepository.findByInterviewerIdAndWeekNum(existingUserId, nextWeekNum))
-        .thenReturn(bookingLimit);
-    assertEquals(bookingLimitService.getUserWeekBookingLimit(existingUserId, nextWeekNum),
-        bookingLimitResponse);
   }
 }
