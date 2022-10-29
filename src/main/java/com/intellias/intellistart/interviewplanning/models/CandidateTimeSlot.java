@@ -1,9 +1,12 @@
 package com.intellias.intellistart.interviewplanning.models;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.intellias.intellistart.interviewplanning.Utils;
 import com.intellias.intellistart.interviewplanning.validators.PeriodValidator;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,6 +17,7 @@ import javax.persistence.SequenceGenerator;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.Hibernate;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -24,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Setter
 @ToString
 public class CandidateTimeSlot {
-
   @ManyToOne
   @JsonIgnore
   User candidate;
@@ -62,4 +65,40 @@ public class CandidateTimeSlot {
     this.candidate = candidate;
   }
 
+  @JsonGetter("from")
+  public String getFromAsString() {
+    return Utils.timeAsString(from);
+  }
+
+  @JsonGetter("to")
+  public String getToAsString() {
+    return Utils.timeAsString(to);
+  }
+
+  @JsonGetter("date")
+  public String getDateAsString() {
+    return date.toString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
+      return false;
+    }
+    CandidateTimeSlot that = (CandidateTimeSlot) o;
+    if (id != null) {
+      return Objects.equals(id, that.id);
+    }
+    return Objects.equals(from, that.from)
+        && Objects.equals(to, that.to)
+        && Objects.equals(date, that.date);
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
+  }
 }

@@ -1,7 +1,7 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
-import static com.intellias.intellistart.interviewplanning.Utils.checkResponseOk;
-import static com.intellias.intellistart.interviewplanning.Utils.json;
+import static com.intellias.intellistart.interviewplanning.TestUtils.checkResponseOk;
+import static com.intellias.intellistart.interviewplanning.TestUtils.json;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import com.intellias.intellistart.interviewplanning.services.CoordinatorService;
@@ -25,20 +25,20 @@ class WeekControllerTest {
   @Test
   void testGetCurrentWeek() {
     checkResponseOk(get("/weeks/current"), json(WeekService.getCurrentWeekNum()),
-        json(new WeekController.WeekNum(WeekService.getCurrentWeekNum())), this.mockMvc);
+        json(new WeekController.WeekNum(WeekService.getCurrentWeekNum())), mockMvc);
   }
 
   @Test
   void testGetNextWeek() {
     checkResponseOk(get("/weeks/next"), json(WeekService.getNextWeekNum()),
-        json(new WeekController.WeekNum(WeekService.getNextWeekNum())), this.mockMvc);
+        json(new WeekController.WeekNum(WeekService.getNextWeekNum())), mockMvc);
   }
 
   @Test
   void testGetDashboardReturnsSomething() {
     //todo update to actually check response json
     checkResponseOk(get("/weeks/{weekId}/dashboard", 202240), null,
-        null, this.mockMvc);
+        null, mockMvc);
   }
 
 

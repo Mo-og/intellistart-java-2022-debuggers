@@ -49,10 +49,6 @@ public class User {
     this.role = role;
   }
 
-  public String getEmail() {
-    return email;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {

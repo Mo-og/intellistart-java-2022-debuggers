@@ -2,10 +2,10 @@ package com.intellias.intellistart.interviewplanning.models;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.intellias.intellistart.interviewplanning.Utils;
 import com.intellias.intellistart.interviewplanning.validators.PeriodValidator;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.Locale;
 import java.util.Objects;
@@ -32,12 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
 @ToString
 @RequiredArgsConstructor
 public class InterviewerTimeSlot {
-
-  private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("HH:mm");
   @ManyToOne
   @JsonIgnore
   User interviewer;
-
   @Id
   @SequenceGenerator(name = "interv_seq", sequenceName = "interviewer_slot_seq", allocationSize = 5)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "interv_seq")
@@ -60,10 +57,10 @@ public class InterviewerTimeSlot {
    */
   public InterviewerTimeSlot(String from, String to, String day, int weekNum) {
     PeriodValidator.validate(from, to);
-    dayOfWeek = DayOfWeek.valueOf(day.toUpperCase());
     this.from = LocalTime.parse(from);
     this.to = LocalTime.parse(to);
     this.weekNum = weekNum;
+    setDayOfWeek(day);
   }
 
   @Transactional
@@ -78,12 +75,12 @@ public class InterviewerTimeSlot {
 
   @JsonGetter("from")
   public String getFromAsString() {
-    return dateFormat.format(from);
+    return Utils.timeAsString(from);
   }
 
   @JsonGetter("to")
   public String getToAsString() {
-    return dateFormat.format(to);
+    return Utils.timeAsString(to);
   }
 
   /**
@@ -92,30 +89,10 @@ public class InterviewerTimeSlot {
    * @param dayOfWeek short form of day of week like 'Mon' for Monday
    */
   public void setDayOfWeek(String dayOfWeek) {
-    switch (dayOfWeek) {
-      case "Mon":
-        this.dayOfWeek = DayOfWeek.MONDAY;
-        break;
-      case "Tue":
-        this.dayOfWeek = DayOfWeek.TUESDAY;
-        break;
-      case "Wed":
-        this.dayOfWeek = DayOfWeek.WEDNESDAY;
-        break;
-      case "Thu":
-        this.dayOfWeek = DayOfWeek.THURSDAY;
-        break;
-      case "Fri":
-        this.dayOfWeek = DayOfWeek.FRIDAY;
-        break;
-      case "Sat":
-        this.dayOfWeek = DayOfWeek.SATURDAY;
-        break;
-      case "Sun":
-        this.dayOfWeek = DayOfWeek.SUNDAY;
-        break;
-      default:
-        throw new IllegalArgumentException("Could not parse '" + dayOfWeek + "' as dayOfWeek");
+    if (dayOfWeek.length() == 3) {
+      this.dayOfWeek = DayOfWeek.from(Utils.DAY_OF_WEEK_FORMATTER.parse(dayOfWeek));
+    } else {
+      this.dayOfWeek = DayOfWeek.valueOf(dayOfWeek.toUpperCase());
     }
   }
 
