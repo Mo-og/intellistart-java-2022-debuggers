@@ -56,7 +56,7 @@ public class BookingLimitService {
     return bookingLimitRepository.save(bookingLimit);
   }
 
-  public List<BookingLimit> getWeekBookingLimits(Integer weekNum) {
+  public List<BookingLimit> getBookingLimitsByWeekNum(Integer weekNum) {
     return bookingLimitRepository.findAllByWeekNum(weekNum);
   }
 

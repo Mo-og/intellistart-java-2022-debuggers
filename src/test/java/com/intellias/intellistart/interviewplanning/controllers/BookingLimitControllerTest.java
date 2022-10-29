@@ -77,7 +77,7 @@ public class BookingLimitControllerTest {
 
   @Test
   void testGetWeekBookingLimits() {
-    when(bookingLimitService.getWeekBookingLimits(nextWeekNum))
+    when(bookingLimitService.getBookingLimitsByWeekNum(nextWeekNum))
         .thenReturn(List.of(bookingLimit, bookingLimit2));
     checkResponseOk(
         get("/interviewers/bookingLimits/{weekNum}", nextWeekNum),

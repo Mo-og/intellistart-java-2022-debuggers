@@ -31,7 +31,7 @@ public class BookingLimitController {
 
   @GetMapping("/interviewers/bookingLimits/{weekNum}")
   public List<BookingLimit> getWeekBookingLimits(@PathVariable Integer weekNum) {
-    return bookingLimitService.getWeekBookingLimits(weekNum);
+    return bookingLimitService.getBookingLimitsByWeekNum(weekNum);
   }
 
   @GetMapping("/interviewers/{interviewerId}/bookingLimits/{weekNum}")

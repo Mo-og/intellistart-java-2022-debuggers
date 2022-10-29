@@ -101,9 +101,9 @@ public class BookingLimitServiceTest {
 
   @Test
   void testGetWeekBookingLimits() {
-    when(bookingLimitService.getWeekBookingLimits(nextWeekNum))
+    when(bookingLimitService.getBookingLimitsByWeekNum(nextWeekNum))
         .thenReturn(List.of(bookingLimit, bookingLimit2));
-    assertEquals(bookingLimitService.getWeekBookingLimits(nextWeekNum),
+    assertEquals(bookingLimitService.getBookingLimitsByWeekNum(nextWeekNum),
         List.of(bookingLimit, bookingLimit2));
   }
 
