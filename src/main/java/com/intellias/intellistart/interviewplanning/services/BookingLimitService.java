@@ -3,7 +3,7 @@ package com.intellias.intellistart.interviewplanning.services;
 import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundException;
 import com.intellias.intellistart.interviewplanning.exceptions.WeekEditException;
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
-import com.intellias.intellistart.interviewplanning.models.dto.BookingLimitResponse;
+import com.intellias.intellistart.interviewplanning.models.dto.BookingLimitRequest;
 import com.intellias.intellistart.interviewplanning.repositories.BookingLimitRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import java.util.List;
@@ -27,25 +27,30 @@ public class BookingLimitService {
   }
 
   /**
-   * set bookings limit for interviewer per week.
+   * Set bookings limit for interviewer per week.
    *
-   * @param limit         bookings limit
-   * @param interviewerId interviewer's id
+   * @param interviewerId       interviewer's id
+   * @param bookingLimitRequest request DTO
    * @return Booking limit
    */
-  public BookingLimit setBookingLimit(Integer limit, Long interviewerId, Integer weekNum) {
+  public BookingLimit setBookingLimit(
+      Long interviewerId,
+      BookingLimitRequest bookingLimitRequest) {
     if (!userRepository.existsById(interviewerId)) {
       throw new UserNotFoundException(interviewerId + "");
     }
-    if (weekNum != WeekService.getNextWeekNum()) {
-      throw new WeekEditException(weekNum, interviewerId);
+    if (bookingLimitRequest.getWeekNum() != WeekService.getNextWeekNum()) {
+      throw new WeekEditException(bookingLimitRequest.getWeekNum(),
+          bookingLimitRequest.getBookingLimit());
     }
     BookingLimit bookingLimit = bookingLimitRepository.findByInterviewerIdAndWeekNum(interviewerId,
-        weekNum);
+        bookingLimitRequest.getWeekNum());
     if (bookingLimit != null) {
-      bookingLimit.setBookingLimit(limit);
+      bookingLimit.setBookingLimit(bookingLimitRequest.getBookingLimit());
     } else {
-      bookingLimit = new BookingLimit(interviewerId, weekNum, limit);
+      bookingLimit = new BookingLimit(interviewerId,
+          bookingLimitRequest.getWeekNum(),
+          bookingLimitRequest.getBookingLimit());
     }
 
     return bookingLimitRepository.save(bookingLimit);
@@ -68,10 +73,4 @@ public class BookingLimitService {
     }
     return bookingLimitRepository.findByInterviewerIdAndWeekNum(interviewerId, weekNum);
   }
-
-  public BookingLimitResponse getUserWeekBookingLimit(Long interviewerId, Integer weekNum) {
-    BookingLimit bookingLimit = getBookingLimit(interviewerId, weekNum);
-    return new BookingLimitResponse(bookingLimit.getBookingLimit());
-  }
-
 }
