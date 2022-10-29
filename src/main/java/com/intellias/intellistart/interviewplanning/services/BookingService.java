@@ -30,7 +30,7 @@ public class BookingService {
    * @param newBooking object with data to update
    * @return booking with new parameters
    */
-  public Booking updateBooking(long id, Booking newBooking) {
+  public Booking updateBooking(Long id, Booking newBooking) {
     Booking booking = bookingRepository.getReferenceById(id);
     booking.setFrom(newBooking.getFrom());
     booking.setTo(newBooking.getTo());
