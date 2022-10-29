@@ -50,7 +50,7 @@ public class BookingLimitControllerTest {
 
 //  @Test
 //  void testSetBookingLimit() {
-//    when(bookingLimitService.setBookingLimit(existingUserId, bookingLimitRequest))
+//    when(bookingLimitService.saveBookingLimit(existingUserId, bookingLimitRequest))
 //        .thenReturn(bookingLimit);
 //    checkResponseOk(
 //        post("/interviewers/{interviewerId}/bookingLimits", existingUserId),
@@ -61,18 +61,18 @@ public class BookingLimitControllerTest {
 
   @Test
   void testSetBookingLimitWeekException() {
-    when(bookingLimitService.setBookingLimit(existingUserId, bookingLimitRequest))
+    when(bookingLimitService.saveBookingLimit(existingUserId, bookingLimitRequest))
         .thenThrow(new WeekEditException(existingUserId + ""));
     assertThrows(WeekEditException.class,
-        () -> bookingLimitService.setBookingLimit(existingUserId, bookingLimitRequest));
+        () -> bookingLimitService.saveBookingLimit(existingUserId, bookingLimitRequest));
   }
 
   @Test
   void testSetBookingLimitUserException() {
-    when(bookingLimitService.setBookingLimit(existingUserId, bookingLimitRequest))
+    when(bookingLimitService.saveBookingLimit(existingUserId, bookingLimitRequest))
         .thenThrow(new UserNotFoundException(notExistingUserId + ""));
     assertThrows(UserNotFoundException.class,
-        () -> bookingLimitService.setBookingLimit(existingUserId, bookingLimitRequest));
+        () -> bookingLimitService.saveBookingLimit(existingUserId, bookingLimitRequest));
   }
 
   @Test
@@ -88,7 +88,7 @@ public class BookingLimitControllerTest {
 
   @Test
   void testGetBookingLimit() {
-    when(bookingLimitService.getBookingLimit(existingUserId, nextWeekNum))
+    when(bookingLimitService.findBookingLimit(existingUserId, nextWeekNum))
         .thenReturn(bookingLimit);
     checkResponseOk(
         get("/interviewers/{interviewerId}/bookingLimits/{weekNum}", existingUserId, nextWeekNum)

@@ -26,7 +26,7 @@ public class BookingLimitController {
   @PostMapping("/interviewers/{interviewerId}/bookingLimits")
   public BookingLimit setBookingLimit(@PathVariable Long interviewerId,
       @RequestBody BookingLimitRequest request) {
-    return bookingLimitService.setBookingLimit(interviewerId, request);
+    return bookingLimitService.saveBookingLimit(interviewerId, request);
   }
 
   @GetMapping("/interviewers/bookingLimits/{weekNum}")
@@ -35,8 +35,8 @@ public class BookingLimitController {
   }
 
   @GetMapping("/interviewers/{interviewerId}/bookingLimits/{weekNum}")
-  public BookingLimit getBookingLimit(@PathVariable Long interviewerId,
+  public BookingLimit findBookingLimit(@PathVariable Long interviewerId,
       @PathVariable Integer weekNum) {
-    return bookingLimitService.getBookingLimit(interviewerId, weekNum);
+    return bookingLimitService.findBookingLimit(interviewerId, weekNum);
   }
 }

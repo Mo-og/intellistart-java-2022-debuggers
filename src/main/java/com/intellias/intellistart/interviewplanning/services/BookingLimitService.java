@@ -33,7 +33,7 @@ public class BookingLimitService {
    * @param bookingLimitRequest request DTO
    * @return Booking limit
    */
-  public BookingLimit setBookingLimit(
+  public BookingLimit saveBookingLimit(
       Long interviewerId,
       BookingLimitRequest bookingLimitRequest) {
     if (!userRepository.existsById(interviewerId)) {
@@ -67,7 +67,7 @@ public class BookingLimitService {
    * @param weekNum       week number
    * @return BookingLimit
    */
-  public BookingLimit getBookingLimit(Long interviewerId, Integer weekNum) {
+  public BookingLimit findBookingLimit(Long interviewerId, Integer weekNum) {
     if (!userRepository.existsById(interviewerId)) {
       throw new UserNotFoundException(interviewerId + "");
     }
