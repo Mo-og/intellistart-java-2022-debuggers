@@ -54,6 +54,7 @@ public class ApplicationErrorException extends RuntimeException {
     SLOT_IS_OVERLAPPING(HttpStatus.CONFLICT, "slot_is_overlapping"),
     INVALID_PERIOD(HttpStatus.BAD_REQUEST, "invalid_boundaries"),
     INVALID_DAY_OF_WEEK(HttpStatus.BAD_REQUEST, "invalid_day_of_week"),
+    INVALID_BOOKING_LIMIT(HttpStatus.BAD_REQUEST, "invalid_booking_limit_number"),
     CANNOT_EDIT_THIS_WEEK(HttpStatus.METHOD_NOT_ALLOWED, "cannot_edit_this_week");
     public final String code;
     public final HttpStatus httpStatus;
