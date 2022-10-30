@@ -46,18 +46,16 @@ public class BookingLimitControllerTest {
   private static final BookingLimitRequest bookingLimitRequest = new BookingLimitRequest(limit,
       nextWeekNum);
 
-// don't know why it is not working!
-
-//  @Test
-//  void testSetBookingLimit() {
-//    when(bookingLimitService.saveBookingLimit(existingUserId, bookingLimitRequest))
-//        .thenReturn(bookingLimit);
-//    checkResponseOk(
-//        post("/interviewers/{interviewerId}/bookingLimits", existingUserId),
-//        json(bookingLimitRequest),
-//        json(bookingLimit),
-//        this.mockMvc);
-//  }
+  @Test
+  void testSetBookingLimit() {
+    when(bookingLimitService.saveBookingLimit(existingUserId, bookingLimitRequest))
+        .thenReturn(bookingLimit);
+    checkResponseOk(
+        post("/interviewers/{interviewerId}/bookingLimits", existingUserId),
+        json(bookingLimitRequest),
+        json(bookingLimit),
+        this.mockMvc);
+  }
 
   @Test
   void testSetBookingLimitWeekException() {
