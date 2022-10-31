@@ -138,7 +138,7 @@ class UserControllerTest {
 
   @Test
   void testGetUser() {
-    when(userService.getCoordinatorById(1L)).thenReturn(testCoordinator);
+    when(userService.getUserById(1L)).thenReturn(testCoordinator);
     checkResponseOk(get("/users/{id}", 1),
         null, json(testCoordinator), mockMvc);
   }
