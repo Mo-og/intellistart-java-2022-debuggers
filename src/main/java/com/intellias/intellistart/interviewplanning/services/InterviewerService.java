@@ -10,7 +10,9 @@ import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
+import java.util.Comparator;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
 import org.hibernate.Hibernate;
@@ -108,7 +110,8 @@ public class InterviewerService {
     return slots.stream()
         .map(slot -> interviewerSlotMapper.mapToInterviewerSlotWithBookingsDto(slot,
             bookingMapper.mapToBookingSetDto(bookingRepository.findByInterviewerSlot(slot))))
-        .collect(Collectors.toSet());
+        .collect(Collectors.toCollection(
+            () -> new TreeSet<>(Comparator.comparing(InterviewerSlotDto::getFrom))));
   }
 
   /**
