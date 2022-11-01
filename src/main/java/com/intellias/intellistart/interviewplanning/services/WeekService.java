@@ -53,6 +53,13 @@ public class WeekService {
         + date.get(IsoFields.WEEK_BASED_YEAR) * 100;
   }
 
+  /**
+   * Defines the date by number of the week and day of week.
+   *
+   * @param weekNum   number of week
+   * @param dayOfWeek day of week
+   * @return local date
+   */
   public static LocalDate getDateByWeekNumAndDayOfWeek(int weekNum, DayOfWeek dayOfWeek) {
     return LocalDate.now()
         .with(IsoFields.WEEK_BASED_YEAR, weekNum / 100)
