@@ -23,6 +23,14 @@ public class BookingService {
   private final CandidateTimeSlotRepository candidateTimeSlotRepository;
   private final BookingMapper bookingMapper;
 
+  /**
+   * Constructor.
+   *
+   * @param bookingRepository             booking repository
+   * @param interviewerTimeSlotRepository interviewer time slot repository
+   * @param candidateTimeSlotRepository   candidate time slot repository
+   * @param bookingMapper                 booking mapper
+   */
   @Autowired
   public BookingService(BookingRepository bookingRepository,
       InterviewerTimeSlotRepository interviewerTimeSlotRepository,
@@ -33,6 +41,12 @@ public class BookingService {
     this.bookingMapper = bookingMapper;
   }
 
+  /**
+   * Create new booking.
+   *
+   * @param bookingDto object with data to create
+   * @return created booking
+   */
   public BookingDto createBooking(BookingDto bookingDto) {
     //Todo calculate possible time
 
