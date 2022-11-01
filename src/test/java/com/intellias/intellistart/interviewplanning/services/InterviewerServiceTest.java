@@ -6,10 +6,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.when;
 
+import com.intellias.intellistart.interviewplanning.controllers.dto.mapper.BookingMapper;
+import com.intellias.intellistart.interviewplanning.controllers.dto.mapper.InterviewerSlotMapper;
 import com.intellias.intellistart.interviewplanning.exceptions.InterviewerNotFoundException;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
+import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import java.util.HashSet;
@@ -42,12 +45,18 @@ class InterviewerServiceTest {
   private InterviewerTimeSlotRepository interviewerTimeSlotRepository;
   @Mock
   private UserRepository userRepository;
+  @Mock
+  private BookingRepository bookingRepository;
+  @Mock
+  private InterviewerSlotMapper interviewerSlotMapper;
+  @Mock
+  private BookingMapper bookingMapper;
   private InterviewerService interviewerService;
 
   @BeforeEach
   void setService() {
-    interviewerService = new InterviewerService(interviewerTimeSlotRepository,
-        userRepository);
+    interviewerService = new InterviewerService(interviewerTimeSlotRepository, userRepository,
+        bookingRepository, bookingMapper, interviewerSlotMapper);
   }
 
   @Test
