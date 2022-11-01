@@ -1,6 +1,7 @@
 package com.intellias.intellistart.interviewplanning.repositories;
 
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
+import java.time.DayOfWeek;
 import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -14,4 +15,6 @@ public interface InterviewerTimeSlotRepository extends JpaRepository<Interviewer
   Set<InterviewerTimeSlot> findByInterviewerIdAndWeekNumGreaterThanEqual(Long id, int weekNum);
 
   Set<InterviewerTimeSlot> findByInterviewerIdAndWeekNum(Long id, int weekNum);
+
+  Set<InterviewerTimeSlot> findByWeekNumAndDayOfWeek(int weekNum, DayOfWeek dayOfWeek);
 }
