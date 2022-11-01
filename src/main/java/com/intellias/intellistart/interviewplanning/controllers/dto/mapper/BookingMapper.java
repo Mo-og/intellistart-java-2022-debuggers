@@ -2,6 +2,8 @@ package com.intellias.intellistart.interviewplanning.controllers.dto.mapper;
 
 import com.intellias.intellistart.interviewplanning.controllers.dto.BookingDto;
 import com.intellias.intellistart.interviewplanning.models.Booking;
+import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
+import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
@@ -28,6 +30,25 @@ public class BookingMapper {
         .interviewerSlotId(booking.getInterviewerSlot().getId())
         .candidateSlotId(booking.getCandidateSlot().getId())
         .build();
+  }
+
+  /**
+   * BookingDto to Booking.
+   *
+   * @param bookingDto bookingDto
+   * @return Booking
+   */
+  public Booking mapToBookingEntity(BookingDto bookingDto, InterviewerTimeSlot interviewerSlot,
+      CandidateTimeSlot candidateSlot) {
+    Booking booking = new Booking();
+    booking.setId(bookingDto.getId());
+    booking.setFrom(bookingDto.getFrom());
+    booking.setTo(bookingDto.getTo());
+    booking.setSubject(bookingDto.getSubject());
+    booking.setDescription(bookingDto.getDescription());
+    booking.setInterviewerSlot(interviewerSlot);
+    booking.setCandidateSlot(candidateSlot);
+    return booking;
   }
 
   /**
