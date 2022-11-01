@@ -1,7 +1,7 @@
 package com.intellias.intellistart.interviewplanning.services;
 
+import com.intellias.intellistart.interviewplanning.Utils;
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
-import com.intellias.intellistart.interviewplanning.controllers.dto.mapper.BookingMapper;
 import com.intellias.intellistart.interviewplanning.controllers.dto.mapper.InterviewerSlotMapper;
 import com.intellias.intellistart.interviewplanning.exceptions.InterviewerNotFoundException;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
@@ -10,6 +10,7 @@ import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
+import java.time.DayOfWeek;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -29,7 +30,6 @@ public class InterviewerService {
   private final UserRepository userRepository;
   private final BookingRepository bookingRepository;
   private final InterviewerSlotMapper interviewerSlotMapper;
-  private final BookingMapper bookingMapper;
 
   /**
    * Constructor.
@@ -38,16 +38,14 @@ public class InterviewerService {
    * @param userRepository                user repository bean
    * @param bookingRepository             booking repository bean
    * @param interviewerSlotMapper         interviewer slot mapper
-   * @param bookingMapper                 booking mapper
    */
   @Autowired
   public InterviewerService(InterviewerTimeSlotRepository interviewerTimeSlotRepository,
       UserRepository userRepository, BookingRepository bookingRepository,
-      BookingMapper bookingMapper, InterviewerSlotMapper interviewerSlotMapper) {
+      InterviewerSlotMapper interviewerSlotMapper) {
     this.interviewerTimeSlotRepository = interviewerTimeSlotRepository;
     this.userRepository = userRepository;
     this.bookingRepository = bookingRepository;
-    this.bookingMapper = bookingMapper;
     this.interviewerSlotMapper = interviewerSlotMapper;
   }
 
@@ -107,11 +105,23 @@ public class InterviewerService {
     Set<InterviewerTimeSlot> slots = interviewerTimeSlotRepository
         .findByInterviewerIdAndWeekNum(interviewerId, weekId);
 
+    return getInterviewerSlotsWithBookings(slots);
+  }
+
+  /**
+   * Returns interviewer slots with bookings.
+   *
+   * @param slots interviewer time slots
+   * @return a set of interviewer time slots with bookings
+   */
+  public Set<InterviewerSlotDto> getInterviewerSlotsWithBookings(Set<InterviewerTimeSlot> slots) {
     return slots.stream()
         .map(slot -> interviewerSlotMapper.mapToInterviewerSlotWithBookingsDto(slot,
-            bookingMapper.mapToBookingSetDto(bookingRepository.findByInterviewerSlot(slot))))
+            bookingRepository.findByInterviewerSlot(slot)))
         .collect(Collectors.toCollection(
-            () -> new TreeSet<>(Comparator.comparing(InterviewerSlotDto::getFrom))));
+            () -> new TreeSet<>(Comparator.comparing((InterviewerSlotDto dto) ->
+                    DayOfWeek.from(Utils.DAY_OF_WEEK_FORMATTER.parse(dto.getDayOfWeek())))
+                .thenComparing(InterviewerSlotDto::getFrom))));
   }
 
   /**
