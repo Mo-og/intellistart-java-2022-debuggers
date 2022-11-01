@@ -7,13 +7,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Week dashboard dto.
+ * Dashboard dto.
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WeekDashboardDto {
+public class DashboardDto {
 
   private Set<DayDashboardDto> days;
 }
