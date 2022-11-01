@@ -21,6 +21,9 @@ public class BookingMapper {
    * @return BookingDto
    */
   public BookingDto mapToBookingDto(Booking booking) {
+    if (booking == null) {
+      return null;
+    }
     return BookingDto.builder()
         .id(booking.getId())
         .from(booking.getFrom())
@@ -40,6 +43,9 @@ public class BookingMapper {
    */
   public Booking mapToBookingEntity(BookingDto bookingDto, InterviewerTimeSlot interviewerSlot,
       CandidateTimeSlot candidateSlot) {
+    if (bookingDto == null) {
+      return null;
+    }
     Booking booking = new Booking();
     booking.setId(bookingDto.getId());
     booking.setFrom(bookingDto.getFrom());
