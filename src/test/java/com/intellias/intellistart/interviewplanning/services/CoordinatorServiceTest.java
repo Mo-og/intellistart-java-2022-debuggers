@@ -29,7 +29,6 @@ import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -51,14 +50,12 @@ class CoordinatorServiceTest {
       UserRole.INTERVIEWER);
   private static final CandidateTimeSlot candidateSlot =
       new CandidateTimeSlot(WeekService.getCurrentDate().toString(), "08:00", "13:00");
-
   private static final CandidateSlotDto candidateSlotDto =
       CandidateSlotDto.builder()
           .date(WeekService.getCurrentDate())
           .from(LocalTime.of(8, 0))
           .to(LocalTime.of(13, 0))
           .build();
-
   private static final InterviewerTimeSlot interviewerSlot =
       new InterviewerTimeSlot("09:00", "18:00", "Mon",
           WeekService.getCurrentWeekNum());
@@ -79,7 +76,6 @@ class CoordinatorServiceTest {
           "some subject",
           "some desc"
       );
-
   private static final BookingDto bookingDto =
       BookingDto.builder()
           .from(LocalTime.of(8, 0))
@@ -95,59 +91,46 @@ class CoordinatorServiceTest {
           DayOfWeek.MONDAY))
       .dayOfWeek("Mon")
       .build();
-
   private static final DayDashboardDto tue = DayDashboardDto.builder()
       .date(WeekService.getDateByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(),
           DayOfWeek.TUESDAY))
       .dayOfWeek("Tue")
       .build();
-
   private static final DayDashboardDto wed = DayDashboardDto.builder()
       .date(WeekService.getDateByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(),
           DayOfWeek.WEDNESDAY))
       .dayOfWeek("Wed")
       .build();
-
   private static final DayDashboardDto thu = DayDashboardDto.builder()
       .date(WeekService.getDateByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(),
           DayOfWeek.THURSDAY))
       .dayOfWeek("Thu")
       .build();
-
   private static final DayDashboardDto fri = DayDashboardDto.builder()
       .date(WeekService.getDateByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(),
           DayOfWeek.FRIDAY))
       .dayOfWeek("Fri")
       .build();
-
   private static final Set<DayDashboardDto> days = new TreeSet<>(
       Comparator.comparing(DayDashboardDto::getDate));
   private static final DashboardDto weekDashboard = new DashboardDto();
-
-  private static final Set<InterviewerTimeSlot> interviewerSlotSet = new HashSet<>();
   private static final Set<InterviewerSlotDto> interviewerSlotDtoSet = new TreeSet<>(
       Comparator.comparing(InterviewerSlotDto::getFrom));
-  private static final Set<CandidateTimeSlot> candidateSlotSet = new HashSet<>();
   private static final Set<CandidateSlotDto> candidateSlotDtoSet = new TreeSet<>(
       Comparator.comparing(CandidateSlotDto::getFrom));
-  private static final Set<Booking> bookingSet = new HashSet<>();
   private static final Map<Long, BookingDto> bookingsDtoMap = new HashMap<>();
 
   static {
     interviewer.setId(1L);
     interviewerSlot.setId(1L);
     interviewerSlot.setInterviewer(interviewer);
-    candidate.setId(1L);
+    candidate.setId(2L);
     candidateSlot.setId(1L);
     candidateSlot.setCandidate(candidate);
-    coordinator.setId(1L);
+    coordinator.setId(3L);
     booking.setCandidateSlot(candidateSlot);
     booking.setInterviewerSlot(interviewerSlot);
     booking.setId(1L);
-
-    interviewerSlotSet.add(interviewerSlot);
-    candidateSlotSet.add(candidateSlot);
-    bookingSet.add(booking);
 
     interviewerSlotDtoSet.add(interviewerSlotDto);
     candidateSlotDtoSet.add(candidateSlotDto);
@@ -192,21 +175,22 @@ class CoordinatorServiceTest {
   void testGetWeekDashboard() {
     when(interviewerTimeSlotRepository
         .findByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(), DayOfWeek.MONDAY))
-        .thenReturn(interviewerSlotSet);
+        .thenReturn(Set.of(interviewerSlot));
     when(candidateTimeSlotRepository
         .findByDate(WeekService
             .getDateByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(), DayOfWeek.MONDAY)))
-        .thenReturn(candidateSlotSet);
+        .thenReturn(Set.of(candidateSlot));
     when(bookingRepository
         .findByCandidateSlotDate(
             WeekService
                 .getDateByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(), DayOfWeek.MONDAY)))
-        .thenReturn(bookingSet);
-    when(bookingRepository.findByInterviewerSlot(interviewerSlot)).thenReturn(bookingSet);
-    when(interviewerSlotMapper.mapToInterviewerSlotWithBookingsDto(interviewerSlot, bookingSet))
+        .thenReturn(Set.of(booking));
+    when(bookingRepository.findByInterviewerSlot(interviewerSlot)).thenReturn(Set.of(booking));
+    when(
+        interviewerSlotMapper.mapToInterviewerSlotWithBookingsDto(interviewerSlot, Set.of(booking)))
         .thenReturn(interviewerSlotDto);
-    when(bookingRepository.findByCandidateSlot(candidateSlot)).thenReturn(bookingSet);
-    when(candidateSlotMapper.mapToCandidateSlotDtoWithBookings(candidateSlot, bookingSet))
+    when(bookingRepository.findByCandidateSlot(candidateSlot)).thenReturn(Set.of(booking));
+    when(candidateSlotMapper.mapToCandidateSlotDtoWithBookings(candidateSlot, Set.of(booking)))
         .thenReturn(candidateSlotDto);
     when(bookingMapper.mapToBookingDto(booking)).thenReturn(bookingDto);
 
@@ -218,20 +202,21 @@ class CoordinatorServiceTest {
   void testGetDayDashboard() {
     when(interviewerTimeSlotRepository
         .findByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(), DayOfWeek.MONDAY))
-        .thenReturn(interviewerSlotSet);
+        .thenReturn(Set.of(interviewerSlot));
     when(candidateTimeSlotRepository
         .findByDate(WeekService.getDateByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(),
             DayOfWeek.MONDAY)))
-        .thenReturn(candidateSlotSet);
+        .thenReturn(Set.of(candidateSlot));
     when(bookingRepository
         .findByCandidateSlotDate(WeekService
             .getDateByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(), DayOfWeek.MONDAY)))
-        .thenReturn(bookingSet);
-    when(bookingRepository.findByInterviewerSlot(interviewerSlot)).thenReturn(bookingSet);
-    when(interviewerSlotMapper.mapToInterviewerSlotWithBookingsDto(interviewerSlot, bookingSet))
+        .thenReturn(Set.of(booking));
+    when(bookingRepository.findByInterviewerSlot(interviewerSlot)).thenReturn(Set.of(booking));
+    when(
+        interviewerSlotMapper.mapToInterviewerSlotWithBookingsDto(interviewerSlot, Set.of(booking)))
         .thenReturn(interviewerSlotDto);
-    when(bookingRepository.findByCandidateSlot(candidateSlot)).thenReturn(bookingSet);
-    when(candidateSlotMapper.mapToCandidateSlotDtoWithBookings(candidateSlot, bookingSet))
+    when(bookingRepository.findByCandidateSlot(candidateSlot)).thenReturn(Set.of(booking));
+    when(candidateSlotMapper.mapToCandidateSlotDtoWithBookings(candidateSlot, Set.of(booking)))
         .thenReturn(candidateSlotDto);
     when(bookingMapper.mapToBookingDto(booking)).thenReturn(bookingDto);
 
@@ -242,27 +227,29 @@ class CoordinatorServiceTest {
 
   @Test
   void testInterviewerSlotsWithBookings() {
-    when(bookingRepository.findByInterviewerSlot(interviewerSlot)).thenReturn(bookingSet);
-    when(interviewerSlotMapper.mapToInterviewerSlotWithBookingsDto(interviewerSlot, bookingSet))
+    when(bookingRepository.findByInterviewerSlot(interviewerSlot)).thenReturn(Set.of(booking));
+    when(
+        interviewerSlotMapper.mapToInterviewerSlotWithBookingsDto(interviewerSlot, Set.of(booking)))
         .thenReturn(interviewerSlotDto);
-    var result = service.getInterviewerSlotsWithBookings(interviewerSlotSet);
+    var result = service
+        .getInterviewerSlotsWithBookings(Set.of(interviewerSlot));
     assertEquals(interviewerSlotDtoSet, result);
   }
 
   @Test
   void testGetCandidateSlotsWithBookings() {
-    when(bookingRepository.findByCandidateSlot(candidateSlot)).thenReturn(bookingSet);
-    when(candidateSlotMapper.mapToCandidateSlotDtoWithBookings(candidateSlot, bookingSet))
+    when(bookingRepository.findByCandidateSlot(candidateSlot)).thenReturn(Set.of(booking));
+    when(candidateSlotMapper.mapToCandidateSlotDtoWithBookings(candidateSlot, Set.of(booking)))
         .thenReturn(candidateSlotDto);
     var result =
-        service.getCandidateSlotsWithBookings(candidateSlotSet);
+        service.getCandidateSlotsWithBookings(Set.of(candidateSlot));
     assertEquals(candidateSlotDtoSet, result);
   }
 
   @Test
   void testGetBookingMap() {
     when(bookingMapper.mapToBookingDto(booking)).thenReturn(bookingDto);
-    var result = service.getBookingMap(bookingSet);
+    var result = service.getBookingMap(Set.of(booking));
     assertEquals(bookingsDtoMap, result);
   }
 
