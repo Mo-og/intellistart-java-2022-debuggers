@@ -160,6 +160,15 @@ class InterviewerServiceTest {
   }
 
   @Test
+  void testGetSlotsByWeekIdWithWrongInterviewerRole() {
+    when(userRepository
+        .existsByIdAndRole(2L, UserRole.INTERVIEWER))
+        .thenThrow(new InterviewerNotFoundException(2L));
+    assertThrows(InterviewerNotFoundException.class,
+        () -> interviewerService.getSlotsByWeekId(2L, 202210));
+  }
+
+  @Test
   void testGetInterviewerSlotsWithBookings() {
     when(bookingRepository.findByInterviewerSlot(timeSlot)).thenReturn(Set.of(booking));
     when(interviewerSlotMapper.mapToInterviewerSlotWithBookingsDto(timeSlot, Set.of(booking)))
