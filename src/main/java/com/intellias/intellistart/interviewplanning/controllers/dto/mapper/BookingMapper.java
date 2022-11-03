@@ -4,7 +4,9 @@ import com.intellias.intellistart.interviewplanning.controllers.dto.BookingDto;
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
+import java.util.Comparator;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
@@ -66,6 +68,7 @@ public class BookingMapper {
   public Set<BookingDto> mapToBookingSetDto(Set<Booking> bookings) {
     return bookings.stream()
         .map(this::mapToBookingDto)
-        .collect(Collectors.toSet());
+        .collect(Collectors.toCollection(
+            () -> new TreeSet<>(Comparator.comparing(BookingDto::getFrom))));
   }
 }
