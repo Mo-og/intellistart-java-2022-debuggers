@@ -3,11 +3,11 @@ package com.intellias.intellistart.interviewplanning.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.when;
 
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
 import com.intellias.intellistart.interviewplanning.controllers.dto.mapper.InterviewerSlotMapper;
+import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
 import com.intellias.intellistart.interviewplanning.exceptions.InterviewerNotFoundException;
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
@@ -17,7 +17,9 @@ import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
+import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.EntityNotFoundException;
@@ -35,15 +37,17 @@ class InterviewerServiceTest {
   private static final User interviewer = new User(INTERVIEWER_EMAIL, UserRole.INTERVIEWER);
   private static final User candidate = new User(CANDIDATE_EMAIL, UserRole.CANDIDATE);
   private static final InterviewerTimeSlot timeSlot = new InterviewerTimeSlot("09:00",
-      "18:00", "Mon", 202210);
+      "18:00", "Mon", WeekService.getNextWeekNum());
   private static final InterviewerTimeSlot timeSlotWithUser = new InterviewerTimeSlot(
       "09:00",
-      "18:00", "Mon", 202210);
+       "18:00", "Mon", WeekService.getNextWeekNum());
   private static final CandidateTimeSlot candidateSlot =
-      new CandidateTimeSlot("2022-03-07", "08:00", "13:00");
+      new CandidateTimeSlot(WeekService
+          .getDateByWeekNumAndDayOfWeek(WeekService.getNextWeekNum(), DayOfWeek.MONDAY).toString(), 
+          "08:00", "13:00");
   private static final InterviewerSlotDto interviewerSlotDto =
       InterviewerSlotDto.builder()
-          .weekNum(202210)
+          .weekNum(WeekService.getNextWeekNum())
           .dayOfWeek("Mon")
           .from(LocalTime.of(9, 0))
           .to(LocalTime.of(18, 0))
@@ -60,6 +64,7 @@ class InterviewerServiceTest {
       );
 
   static {
+    timeSlot.setId(1L);
     interviewer.setId(1L);
     candidate.setId(2L);
     timeSlotWithUser.setId(1L);
@@ -86,14 +91,16 @@ class InterviewerServiceTest {
 
   @Test
   void testCreateSlot() {
-    when(userRepository
-        .getReferenceById(1L))
-        .thenReturn(interviewer);
-    when(interviewerTimeSlotRepository
-        .saveAndFlush(isA(InterviewerTimeSlot.class)))
-        .thenReturn(timeSlotWithUser);
-    var retrievedSlot = interviewerService.createSlot(1L, timeSlot);
-    assertEquals(interviewer, retrievedSlot.getInterviewer());
+    if (LocalDate.now().getDayOfWeek().getValue() <= DayOfWeek.FRIDAY.getValue()) {
+      when(userRepository.getReferenceById(1L)).thenReturn(interviewer);
+      when(interviewerTimeSlotRepository.saveAndFlush(any(InterviewerTimeSlot.class)))
+          .thenReturn(timeSlot);
+      InterviewerTimeSlot createdSlot = interviewerService.createSlot(1L, timeSlot);
+      assertEquals(timeSlot, createdSlot);
+    } else {
+      assertThrows(ApplicationErrorException.class,
+          () -> interviewerService.createSlot(1L, timeSlot));
+    }
   }
 
   @Test
@@ -136,7 +143,7 @@ class InterviewerServiceTest {
         .existsByIdAndRole(1L, UserRole.INTERVIEWER))
         .thenReturn(true);
     when(interviewerTimeSlotRepository
-        .findByInterviewerIdAndWeekNum(1L, 202210))
+        .findByInterviewerIdAndWeekNum(1L, WeekService.getNextWeekNum()))
         .thenReturn(Set.of(timeSlot));
     when(bookingRepository
         .findByInterviewerSlot(timeSlot))
@@ -146,7 +153,7 @@ class InterviewerServiceTest {
         .thenReturn(interviewerSlotDto);
 
     var result = interviewerService
-        .getSlotsByWeekId(1L, 202210);
+        .getSlotsByWeekId(1L, WeekService.getNextWeekNum());
     assertEquals(Set.of(interviewerSlotDto), result);
   }
 
@@ -156,7 +163,7 @@ class InterviewerServiceTest {
         .existsByIdAndRole(-1L, UserRole.INTERVIEWER))
         .thenThrow(new InterviewerNotFoundException(-1L));
     assertThrows(InterviewerNotFoundException.class,
-        () -> interviewerService.getSlotsByWeekId(-1L, 202210));
+        () -> interviewerService.getSlotsByWeekId(-1L, WeekService.getNextWeekNum()));
   }
 
   @Test
@@ -165,7 +172,7 @@ class InterviewerServiceTest {
         .existsByIdAndRole(2L, UserRole.INTERVIEWER))
         .thenThrow(new InterviewerNotFoundException(2L));
     assertThrows(InterviewerNotFoundException.class,
-        () -> interviewerService.getSlotsByWeekId(2L, 202210));
+        () -> interviewerService.getSlotsByWeekId(2L, WeekService.getNextWeekNum()));
   }
 
   @Test
@@ -180,18 +187,23 @@ class InterviewerServiceTest {
 
   @Test
   void testUpdateSlot() {
-    when(interviewerTimeSlotRepository
-        .getReferenceById(1L))
-        .thenReturn(new InterviewerTimeSlot());
-    when(interviewerTimeSlotRepository
-        .save(any()))
-        .thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
-    var slot = interviewerService
-        .updateSlot(1L, 1L, timeSlot);
-    assertEquals(timeSlot.getFrom(), slot.getFrom());
-    assertEquals(timeSlot.getTo(), slot.getTo());
-    assertEquals(timeSlot.getDayOfWeek(), slot.getDayOfWeek());
-    assertEquals(timeSlot.getWeekNum(), slot.getWeekNum());
+    if (LocalDate.now().getDayOfWeek().getValue() <= DayOfWeek.FRIDAY.getValue()) {
+      when(interviewerTimeSlotRepository
+          .getReferenceById(1L))
+          .thenReturn(new InterviewerTimeSlot());
+      when(interviewerTimeSlotRepository
+          .save(any()))
+          .thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
+      var slot = interviewerService
+          .updateSlot(1L, 1L, timeSlot);
+      assertEquals(timeSlot.getFrom(), slot.getFrom());
+      assertEquals(timeSlot.getTo(), slot.getTo());
+      assertEquals(timeSlot.getDayOfWeek(), slot.getDayOfWeek());
+      assertEquals(timeSlot.getWeekNum(), slot.getWeekNum());
+    } else {
+      assertThrows(ApplicationErrorException.class,
+          () -> interviewerService.updateSlot(1L, 1L, timeSlot));
+    }
   }
 
   @Test
