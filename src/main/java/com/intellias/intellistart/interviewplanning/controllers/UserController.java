@@ -1,14 +1,20 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.intellias.intellistart.interviewplanning.configs.CustomOauth2User;
+import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundException;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.services.CoordinatorService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import com.intellias.intellistart.interviewplanning.services.UserService;
 import java.util.Set;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,6 +47,47 @@ public class UserController {
     this.interviewerService = interviewerService;
     this.userService = userService;
   }
+
+  /**
+   * Test method to see what token contains.
+   *
+   * @param authentication Object from spring security containing the principle presented by our
+   *                       user.
+   * @return toString() of received authentication object
+   */
+  @GetMapping("/")
+  //todo remove
+  public String test(Authentication authentication) {
+    if (authentication != null) {
+      System.out.println("Authentication class: " + authentication.getClass());
+      System.out.println("Authentication authorities: " + authentication.getAuthorities());
+      System.out.println(
+          "Authentication principal class: " + authentication.getPrincipal().getClass());
+    } else {
+      System.out.println("Not authenticated");
+    }
+
+    return String.valueOf(authentication);
+  }
+
+  /**
+   * Me endpoint. Provides current user info
+   *
+   * @return current user info as json object containing email and role. Also contains id if user is
+   * not a Candidate
+   */
+  @GetMapping("/me")
+  public ResponseEntity<?> getUserInfo(Authentication authentication) {
+    User user;
+    CustomOauth2User auth2User = (CustomOauth2User) authentication.getPrincipal();
+    try {
+      user = userService.getByEmail(auth2User.getEmail());
+    } catch (UserNotFoundException e) {
+      return ResponseEntity.ok(new UserForm(auth2User.getEmail(), UserRole.CANDIDATE));
+    }
+    return ResponseEntity.ok(user);
+  }
+
 
   @GetMapping("/interviewers/{interviewerId}")
   public User getInterviewerById(@PathVariable Long interviewerId) {
@@ -93,5 +140,23 @@ public class UserController {
   @GetMapping("/users/coordinators")
   public Set<User> getCoordinators() {
     return coordinatorService.getUsersWithRole(UserRole.COORDINATOR);
+  }
+
+  @Data
+  @NoArgsConstructor
+  static class UserForm {
+
+    private String email;
+    private String role;
+
+    public UserForm(User user) {
+      email = user.getEmail();
+      role = user.getRole().name();
+    }
+
+    public UserForm(String email, UserRole role) {
+      this.email = email;
+      this.role = role.name();
+    }
   }
 }

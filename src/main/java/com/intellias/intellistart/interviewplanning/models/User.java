@@ -1,6 +1,9 @@
 package com.intellias.intellistart.interviewplanning.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,11 +14,13 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
+import org.springframework.security.core.GrantedAuthority;
 
 /**
  * User.
@@ -37,16 +42,32 @@ public class User {
   private Long id;
   private String email;
   private UserRole role;
+  @JsonIgnore
+  @Transient
+  private Collection<GrantedAuthority> authorities;
 
   /**
    * User.
    *
-   * @param email    mail
-   * @param role role
+   * @param email mail
+   * @param role  role
    */
   public User(String email, UserRole role) {
     this.email = email;
     this.role = role;
+    authorities = List.of(role);
+  }
+
+  /**
+   * UserDetails method implementation.
+   *
+   * @return Unmodifiable list of a single role element
+   */
+  public Collection<GrantedAuthority> getAuthorities() {
+    if (authorities == null) {
+      authorities = List.of(role);
+    }
+    return authorities;
   }
 
   @Override
@@ -72,7 +93,12 @@ public class User {
   /**
    * User role.
    */
-  public enum UserRole {
-    INTERVIEWER, CANDIDATE, COORDINATOR
+  public enum UserRole implements GrantedAuthority {
+    INTERVIEWER, CANDIDATE, COORDINATOR;
+
+    @Override
+    public String getAuthority() {
+      return name();
+    }
   }
 }

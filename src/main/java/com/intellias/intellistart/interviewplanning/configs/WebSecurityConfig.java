@@ -1,14 +1,15 @@
 package com.intellias.intellistart.interviewplanning.configs;
 
+import com.intellias.intellistart.interviewplanning.services.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
@@ -16,41 +17,31 @@ import org.springframework.security.web.SecurityFilterChain;
  */
 @Configuration
 @EnableWebSecurity
+@EnableConfigurationProperties
+@RequiredArgsConstructor
 public class WebSecurityConfig {
 
+  private final UserService userService;
+
   /**
-   * Requests filter to perform authorisation.
+   * Requests filter to perform authorization.
    *
    * @param http HttpSecurity injected object
    * @return http filter
    */
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-        .csrf().disable()
-        .headers().disable()
-        .authorizeHttpRequests(requests -> requests
-            .anyRequest().permitAll() //for now allow everyone
-        )
-        .logout(LogoutConfigurer::permitAll);
+  public SecurityFilterChain securityFilterChain(HttpSecurity http,
+      Oauth2LoginSuccessHandler successHandler) throws Exception {
+    http.csrf().disable();
+    http.authorizeRequests().anyRequest().authenticated();
 
+    http.oauth2Login().userInfoEndpoint().userService(userService)
+        .and().successHandler(successHandler);
     return http.build();
   }
 
-  /**
-   * Temporary service provider to allow in-memory authentication.
-   *
-   * @return in-memory user manager
-   */
   @Bean
-  public UserDetailsService userDetailsService() {
-    UserDetails user =
-        User.withDefaultPasswordEncoder()
-            .username("user")
-            .password("password")
-            .roles("USER")
-            .build();
-
-    return new InMemoryUserDetailsManager(user);
+  public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2Userservice() {
+    return userService;
   }
 }
