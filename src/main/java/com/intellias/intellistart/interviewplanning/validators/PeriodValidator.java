@@ -1,6 +1,6 @@
 package com.intellias.intellistart.interviewplanning.validators;
 
-import com.intellias.intellistart.interviewplanning.exceptions.InvalidPeriodException;
+import com.intellias.intellistart.interviewplanning.exceptions.InvalidBoundariesException;
 import java.time.LocalTime;
 
 /**
@@ -30,11 +30,11 @@ public class PeriodValidator {
    *
    * @param from start time
    * @param to   end time
-   * @throws InvalidPeriodException if period is invalid
+   * @throws InvalidBoundariesException if period is invalid
    */
   public static void validate(String from, String to) {
     if (!isValid(from, to)) {
-      throw new InvalidPeriodException(from, to);
+      throw new InvalidBoundariesException(from, to);
     }
   }
 
