@@ -1,24 +1,16 @@
-package com.intellias.intellistart.interviewplanning.controllers.dto.mapper;
+package com.intellias.intellistart.interviewplanning.utils.mappers;
 
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import lombok.experimental.UtilityClass;
 
 /**
  * Interviewer slot mapper.
  */
-@Component
+@UtilityClass
 public class InterviewerSlotMapper {
-
-  private final BookingMapper bookingMapper;
-
-  @Autowired
-  public InterviewerSlotMapper(BookingMapper bookingMapper) {
-    this.bookingMapper = bookingMapper;
-  }
 
   /**
    * to InterviewerSlotDto.
@@ -38,7 +30,7 @@ public class InterviewerSlotMapper {
         .dayOfWeek(slot.getShortDayOfWeek())
         .from(slot.getFrom())
         .to(slot.getTo())
-        .bookings(bookingMapper.mapToBookingSetDto(bookings))
+        .bookings(BookingMapper.mapToBookingSetDto(bookings))
         .build();
   }
 }

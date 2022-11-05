@@ -1,7 +1,6 @@
 package com.intellias.intellistart.interviewplanning.services;
 
 import com.intellias.intellistart.interviewplanning.controllers.dto.BookingDto;
-import com.intellias.intellistart.interviewplanning.controllers.dto.mapper.BookingMapper;
 import com.intellias.intellistart.interviewplanning.exceptions.TimeSlotNotFoundException;
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
@@ -9,6 +8,7 @@ import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
 import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
+import com.intellias.intellistart.interviewplanning.utils.mappers.BookingMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +21,6 @@ public class BookingService {
   private final BookingRepository bookingRepository;
   private final InterviewerTimeSlotRepository interviewerTimeSlotRepository;
   private final CandidateTimeSlotRepository candidateTimeSlotRepository;
-  private final BookingMapper bookingMapper;
 
   /**
    * Constructor.
@@ -29,16 +28,14 @@ public class BookingService {
    * @param bookingRepository             booking repository
    * @param interviewerTimeSlotRepository interviewer time slot repository
    * @param candidateTimeSlotRepository   candidate time slot repository
-   * @param bookingMapper                 booking mapper
    */
   @Autowired
   public BookingService(BookingRepository bookingRepository,
       InterviewerTimeSlotRepository interviewerTimeSlotRepository,
-      CandidateTimeSlotRepository candidateTimeSlotRepository, BookingMapper bookingMapper) {
+      CandidateTimeSlotRepository candidateTimeSlotRepository) {
     this.bookingRepository = bookingRepository;
     this.interviewerTimeSlotRepository = interviewerTimeSlotRepository;
     this.candidateTimeSlotRepository = candidateTimeSlotRepository;
-    this.bookingMapper = bookingMapper;
   }
 
   /**
@@ -58,9 +55,9 @@ public class BookingService {
     CandidateTimeSlot candidateSlot = candidateTimeSlotRepository.findById(candidateSlotId)
         .orElseThrow(() -> new TimeSlotNotFoundException(candidateSlotId));
 
-    Booking booking = bookingMapper.mapToBookingEntity(bookingDto, interviewerSlot, candidateSlot);
+    Booking booking = BookingMapper.mapToBookingEntity(bookingDto, interviewerSlot, candidateSlot);
 
-    return bookingMapper.mapToBookingDto(bookingRepository.save(booking));
+    return BookingMapper.mapToBookingDto(bookingRepository.save(booking));
   }
 
   /**

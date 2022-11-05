@@ -5,9 +5,6 @@ import com.intellias.intellistart.interviewplanning.controllers.dto.CandidateSlo
 import com.intellias.intellistart.interviewplanning.controllers.dto.DashboardDto;
 import com.intellias.intellistart.interviewplanning.controllers.dto.DayDashboardDto;
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
-import com.intellias.intellistart.interviewplanning.controllers.dto.mapper.BookingMapper;
-import com.intellias.intellistart.interviewplanning.controllers.dto.mapper.CandidateSlotMapper;
-import com.intellias.intellistart.interviewplanning.controllers.dto.mapper.InterviewerSlotMapper;
 import com.intellias.intellistart.interviewplanning.exceptions.CoordinatorNotFoundException;
 import com.intellias.intellistart.interviewplanning.exceptions.InterviewerNotFoundException;
 import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundException;
@@ -20,6 +17,9 @@ import com.intellias.intellistart.interviewplanning.repositories.BookingReposito
 import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
+import com.intellias.intellistart.interviewplanning.utils.mappers.BookingMapper;
+import com.intellias.intellistart.interviewplanning.utils.mappers.CandidateSlotMapper;
+import com.intellias.intellistart.interviewplanning.utils.mappers.InterviewerSlotMapper;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
@@ -43,9 +43,6 @@ public class CoordinatorService {
   private final CandidateTimeSlotRepository candidateTimeSlotRepository;
   private final BookingRepository bookingRepository;
   private final UserRepository userRepository;
-  private final InterviewerSlotMapper interviewerSlotMapper;
-  private final CandidateSlotMapper candidateSlotMapper;
-  private final BookingMapper bookingMapper;
 
   /**
    * Constructor.
@@ -54,23 +51,15 @@ public class CoordinatorService {
    * @param candidateTimeSlotRepository   candidate time slot repository
    * @param bookingRepository             booking repository
    * @param userRepository                user repository
-   * @param interviewerSlotMapper         interviewer slot mapper
-   * @param candidateSlotMapper           candidate slot mapper
-   * @param bookingMapper                 booking mapper
    */
   @Autowired
   public CoordinatorService(InterviewerTimeSlotRepository interviewerTimeSlotRepository,
       CandidateTimeSlotRepository candidateTimeSlotRepository,
-      BookingRepository bookingRepository, UserRepository userRepository,
-      InterviewerSlotMapper interviewerSlotMapper, CandidateSlotMapper candidateSlotMapper,
-      BookingMapper bookingMapper) {
+      BookingRepository bookingRepository, UserRepository userRepository) {
     this.interviewerTimeSlotRepository = interviewerTimeSlotRepository;
     this.candidateTimeSlotRepository = candidateTimeSlotRepository;
     this.bookingRepository = bookingRepository;
     this.userRepository = userRepository;
-    this.interviewerSlotMapper = interviewerSlotMapper;
-    this.candidateSlotMapper = candidateSlotMapper;
-    this.bookingMapper = bookingMapper;
   }
 
   /**
@@ -122,7 +111,7 @@ public class CoordinatorService {
    */
   public Set<InterviewerSlotDto> getInterviewerSlotsWithBookings(Set<InterviewerTimeSlot> slots) {
     return slots.stream()
-        .map(slot -> interviewerSlotMapper.mapToInterviewerSlotWithBookingsDto(slot,
+        .map(slot -> InterviewerSlotMapper.mapToInterviewerSlotWithBookingsDto(slot,
             bookingRepository.findByInterviewerSlot(slot)))
         .collect(Collectors.toCollection(
             () -> new TreeSet<>(Comparator.comparing(InterviewerSlotDto::getFrom))));
@@ -136,7 +125,7 @@ public class CoordinatorService {
    */
   public Set<CandidateSlotDto> getCandidateSlotsWithBookings(Set<CandidateTimeSlot> slots) {
     return slots.stream()
-        .map(slot -> candidateSlotMapper.mapToCandidateSlotDtoWithBookings(slot,
+        .map(slot -> CandidateSlotMapper.mapToCandidateSlotDtoWithBookings(slot,
             bookingRepository.findByCandidateSlot(slot)))
         .collect(Collectors.toCollection(
             () -> new TreeSet<>(Comparator.comparing(CandidateSlotDto::getFrom))));
@@ -150,7 +139,7 @@ public class CoordinatorService {
    */
   public Map<Long, BookingDto> getBookingMap(Set<Booking> bookings) {
     return bookings.stream()
-        .map(bookingMapper::mapToBookingDto)
+        .map(BookingMapper::mapToBookingDto)
         .collect(Collectors.toMap(BookingDto::getId, Function.identity()));
   }
 

@@ -10,9 +10,6 @@ import com.intellias.intellistart.interviewplanning.controllers.dto.CandidateSlo
 import com.intellias.intellistart.interviewplanning.controllers.dto.DashboardDto;
 import com.intellias.intellistart.interviewplanning.controllers.dto.DayDashboardDto;
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
-import com.intellias.intellistart.interviewplanning.controllers.dto.mapper.BookingMapper;
-import com.intellias.intellistart.interviewplanning.controllers.dto.mapper.CandidateSlotMapper;
-import com.intellias.intellistart.interviewplanning.controllers.dto.mapper.InterviewerSlotMapper;
 import com.intellias.intellistart.interviewplanning.exceptions.CoordinatorNotFoundException;
 import com.intellias.intellistart.interviewplanning.exceptions.InterviewerNotFoundException;
 import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundException;
@@ -28,7 +25,6 @@ import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -85,7 +81,6 @@ class CoordinatorServiceTest {
           .interviewerSlotId(interviewerSlot.getId())
           .candidateSlotId(candidateSlot.getId())
           .build();
-
   private static final DayDashboardDto mon = DayDashboardDto.builder()
       .date(WeekService.getDateByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(),
           DayOfWeek.MONDAY))
@@ -118,7 +113,6 @@ class CoordinatorServiceTest {
       Comparator.comparing(InterviewerSlotDto::getFrom));
   private static final Set<CandidateSlotDto> candidateSlotDtoSet = new TreeSet<>(
       Comparator.comparing(CandidateSlotDto::getFrom));
-  private static final Map<Long, BookingDto> bookingsDtoMap = new HashMap<>();
 
   static {
     interviewer.setId(1L);
@@ -128,17 +122,20 @@ class CoordinatorServiceTest {
     candidateSlot.setId(1L);
     candidateSlot.setCandidate(candidate);
     coordinator.setId(3L);
+
     booking.setCandidateSlot(candidateSlot);
     booking.setInterviewerSlot(interviewerSlot);
     booking.setId(1L);
+    bookingDto.setId(1L);
+    bookingDto.setCandidateSlotId(candidateSlot.getId());
+    bookingDto.setInterviewerSlotId(interviewerSlot.getId());
 
     interviewerSlotDtoSet.add(interviewerSlotDto);
     candidateSlotDtoSet.add(candidateSlotDto);
-    bookingsDtoMap.put(bookingDto.getId(), bookingDto);
 
     mon.setInterviewerSlots(interviewerSlotDtoSet);
     mon.setCandidateSlots(candidateSlotDtoSet);
-    mon.setBookings(bookingsDtoMap);
+    mon.setBookings(Map.of(bookingDto.getId(), bookingDto));
     days.add(mon);
     days.add(tue);
     days.add(wed);
@@ -155,20 +152,13 @@ class CoordinatorServiceTest {
   InterviewerTimeSlotRepository interviewerTimeSlotRepository;
   @Mock
   UserRepository userRepository;
-  @Mock
-  InterviewerSlotMapper interviewerSlotMapper;
-  @Mock
-  CandidateSlotMapper candidateSlotMapper;
-  @Mock
-  BookingMapper bookingMapper;
 
   private CoordinatorService service;
 
   @BeforeEach
   void setService() {
     service = new CoordinatorService(interviewerTimeSlotRepository, candidateTimeSlotRepository,
-        bookingRepository, userRepository, interviewerSlotMapper, candidateSlotMapper,
-        bookingMapper);
+        bookingRepository, userRepository);
   }
 
   @Test
@@ -186,14 +176,7 @@ class CoordinatorServiceTest {
                 .getDateByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(), DayOfWeek.MONDAY)))
         .thenReturn(Set.of(booking));
     when(bookingRepository.findByInterviewerSlot(interviewerSlot)).thenReturn(Set.of(booking));
-    when(
-        interviewerSlotMapper.mapToInterviewerSlotWithBookingsDto(interviewerSlot, Set.of(booking)))
-        .thenReturn(interviewerSlotDto);
     when(bookingRepository.findByCandidateSlot(candidateSlot)).thenReturn(Set.of(booking));
-    when(candidateSlotMapper.mapToCandidateSlotDtoWithBookings(candidateSlot, Set.of(booking)))
-        .thenReturn(candidateSlotDto);
-    when(bookingMapper.mapToBookingDto(booking)).thenReturn(bookingDto);
-
     var dashboard = service.getWeekDashboard(WeekService.getCurrentWeekNum());
     assertEquals(weekDashboard, dashboard);
   }
@@ -212,14 +195,7 @@ class CoordinatorServiceTest {
             .getDateByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(), DayOfWeek.MONDAY)))
         .thenReturn(Set.of(booking));
     when(bookingRepository.findByInterviewerSlot(interviewerSlot)).thenReturn(Set.of(booking));
-    when(
-        interviewerSlotMapper.mapToInterviewerSlotWithBookingsDto(interviewerSlot, Set.of(booking)))
-        .thenReturn(interviewerSlotDto);
     when(bookingRepository.findByCandidateSlot(candidateSlot)).thenReturn(Set.of(booking));
-    when(candidateSlotMapper.mapToCandidateSlotDtoWithBookings(candidateSlot, Set.of(booking)))
-        .thenReturn(candidateSlotDto);
-    when(bookingMapper.mapToBookingDto(booking)).thenReturn(bookingDto);
-
     var dashboard =
         service.getDayDashboard(WeekService.getCurrentWeekNum(), DayOfWeek.MONDAY);
     assertEquals(mon, dashboard);
@@ -228,9 +204,6 @@ class CoordinatorServiceTest {
   @Test
   void testInterviewerSlotsWithBookings() {
     when(bookingRepository.findByInterviewerSlot(interviewerSlot)).thenReturn(Set.of(booking));
-    when(
-        interviewerSlotMapper.mapToInterviewerSlotWithBookingsDto(interviewerSlot, Set.of(booking)))
-        .thenReturn(interviewerSlotDto);
     var result = service
         .getInterviewerSlotsWithBookings(Set.of(interviewerSlot));
     assertEquals(interviewerSlotDtoSet, result);
@@ -239,8 +212,6 @@ class CoordinatorServiceTest {
   @Test
   void testGetCandidateSlotsWithBookings() {
     when(bookingRepository.findByCandidateSlot(candidateSlot)).thenReturn(Set.of(booking));
-    when(candidateSlotMapper.mapToCandidateSlotDtoWithBookings(candidateSlot, Set.of(booking)))
-        .thenReturn(candidateSlotDto);
     var result =
         service.getCandidateSlotsWithBookings(Set.of(candidateSlot));
     assertEquals(candidateSlotDtoSet, result);
@@ -248,9 +219,8 @@ class CoordinatorServiceTest {
 
   @Test
   void testGetBookingMap() {
-    when(bookingMapper.mapToBookingDto(booking)).thenReturn(bookingDto);
     var result = service.getBookingMap(Set.of(booking));
-    assertEquals(bookingsDtoMap, result);
+    assertEquals(Map.of(bookingDto.getId(), bookingDto), result);
   }
 
   @Test
@@ -278,7 +248,6 @@ class CoordinatorServiceTest {
         .thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
     when(userRepository.findByEmail("interviewer@gmail.com"))
         .thenReturn(Optional.of(new User()));
-
     when(userRepository.findByIdAndRole(1L, UserRole.INTERVIEWER))
         .thenReturn(Optional.of(interviewer));
     assertEquals(UserRole.CANDIDATE,

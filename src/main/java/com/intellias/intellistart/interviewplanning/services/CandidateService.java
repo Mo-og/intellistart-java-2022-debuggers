@@ -1,7 +1,6 @@
 package com.intellias.intellistart.interviewplanning.services;
 
 import com.intellias.intellistart.interviewplanning.controllers.dto.CandidateSlotDto;
-import com.intellias.intellistart.interviewplanning.controllers.dto.mapper.CandidateSlotMapper;
 import com.intellias.intellistart.interviewplanning.exceptions.CandidateNotFoundException;
 import com.intellias.intellistart.interviewplanning.exceptions.TimeSlotNotFoundException;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
@@ -10,6 +9,7 @@ import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
 import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
+import com.intellias.intellistart.interviewplanning.utils.mappers.CandidateSlotMapper;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -29,7 +29,6 @@ public class CandidateService {
   private final CandidateTimeSlotRepository candidateTimeSlotRepository;
   private final UserRepository userRepository;
   private final BookingRepository bookingRepository;
-  private final CandidateSlotMapper candidateSlotMapper;
 
   /**
    * Constructor.
@@ -37,16 +36,13 @@ public class CandidateService {
    * @param candidateTimeSlotRepository time slot repository bean
    * @param userRepository              user repository bean
    * @param bookingRepository           booking repository bean
-   * @param candidateSlotMapper         candidate slot mapper
    */
   @Autowired
   public CandidateService(CandidateTimeSlotRepository candidateTimeSlotRepository,
-      UserRepository userRepository, BookingRepository bookingRepository,
-      CandidateSlotMapper candidateSlotMapper) {
+      UserRepository userRepository, BookingRepository bookingRepository) {
     this.candidateTimeSlotRepository = candidateTimeSlotRepository;
     this.userRepository = userRepository;
     this.bookingRepository = bookingRepository;
-    this.candidateSlotMapper = candidateSlotMapper;
   }
 
   /**
@@ -59,9 +55,9 @@ public class CandidateService {
   public CandidateSlotDto createSlot(Long candidateId, CandidateSlotDto candidateSlotDto) {
     //todo validation of slot
     User candidate = userRepository.getReferenceById(candidateId);
-    CandidateTimeSlot candidateSlot = candidateSlotMapper.mapToCandidateSlotEntity(candidateSlotDto,
-        candidate);
-    return candidateSlotMapper.mapToCandidateSlotDto(
+    CandidateTimeSlot candidateSlot = CandidateSlotMapper
+        .mapToCandidateSlotEntity(candidateSlotDto, candidate);
+    return CandidateSlotMapper.mapToCandidateSlotDto(
         candidateTimeSlotRepository.save(candidateSlot));
   }
 
@@ -96,8 +92,8 @@ public class CandidateService {
    */
   public Set<CandidateSlotDto> getCandidateSlotsWithBookings(List<CandidateTimeSlot> slots) {
     return slots.stream()
-        .map(slot -> candidateSlotMapper.mapToCandidateSlotDtoWithBookings(slot,
-            bookingRepository.findByCandidateSlot(slot)))
+        .map(slot -> CandidateSlotMapper
+            .mapToCandidateSlotDtoWithBookings(slot, bookingRepository.findByCandidateSlot(slot)))
         .collect(Collectors.toCollection(
             () -> new TreeSet<>(Comparator.comparing(CandidateSlotDto::getDate)
                 .thenComparing(CandidateSlotDto::getFrom))));

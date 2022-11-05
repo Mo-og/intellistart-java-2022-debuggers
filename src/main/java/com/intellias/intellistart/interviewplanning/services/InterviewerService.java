@@ -1,8 +1,6 @@
 package com.intellias.intellistart.interviewplanning.services;
 
-import com.intellias.intellistart.interviewplanning.utils.Utils;
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
-import com.intellias.intellistart.interviewplanning.controllers.dto.mapper.InterviewerSlotMapper;
 import com.intellias.intellistart.interviewplanning.exceptions.InterviewerNotFoundException;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.User;
@@ -10,6 +8,8 @@ import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
+import com.intellias.intellistart.interviewplanning.utils.Utils;
+import com.intellias.intellistart.interviewplanning.utils.mappers.InterviewerSlotMapper;
 import com.intellias.intellistart.interviewplanning.validators.InterviewerSlotValidator;
 import com.intellias.intellistart.interviewplanning.validators.InterviewerSlotValidator.Action;
 import java.time.DayOfWeek;
@@ -31,7 +31,6 @@ public class InterviewerService {
   private final InterviewerTimeSlotRepository interviewerTimeSlotRepository;
   private final UserRepository userRepository;
   private final BookingRepository bookingRepository;
-  private final InterviewerSlotMapper interviewerSlotMapper;
 
   /**
    * Constructor.
@@ -39,16 +38,13 @@ public class InterviewerService {
    * @param interviewerTimeSlotRepository time slot repository bean
    * @param userRepository                user repository bean
    * @param bookingRepository             booking repository bean
-   * @param interviewerSlotMapper         interviewer slot mapper
    */
   @Autowired
   public InterviewerService(InterviewerTimeSlotRepository interviewerTimeSlotRepository,
-      UserRepository userRepository, BookingRepository bookingRepository,
-      InterviewerSlotMapper interviewerSlotMapper) {
+      UserRepository userRepository, BookingRepository bookingRepository) {
     this.interviewerTimeSlotRepository = interviewerTimeSlotRepository;
     this.userRepository = userRepository;
     this.bookingRepository = bookingRepository;
-    this.interviewerSlotMapper = interviewerSlotMapper;
   }
 
   /**
@@ -118,7 +114,7 @@ public class InterviewerService {
    */
   public Set<InterviewerSlotDto> getInterviewerSlotsWithBookings(Set<InterviewerTimeSlot> slots) {
     return slots.stream()
-        .map(slot -> interviewerSlotMapper.mapToInterviewerSlotWithBookingsDto(slot,
+        .map(slot -> InterviewerSlotMapper.mapToInterviewerSlotWithBookingsDto(slot,
             bookingRepository.findByInterviewerSlot(slot)))
         .collect(Collectors.toCollection(
             () -> new TreeSet<>(Comparator.comparing((InterviewerSlotDto dto) ->

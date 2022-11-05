@@ -3,12 +3,12 @@ package com.intellias.intellistart.interviewplanning.services;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import com.intellias.intellistart.interviewplanning.controllers.dto.BookingDto;
-import com.intellias.intellistart.interviewplanning.controllers.dto.mapper.BookingMapper;
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
@@ -53,6 +53,7 @@ class BookingServiceTest {
     interviewerSlot.setId(1L);
     candidateSlot.setId(1L);
     booking.setId(1L);
+    bookingDto.setId(1L);
     bookingDto.setInterviewerSlotId(interviewerSlot.getId());
     bookingDto.setCandidateSlotId(candidateSlot.getId());
   }
@@ -63,14 +64,12 @@ class BookingServiceTest {
   InterviewerTimeSlotRepository interviewerTimeSlotRepository;
   @Mock
   CandidateTimeSlotRepository candidateTimeSlotRepository;
-  @Mock
-  BookingMapper bookingMapper;
   private BookingService service;
 
   @BeforeEach
   void setService() {
     service = new BookingService(bookingRepository, interviewerTimeSlotRepository,
-        candidateTimeSlotRepository, bookingMapper);
+        candidateTimeSlotRepository);
   }
 
   @Test
@@ -79,13 +78,9 @@ class BookingServiceTest {
         .thenReturn(Optional.of(interviewerSlot));
     when(candidateTimeSlotRepository.findById(candidateSlot.getId()))
         .thenReturn(Optional.of(candidateSlot));
-    when(bookingMapper.mapToBookingEntity(bookingDto, interviewerSlot, candidateSlot))
-        .thenReturn(booking);
     when(bookingRepository
-        .save(booking))
+        .save(any()))
         .thenReturn(booking);
-    when(bookingMapper.mapToBookingDto(booking))
-        .thenReturn(bookingDto);
 
     var createdBooking = service.createBooking(bookingDto);
     assertEquals(bookingDto, createdBooking);
