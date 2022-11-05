@@ -22,7 +22,7 @@ public class BookingMapper {
    * @param booking entity
    * @return BookingDto
    */
-  public BookingDto mapToBookingDto(Booking booking) {
+  public BookingDto mapToDto(Booking booking) {
     if (booking == null) {
       return null;
     }
@@ -43,7 +43,7 @@ public class BookingMapper {
    * @param bookingDto bookingDto
    * @return Booking
    */
-  public Booking mapToBookingEntity(BookingDto bookingDto, InterviewerTimeSlot interviewerSlot,
+  public Booking mapToEntity(BookingDto bookingDto, InterviewerTimeSlot interviewerSlot,
       CandidateTimeSlot candidateSlot) {
     if (bookingDto == null) {
       return null;
@@ -65,9 +65,9 @@ public class BookingMapper {
    * @param bookings entities
    * @return Set of BookingDto
    */
-  public Set<BookingDto> mapToBookingSetDto(Set<Booking> bookings) {
+  public Set<BookingDto> mapSetToDto(Set<Booking> bookings) {
     return bookings.stream()
-        .map(BookingMapper::mapToBookingDto)
+        .map(BookingMapper::mapToDto)
         .collect(Collectors.toCollection(
             () -> new TreeSet<>(Comparator.comparing(BookingDto::getFrom))));
   }

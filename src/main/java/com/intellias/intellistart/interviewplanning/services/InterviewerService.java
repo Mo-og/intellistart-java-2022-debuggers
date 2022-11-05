@@ -114,7 +114,7 @@ public class InterviewerService {
    */
   public Set<InterviewerSlotDto> getInterviewerSlotsWithBookings(Set<InterviewerTimeSlot> slots) {
     return slots.stream()
-        .map(slot -> InterviewerSlotMapper.mapToInterviewerSlotWithBookingsDto(slot,
+        .map(slot -> InterviewerSlotMapper.mapToDtoWithBookings(slot,
             bookingRepository.findByInterviewerSlot(slot)))
         .collect(Collectors.toCollection(
             () -> new TreeSet<>(Comparator.comparing((InterviewerSlotDto dto) ->

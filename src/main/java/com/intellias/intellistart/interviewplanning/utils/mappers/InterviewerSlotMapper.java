@@ -19,8 +19,7 @@ public class InterviewerSlotMapper {
    * @param bookings BookingDto
    * @return InterviewerSlotDto
    */
-  public InterviewerSlotDto mapToInterviewerSlotWithBookingsDto(
-      InterviewerTimeSlot slot, Set<Booking> bookings) {
+  public InterviewerSlotDto mapToDtoWithBookings(InterviewerTimeSlot slot, Set<Booking> bookings) {
     if (slot == null) {
       return null;
     }
@@ -30,7 +29,7 @@ public class InterviewerSlotMapper {
         .dayOfWeek(slot.getShortDayOfWeek())
         .from(slot.getFrom())
         .to(slot.getTo())
-        .bookings(BookingMapper.mapToBookingSetDto(bookings))
+        .bookings(BookingMapper.mapSetToDto(bookings))
         .build();
   }
 }

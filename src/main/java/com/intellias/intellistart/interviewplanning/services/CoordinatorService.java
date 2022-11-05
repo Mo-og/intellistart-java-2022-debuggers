@@ -111,7 +111,7 @@ public class CoordinatorService {
    */
   public Set<InterviewerSlotDto> getInterviewerSlotsWithBookings(Set<InterviewerTimeSlot> slots) {
     return slots.stream()
-        .map(slot -> InterviewerSlotMapper.mapToInterviewerSlotWithBookingsDto(slot,
+        .map(slot -> InterviewerSlotMapper.mapToDtoWithBookings(slot,
             bookingRepository.findByInterviewerSlot(slot)))
         .collect(Collectors.toCollection(
             () -> new TreeSet<>(Comparator.comparing(InterviewerSlotDto::getFrom))));
@@ -125,7 +125,7 @@ public class CoordinatorService {
    */
   public Set<CandidateSlotDto> getCandidateSlotsWithBookings(Set<CandidateTimeSlot> slots) {
     return slots.stream()
-        .map(slot -> CandidateSlotMapper.mapToCandidateSlotDtoWithBookings(slot,
+        .map(slot -> CandidateSlotMapper.mapToDtoWithBookings(slot,
             bookingRepository.findByCandidateSlot(slot)))
         .collect(Collectors.toCollection(
             () -> new TreeSet<>(Comparator.comparing(CandidateSlotDto::getFrom))));
@@ -139,7 +139,7 @@ public class CoordinatorService {
    */
   public Map<Long, BookingDto> getBookingMap(Set<Booking> bookings) {
     return bookings.stream()
-        .map(BookingMapper::mapToBookingDto)
+        .map(BookingMapper::mapToDto)
         .collect(Collectors.toMap(BookingDto::getId, Function.identity()));
   }
 

@@ -55,9 +55,9 @@ public class BookingService {
     CandidateTimeSlot candidateSlot = candidateTimeSlotRepository.findById(candidateSlotId)
         .orElseThrow(() -> new TimeSlotNotFoundException(candidateSlotId));
 
-    Booking booking = BookingMapper.mapToBookingEntity(bookingDto, interviewerSlot, candidateSlot);
+    Booking booking = BookingMapper.mapToEntity(bookingDto, interviewerSlot, candidateSlot);
 
-    return BookingMapper.mapToBookingDto(bookingRepository.save(booking));
+    return BookingMapper.mapToDto(bookingRepository.save(booking));
   }
 
   /**

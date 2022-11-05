@@ -20,7 +20,7 @@ public class CandidateSlotMapper {
    * @param bookings BookingDto
    * @return CandidateSlotDto
    */
-  public CandidateSlotDto mapToCandidateSlotDtoWithBookings(CandidateTimeSlot slot,
+  public CandidateSlotDto mapToDtoWithBookings(CandidateTimeSlot slot,
       Set<Booking> bookings) {
     if (slot == null) {
       return null;
@@ -30,7 +30,7 @@ public class CandidateSlotMapper {
         .from(slot.getFrom())
         .to(slot.getTo())
         .date(slot.getDate())
-        .bookings(BookingMapper.mapToBookingSetDto(bookings))
+        .bookings(BookingMapper.mapSetToDto(bookings))
         .build();
   }
 
@@ -40,7 +40,7 @@ public class CandidateSlotMapper {
    * @param slot entity
    * @return CandidateSlotDto
    */
-  public CandidateSlotDto mapToCandidateSlotDto(CandidateTimeSlot slot) {
+  public CandidateSlotDto mapToDto(CandidateTimeSlot slot) {
     if (slot == null) {
       return null;
     }
@@ -58,7 +58,7 @@ public class CandidateSlotMapper {
    * @param slotDto slot dto
    * @return CandidateSlotDto
    */
-  public CandidateTimeSlot mapToCandidateSlotEntity(CandidateSlotDto slotDto, User candidate) {
+  public CandidateTimeSlot mapToEntity(CandidateSlotDto slotDto, User candidate) {
     if (slotDto == null) {
       return null;
     }

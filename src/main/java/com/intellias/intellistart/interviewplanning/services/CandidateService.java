@@ -55,10 +55,8 @@ public class CandidateService {
   public CandidateSlotDto createSlot(Long candidateId, CandidateSlotDto candidateSlotDto) {
     //todo validation of slot
     User candidate = userRepository.getReferenceById(candidateId);
-    CandidateTimeSlot candidateSlot = CandidateSlotMapper
-        .mapToCandidateSlotEntity(candidateSlotDto, candidate);
-    return CandidateSlotMapper.mapToCandidateSlotDto(
-        candidateTimeSlotRepository.save(candidateSlot));
+    CandidateTimeSlot candidateSlot = CandidateSlotMapper.mapToEntity(candidateSlotDto, candidate);
+    return CandidateSlotMapper.mapToDto(candidateTimeSlotRepository.save(candidateSlot));
   }
 
   /**
@@ -93,7 +91,7 @@ public class CandidateService {
   public Set<CandidateSlotDto> getCandidateSlotsWithBookings(List<CandidateTimeSlot> slots) {
     return slots.stream()
         .map(slot -> CandidateSlotMapper
-            .mapToCandidateSlotDtoWithBookings(slot, bookingRepository.findByCandidateSlot(slot)))
+            .mapToDtoWithBookings(slot, bookingRepository.findByCandidateSlot(slot)))
         .collect(Collectors.toCollection(
             () -> new TreeSet<>(Comparator.comparing(CandidateSlotDto::getDate)
                 .thenComparing(CandidateSlotDto::getFrom))));
