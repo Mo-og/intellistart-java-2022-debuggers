@@ -1,4 +1,4 @@
-package com.intellias.intellistart.interviewplanning;
+package com.intellias.intellistart.interviewplanning.utils;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
