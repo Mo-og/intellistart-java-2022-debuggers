@@ -6,15 +6,14 @@ import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundExcep
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
-import java.util.Optional;
 import javax.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 
 /**
@@ -22,7 +21,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
-public class UserService extends DefaultOAuth2UserService {
+public class UserService implements UserDetailsManager {
 
   private final UserRepository userRepository;
 
@@ -95,16 +94,34 @@ public class UserService extends DefaultOAuth2UserService {
   }
 
 
-  /**
-   * DefaultOAuth2UserService method implementation to create a Principal by OAuth 2.0.
-   *
-   * @param userRequest OAuth2UserRequest
-   * @return CustomOAuth2User with user of given email inside
-   */
   @Override
-  public OAuth2User loadUser(OAuth2UserRequest userRequest) {
-    OAuth2User auth2User = super.loadUser(userRequest);
-    Optional<User> actualUser = userRepository.findByEmail(auth2User.getAttribute("email"));
-    return new CustomOauth2User(auth2User, actualUser.orElse(null));
+  public void createUser(UserDetails user) {
+    userRepository.save((User) user);
+  }
+
+  @Override
+  public void updateUser(UserDetails user) {
+
+  }
+
+  @Override
+  public void deleteUser(String username) {
+
+  }
+
+  @Override
+  public void changePassword(String oldPassword, String newPassword) {
+
+  }
+
+  @Override
+  public boolean userExists(String username) {
+    return true;
+  }
+
+  @Override
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    return userRepository.findByEmail(username).orElseThrow(
+        () -> new UsernameNotFoundException("No user found with username " + username));
   }
 }

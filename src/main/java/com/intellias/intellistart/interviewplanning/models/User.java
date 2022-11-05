@@ -21,6 +21,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * User.
@@ -33,7 +34,7 @@ import org.springframework.security.core.GrantedAuthority;
 @Table(name = "COORDINATOR")
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class User {
+public class User implements UserDetails {
 
   @Id
   @SequenceGenerator(name = "user_seq", sequenceName = "USER_SEQUENCE", allocationSize = 5)
@@ -68,6 +69,42 @@ public class User {
       authorities = List.of(role);
     }
     return authorities;
+  }
+
+  @Override
+  @JsonIgnore
+  public String getPassword() {
+    return "";
+  }
+
+  @Override
+  @JsonIgnore
+  public String getUsername() {
+    return email;
+  }
+
+  @Override
+  @JsonIgnore
+  public boolean isAccountNonExpired() {
+    return true;
+  }
+
+  @Override
+  @JsonIgnore
+  public boolean isAccountNonLocked() {
+    return true;
+  }
+
+  @Override
+  @JsonIgnore
+  public boolean isCredentialsNonExpired() {
+    return true;
+  }
+
+  @Override
+  @JsonIgnore
+  public boolean isEnabled() {
+    return true;
   }
 
   @Override

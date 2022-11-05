@@ -2,18 +2,22 @@ package com.intellias.intellistart.interviewplanning.controllers;
 
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.intellias.intellistart.interviewplanning.configs.CustomOauth2User;
+import com.intellias.intellistart.interviewplanning.configs.SignupDTO;
+import com.intellias.intellistart.interviewplanning.configs.TokenGenerator;
 import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundException;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.services.CoordinatorService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import com.intellias.intellistart.interviewplanning.services.UserService;
+import java.util.Collections;
 import java.util.Set;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,27 +30,15 @@ import org.springframework.web.bind.annotation.RestController;
  * Controller involved in login and user CRUD operations.
  */
 @RestController
+@RequiredArgsConstructor
 @Slf4j
 public class UserController {
 
   private final InterviewerService interviewerService;
   private final CoordinatorService coordinatorService;
   private final UserService userService;
+  private final TokenGenerator tokenGenerator;
 
-  /**
-   * Constructor.
-   *
-   * @param coordinatorService coordinator service
-   * @param interviewerService interviewer service
-   * @param userService        user service
-   */
-  @Autowired
-  public UserController(CoordinatorService coordinatorService,
-      InterviewerService interviewerService, UserService userService) {
-    this.coordinatorService = coordinatorService;
-    this.interviewerService = interviewerService;
-    this.userService = userService;
-  }
 
   /**
    * Test method to see what token contains.
@@ -68,6 +60,16 @@ public class UserController {
     }
 
     return String.valueOf(authentication);
+  }
+
+  @PostMapping("/register")
+  public ResponseEntity register(@RequestBody SignupDTO signupDTO) {
+    User user = new User(signupDTO.getUsername(), UserRole.INTERVIEWER);
+    userService.createUser(user);
+
+    Authentication authentication = UsernamePasswordAuthenticationToken.authenticated(user, "",
+        Collections.emptyList());
+    return ResponseEntity.ok(tokenGenerator.createToken(authentication));
   }
 
   /**
