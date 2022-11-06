@@ -6,7 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
-import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundException;
+import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.exceptions.WeekEditException;
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
 import com.intellias.intellistart.interviewplanning.models.dto.BookingLimitRequest;
@@ -71,7 +71,7 @@ public class BookingLimitServiceTest {
   void testSetBookingThrowUserException() {
     lenient().when(userRepository.existsById(notExistingUserId))
         .thenReturn(false);
-    assertThrows(UserNotFoundException.class,
+    assertThrows(NotFoundException.class,
         () -> bookingLimitService.saveBookingLimit(existingUserId, bookingLimitRequest));
   }
 
@@ -121,7 +121,7 @@ public class BookingLimitServiceTest {
   void testGetBookingLimitThrowUserException() {
     when(userRepository.existsById(existingUserId))
         .thenReturn(false);
-    assertThrows(UserNotFoundException.class,
+    assertThrows(NotFoundException.class,
         () -> bookingLimitService.findBookingLimit(existingUserId, nextWeekNum));
   }
 }

@@ -5,9 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.intellias.intellistart.interviewplanning.exceptions.CoordinatorNotFoundException;
-import com.intellias.intellistart.interviewplanning.exceptions.InterviewerNotFoundException;
-import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundException;
+import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
@@ -17,7 +15,6 @@ import com.intellias.intellistart.interviewplanning.repositories.BookingReposito
 import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
-import com.intellias.intellistart.interviewplanning.services.CoordinatorService.Dashboard;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Comparator;
@@ -63,8 +60,6 @@ class CoordinatorServiceTest {
       = new HashMap<>();
   private static final Map<DayOfWeek, TreeSet<Booking>> bookingsMap
       = new HashMap<>();
-  private static final Dashboard dashboard =
-      new Dashboard(interviewerTimeSlotsMap, candidateTimeSlotsMap, bookingsMap);
 
   static {
     interviewer.setId(1L);
@@ -165,7 +160,7 @@ class CoordinatorServiceTest {
   void testGrantRoleInvalidUser() {
     when(userRepository.findByEmail("invalid@gmail.com"))
         .thenReturn(Optional.empty());
-    assertThrows(UserNotFoundException.class,
+    assertThrows(NotFoundException.class,
         () -> service.grantRole("invalid@gmail.com", UserRole.INTERVIEWER));
   }
 
@@ -186,7 +181,7 @@ class CoordinatorServiceTest {
   void testRevokeInterviewerRoleWrongId() {
     when(userRepository.findByIdAndRole(-1L, UserRole.INTERVIEWER))
         .thenReturn(Optional.empty());
-    assertThrows(InterviewerNotFoundException.class,
+    assertThrows(NotFoundException.class,
         () -> service.revokeInterviewerRole(-1L));
   }
 
@@ -206,7 +201,7 @@ class CoordinatorServiceTest {
   void testRevokeCoordinatorRoleWrongId() {
     when(userRepository.findByIdAndRole(-1L, UserRole.COORDINATOR))
         .thenReturn(Optional.empty());
-    assertThrows(CoordinatorNotFoundException.class,
+    assertThrows(NotFoundException.class,
         () -> service.revokeCoordinatorRole(-1L));
   }
 
