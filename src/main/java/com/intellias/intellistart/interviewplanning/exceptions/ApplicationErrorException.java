@@ -23,9 +23,15 @@ public class ApplicationErrorException extends RuntimeException {
    * @param errorMessage user-friendly error message
    */
   public ApplicationErrorException(ErrorCode errorCode, String errorMessage) {
-    super(errorMessage);
+    super(errorCode.message + errorMessage);
     this.errorCode = errorCode;
     this.errorMessage = errorMessage;
+  }
+
+  public ApplicationErrorException(ErrorCode errorCode) {
+    super(errorCode.message);
+    this.errorCode = errorCode;
+    this.errorMessage = errorCode.message;
   }
 
   @JsonGetter
@@ -46,11 +52,11 @@ public class ApplicationErrorException extends RuntimeException {
    * API error codes enum that delivers necessary statuses.
    */
   public enum ErrorCode {
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "user_not_found"),
-    CANDIDATE_NOT_FOUND(HttpStatus.NOT_FOUND, "candidate_not_found"),
-    INTERVIEWER_NOT_FOUND(HttpStatus.NOT_FOUND, "interviewer_not_found"),
-    COORDINATOR_NOT_FOUND(HttpStatus.NOT_FOUND, "coordinator_not_found"),
-    SLOT_NOT_FOUND(HttpStatus.NOT_FOUND, "slot_not_found"),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "user_not_found", "No user found"),
+    CANDIDATE_NOT_FOUND(HttpStatus.NOT_FOUND, "candidate_not_found", "No candidate found"),
+    INTERVIEWER_NOT_FOUND(HttpStatus.NOT_FOUND, "interviewer_not_found", "No interviewer found"),
+    COORDINATOR_NOT_FOUND(HttpStatus.NOT_FOUND, "coordinator_not_found", "No coordinator found"),
+    SLOT_NOT_FOUND(HttpStatus.NOT_FOUND, "slot_not_found", "No slot found"),
     SLOT_IS_OVERLAPPING(HttpStatus.CONFLICT, "slot_is_overlapping"),
     INVALID_PERIOD(HttpStatus.BAD_REQUEST, "invalid_boundaries"),
     INVALID_DAY_OF_WEEK(HttpStatus.BAD_REQUEST, "invalid_day_of_week"),
@@ -58,10 +64,18 @@ public class ApplicationErrorException extends RuntimeException {
     CANNOT_EDIT_THIS_WEEK(HttpStatus.METHOD_NOT_ALLOWED, "cannot_edit_this_week");
     public final String code;
     public final HttpStatus httpStatus;
+    public final String message;
 
     ErrorCode(HttpStatus httpStatus, String code) {
       this.code = code;
       this.httpStatus = httpStatus;
+      message = "";
+    }
+
+    ErrorCode(HttpStatus httpStatus, String code, String errorMessage) {
+      this.code = code;
+      this.httpStatus = httpStatus;
+      this.message = errorMessage;
     }
   }
 
