@@ -1,6 +1,6 @@
 package com.intellias.intellistart.interviewplanning.services;
 
-import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundException;
+import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.exceptions.WeekEditException;
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
 import com.intellias.intellistart.interviewplanning.models.dto.BookingLimitRequest;
@@ -37,7 +37,7 @@ public class BookingLimitService {
       Long interviewerId,
       BookingLimitRequest bookingLimitRequest) {
     if (!userRepository.existsById(interviewerId)) {
-      throw new UserNotFoundException(interviewerId + "");
+      throw NotFoundException.interviewerNotFound(interviewerId);
     }
     if (bookingLimitRequest.getWeekNum() != WeekService.getNextWeekNum()) {
       throw new WeekEditException(bookingLimitRequest.getWeekNum(),
@@ -69,7 +69,7 @@ public class BookingLimitService {
    */
   public BookingLimit findBookingLimit(Long interviewerId, Integer weekNum) {
     if (!userRepository.existsById(interviewerId)) {
-      throw new UserNotFoundException(interviewerId + "");
+      throw NotFoundException.interviewerNotFound(interviewerId);
     }
     return bookingLimitRepository.findByInterviewerIdAndWeekNum(interviewerId, weekNum);
   }
