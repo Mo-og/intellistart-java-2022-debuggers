@@ -39,10 +39,10 @@ public class NotFoundException extends ApplicationErrorException {
   }
 
   public static NotFoundException timeSlotNotFound(Long id) {
-    return new NotFoundException(ErrorCode.COORDINATOR_NOT_FOUND, " with id: " + id);
+    return new NotFoundException(ErrorCode.SLOT_NOT_FOUND, " with id: " + id);
   }
 
   public static NotFoundException timeSlotNotFound() {
-    return new NotFoundException(ErrorCode.COORDINATOR_NOT_FOUND, "");
+    return new NotFoundException(ErrorCode.SLOT_NOT_FOUND, "");
   }
 }
