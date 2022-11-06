@@ -58,10 +58,13 @@ public class ApplicationErrorException extends RuntimeException {
     COORDINATOR_NOT_FOUND(HttpStatus.NOT_FOUND, "coordinator_not_found", "No coordinator found"),
     SLOT_NOT_FOUND(HttpStatus.NOT_FOUND, "slot_not_found", "No slot found"),
     SLOT_IS_OVERLAPPING(HttpStatus.CONFLICT, "slot_is_overlapping"),
-    INVALID_PERIOD(HttpStatus.BAD_REQUEST, "invalid_boundaries"),
+    INVALID_BOUNDARIES(HttpStatus.BAD_REQUEST, "invalid_boundaries"),
+    CANNOT_EDIT_WEEK(HttpStatus.METHOD_NOT_ALLOWED, "cannot_edit_week"),
     INVALID_DAY_OF_WEEK(HttpStatus.BAD_REQUEST, "invalid_day_of_week"),
+    CANNOT_CREATE_OR_UPDATE_SLOT(HttpStatus.METHOD_NOT_ALLOWED, "cannot_create_or_update_slot"),
     INVALID_BOOKING_LIMIT(HttpStatus.BAD_REQUEST, "invalid_booking_limit_number"),
     CANNOT_EDIT_THIS_WEEK(HttpStatus.METHOD_NOT_ALLOWED, "cannot_edit_this_week");
+
     public final String code;
     public final HttpStatus httpStatus;
     public final String message;

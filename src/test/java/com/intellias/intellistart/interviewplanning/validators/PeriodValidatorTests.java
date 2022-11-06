@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.intellias.intellistart.interviewplanning.exceptions.InvalidPeriodException;
+import com.intellias.intellistart.interviewplanning.exceptions.InvalidBoundariesException;
 import org.junit.jupiter.api.Test;
 
 class PeriodValidatorTests {
@@ -27,7 +27,7 @@ class PeriodValidatorTests {
 
   @Test
   void testValidateWrongPeriod() {
-    assertThrows(InvalidPeriodException.class,
+    assertThrows(InvalidBoundariesException.class,
         () -> PeriodValidator.validate("08:00", "10:10"));
   }
 

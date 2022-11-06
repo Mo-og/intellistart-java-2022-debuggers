@@ -35,6 +35,7 @@ public abstract class TestUtils {
       String responseBody, MockMvc mock) {
     checkResponseBad(methodAndUrl, requestBody, responseBody, status().isOk(), mock);
   }
+
   @SneakyThrows
   public static void checkResponseBad(MockHttpServletRequestBuilder methodAndUrl,
       String requestBody,

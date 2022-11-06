@@ -6,6 +6,8 @@ import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
+import com.intellias.intellistart.interviewplanning.validators.InterviewerSlotValidator;
+import com.intellias.intellistart.interviewplanning.validators.InterviewerSlotValidator.Action;
 import java.util.Set;
 import javax.persistence.EntityNotFoundException;
 import org.hibernate.Hibernate;
@@ -35,7 +37,7 @@ public class InterviewerService {
   }
 
   /**
-   * Create slot for interview. Interviewer can create slot for next week.
+   * Create slot for interview. Interviewer can create slot for current or next week.
    *
    * @param interviewerId       id of interviewer to bind slot to
    * @param interviewerTimeSlot slot to validate and save
@@ -43,7 +45,7 @@ public class InterviewerService {
    */
   public InterviewerTimeSlot createSlot(Long interviewerId,
       InterviewerTimeSlot interviewerTimeSlot) {
-    //todo validation of slot
+    InterviewerSlotValidator.validate(interviewerTimeSlot, Action.CREATE);
     User interviewer = userRepository.getReferenceById(interviewerId);
     interviewerTimeSlot.setInterviewer(interviewer);
     return interviewerTimeSlotRepository.saveAndFlush(interviewerTimeSlot);
@@ -98,8 +100,7 @@ public class InterviewerService {
    */
   public InterviewerTimeSlot updateSlot(Long interviewerId, Long slotId,
       InterviewerTimeSlot interviewerTimeSlot) {
-    // validate from, to, day, weekNum
-    // check if current time is by end of Friday (00:00) of current week
+    InterviewerSlotValidator.validate(interviewerTimeSlot, Action.UPDATE);
     User interviewer = userRepository.getReferenceById(interviewerId);
     InterviewerTimeSlot slot = getSlotById(slotId);
     slot.setFrom(interviewerTimeSlot.getFrom());
