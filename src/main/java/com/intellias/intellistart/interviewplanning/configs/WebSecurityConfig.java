@@ -53,14 +53,14 @@ public class WebSecurityConfig {
 //        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
     http.authorizeRequests(authorize -> authorize
-            .anyRequest().permitAll() //!!
-//        .antMatchers("/", "/login/**").permitAll()
-//        .anyRequest().authenticated()
+//            .anyRequest().permitAll() //!!
+            .antMatchers("/", "/login/**", "/oauth2/**").permitAll()
+            .anyRequest().authenticated()
     );
 
     http.oauth2Login(config -> {
           config.authorizationEndpoint(subconfig -> {
-//            subconfig.baseUri(OAuthHandler.AUTHORIZATION_BASE_URL);
+            subconfig.baseUri(OAuthHandler.AUTHORIZATION_BASE_URL);
             subconfig.authorizationRequestResolver(this.customAuthorizationRequestResolver);
             subconfig.authorizationRequestRepository(this.customStatelessAuthorizationRequestRepo);
           });
