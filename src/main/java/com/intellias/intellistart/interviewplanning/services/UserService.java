@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 
 /**
@@ -21,7 +20,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
-public class UserService implements UserDetailsManager {
+public class UserService {
 
   private final UserRepository userRepository;
 
@@ -93,35 +92,17 @@ public class UserService implements UserDetailsManager {
         .orElseThrow(() -> new UserNotFoundException(email));
   }
 
+/*  @Override
+  public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+    OAuth2User auth2User =  super.loadUser(userRequest);
+    User actualUser = userRepository.findByEmail(auth2User.getAttribute("email")).orElse(null);
+    return new CustomOauth2User(auth2User, actualUser);
+  }*/
 
-  @Override
-  public void createUser(UserDetails user) {
-    userRepository.save((User) user);
-  }
-
-  @Override
-  public void updateUser(UserDetails user) {
-
-  }
-
-  @Override
-  public void deleteUser(String username) {
-
-  }
-
-  @Override
-  public void changePassword(String oldPassword, String newPassword) {
-
-  }
-
-  @Override
-  public boolean userExists(String username) {
-    return true;
-  }
-
-  @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     return userRepository.findByEmail(username).orElseThrow(
         () -> new UsernameNotFoundException("No user found with username " + username));
   }
+
+
 }

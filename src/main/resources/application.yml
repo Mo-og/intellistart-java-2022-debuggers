@@ -1,0 +1,46 @@
+spring:
+  jpa:
+    database-platform:
+      org.hibernate.dialect.H2Dialect
+    properties:
+      hibernate:
+        hbm2ddl:
+          import_files: schema-h2.sql
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  datasource:
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+    url: jdbc:h2:file:./data/demo;AUTO_SERVER=TRUE;
+  security:
+    oauth2:
+      client:
+        registration:
+          facebook:
+            client-id: 639777021199239
+            client-secret: 93d125256e4cbaa74630c32b87de2899
+            redirect-uri: 'localhost:8080/login/oauth2/facebook'
+  profiles:
+    active: dev
+app:
+  auth:
+    tokenSecret: 926D96C90030DD58429D2751AC1BDBBC
+    tokenExpirationMsec: 864000000
+  oauth2:
+    authorizedRedirectUris:
+      - http://localhost:8080/oauth2/redirect
+
+
+logging:
+  level:
+    org:
+      springframework: warn
+    com:
+      intellias:
+        intellistart:
+          interviewplanning:
+            configs: debug
+  pattern:
+    console: "%clr(%d{dd.MM.yyyy HH:mm:ss}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%5.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"

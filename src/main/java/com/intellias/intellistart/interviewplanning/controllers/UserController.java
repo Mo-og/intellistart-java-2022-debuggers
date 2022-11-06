@@ -2,22 +2,19 @@ package com.intellias.intellistart.interviewplanning.controllers;
 
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.intellias.intellistart.interviewplanning.configs.CustomOauth2User;
-import com.intellias.intellistart.interviewplanning.configs.SignupDTO;
-import com.intellias.intellistart.interviewplanning.configs.TokenGenerator;
 import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundException;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.services.CoordinatorService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import com.intellias.intellistart.interviewplanning.services.UserService;
-import java.util.Collections;
 import java.util.Set;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,7 +34,6 @@ public class UserController {
   private final InterviewerService interviewerService;
   private final CoordinatorService coordinatorService;
   private final UserService userService;
-  private final TokenGenerator tokenGenerator;
 
 
   /**
@@ -62,15 +58,6 @@ public class UserController {
     return String.valueOf(authentication);
   }
 
-  @PostMapping("/register")
-  public ResponseEntity register(@RequestBody SignupDTO signupDTO) {
-    User user = new User(signupDTO.getUsername(), UserRole.INTERVIEWER);
-    userService.createUser(user);
-
-    Authentication authentication = UsernamePasswordAuthenticationToken.authenticated(user, "",
-        Collections.emptyList());
-    return ResponseEntity.ok(tokenGenerator.createToken(authentication));
-  }
 
   /**
    * Me endpoint. Provides current user info
@@ -79,6 +66,7 @@ public class UserController {
    * not a Candidate
    */
   @GetMapping("/me")
+  @PreAuthorize("authenticated") // hasAnyRole('CANDIDATE','COORDINATOR','INTERVIEWER')
   public ResponseEntity<?> getUserInfo(Authentication authentication) {
     User user;
     CustomOauth2User auth2User = (CustomOauth2User) authentication.getPrincipal();

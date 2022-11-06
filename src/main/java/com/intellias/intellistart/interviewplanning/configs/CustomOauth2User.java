@@ -2,6 +2,7 @@ package com.intellias.intellistart.interviewplanning.configs;
 
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -48,4 +49,9 @@ public class CustomOauth2User implements OAuth2User {
     return user;
   }
 
+  @Override
+  public String toString() {
+    return MessageFormat.format("{0}:'{'email:{1}, role:{2}'}'",
+        CustomOauth2User.class.getSimpleName(), getEmail(), getAuthorities());
+  }
 }
