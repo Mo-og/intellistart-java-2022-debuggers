@@ -1,6 +1,6 @@
 package com.intellias.intellistart.interviewplanning.services;
 
-import com.intellias.intellistart.interviewplanning.exceptions.CoordinatorNotFoundException;
+import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
@@ -48,7 +48,7 @@ public class UserService {
     try {
       return (User) Hibernate.unproxy(userRepository.getReferenceById(id));
     } catch (EntityNotFoundException e) {
-      throw new CoordinatorNotFoundException(id);
+      throw NotFoundException.coordinatorNotFound(id);
     }
   }
 
@@ -61,7 +61,7 @@ public class UserService {
     try {
       userRepository.deleteById(id);
     } catch (EntityNotFoundException e) {
-      throw new CoordinatorNotFoundException(id);
+      throw NotFoundException.coordinatorNotFound(id);
     }
   }
 
