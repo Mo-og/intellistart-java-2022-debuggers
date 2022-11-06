@@ -1,6 +1,6 @@
 package com.intellias.intellistart.interviewplanning.services;
 
-import com.intellias.intellistart.interviewplanning.exceptions.InterviewerNotFoundException;
+import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
@@ -67,7 +67,7 @@ public class InterviewerService {
    */
   public Set<InterviewerTimeSlot> getRelevantInterviewerSlots(Long interviewerId) {
     if (!userRepository.existsById(interviewerId)) {
-      throw new InterviewerNotFoundException(interviewerId);
+      throw NotFoundException.interviewerNotFound(interviewerId);
     }
     return interviewerTimeSlotRepository
         .findByInterviewerIdAndWeekNumGreaterThanEqual(
@@ -80,11 +80,11 @@ public class InterviewerService {
    * @param interviewerId id of interviewer
    * @param weekId        id of week
    * @return a set of interviewer time slots
-   * @throws InterviewerNotFoundException if no interviewer is found
+   * @throws NotFoundException if no interviewer is found
    */
   public Set<InterviewerTimeSlot> getSlotsByWeekId(Long interviewerId, int weekId) {
     if (!userRepository.existsByIdAndRole(interviewerId, UserRole.INTERVIEWER)) {
-      throw new InterviewerNotFoundException(interviewerId);
+      throw NotFoundException.interviewerNotFound(interviewerId);
     }
     return interviewerTimeSlotRepository.findByInterviewerIdAndWeekNum(interviewerId, weekId);
   }
@@ -120,7 +120,7 @@ public class InterviewerService {
     try {
       return (User) Hibernate.unproxy(userRepository.getReferenceById(id));
     } catch (EntityNotFoundException e) {
-      throw new InterviewerNotFoundException(id);
+      throw NotFoundException.interviewerNotFound(id);
     }
   }
 }
