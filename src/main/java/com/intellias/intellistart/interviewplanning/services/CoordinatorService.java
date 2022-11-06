@@ -1,9 +1,7 @@
 package com.intellias.intellistart.interviewplanning.services;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
-import com.intellias.intellistart.interviewplanning.exceptions.CoordinatorNotFoundException;
-import com.intellias.intellistart.interviewplanning.exceptions.InterviewerNotFoundException;
-import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundException;
+import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
@@ -115,7 +113,7 @@ public class CoordinatorService {
    */
   public User grantRole(String email, UserRole role) {
     User user = userRepository.findByEmail(email)
-        .orElseThrow(() -> new UserNotFoundException(email));
+        .orElseThrow(() -> NotFoundException.userNotFound(email));
     user.setRole(role);
     return userRepository.save(user);
   }
@@ -128,7 +126,7 @@ public class CoordinatorService {
    */
   public User revokeInterviewerRole(Long id) {
     User user = userRepository.findByIdAndRole(id, UserRole.INTERVIEWER)
-        .orElseThrow(() -> new InterviewerNotFoundException(id));
+        .orElseThrow(() -> NotFoundException.interviewerNotFound(id));
     return grantRole(user.getEmail(), UserRole.CANDIDATE);
   }
 
@@ -140,7 +138,7 @@ public class CoordinatorService {
    */
   public User revokeCoordinatorRole(Long id) {
     User user = userRepository.findByIdAndRole(id, UserRole.COORDINATOR)
-        .orElseThrow(() -> new CoordinatorNotFoundException(id));
+        .orElseThrow(() -> NotFoundException.coordinatorNotFound(id));
     return grantRole(user.getEmail(), UserRole.CANDIDATE);
   }
 
