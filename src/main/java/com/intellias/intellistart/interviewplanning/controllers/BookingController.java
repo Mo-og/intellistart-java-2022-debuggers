@@ -1,5 +1,6 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
+import com.intellias.intellistart.interviewplanning.controllers.dto.BookingDto;
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.services.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +29,8 @@ public class BookingController {
   }
 
   @PostMapping("/bookings")
-  public Booking createBooking(@RequestBody Booking booking) {
-    return bookingService.createBooking(booking);
+  public BookingDto createBooking(@RequestBody BookingDto bookingDto) {
+    return bookingService.createBooking(bookingDto);
   }
 
   /**

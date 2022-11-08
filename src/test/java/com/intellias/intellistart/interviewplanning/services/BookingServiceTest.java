@@ -1,18 +1,22 @@
 package com.intellias.intellistart.interviewplanning.services;
 
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
+import com.intellias.intellistart.interviewplanning.controllers.dto.BookingDto;
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
+import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSlotRepository;
+import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import java.time.LocalTime;
+import java.util.Optional;
 import javax.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,28 +41,49 @@ class BookingServiceTest {
           "some desc"
       );
 
+  private static final BookingDto bookingDto =
+      BookingDto.builder()
+          .from(LocalTime.of(8, 0))
+          .to(LocalTime.of(10, 0))
+          .subject("some subject")
+          .description("some desc")
+          .build();
+
   static {
     interviewerSlot.setId(1L);
     candidateSlot.setId(1L);
     booking.setId(1L);
+    bookingDto.setId(1L);
+    bookingDto.setInterviewerSlotId(interviewerSlot.getId());
+    bookingDto.setCandidateSlotId(candidateSlot.getId());
   }
 
   @Mock
   BookingRepository bookingRepository;
+  @Mock
+  InterviewerTimeSlotRepository interviewerTimeSlotRepository;
+  @Mock
+  CandidateTimeSlotRepository candidateTimeSlotRepository;
   private BookingService service;
 
   @BeforeEach
   void setService() {
-    service = new BookingService(bookingRepository);
+    service = new BookingService(bookingRepository, interviewerTimeSlotRepository,
+        candidateTimeSlotRepository);
   }
 
   @Test
   void testCreateBooking() {
+    when(interviewerTimeSlotRepository.findById(interviewerSlot.getId()))
+        .thenReturn(Optional.of(interviewerSlot));
+    when(candidateTimeSlotRepository.findById(candidateSlot.getId()))
+        .thenReturn(Optional.of(candidateSlot));
     when(bookingRepository
-        .save(booking))
+        .save(any()))
         .thenReturn(booking);
-    var createdBooking = service.createBooking(booking);
-    assertEquals(booking, createdBooking);
+
+    var createdBooking = service.createBooking(bookingDto);
+    assertEquals(bookingDto, createdBooking);
   }
 
   @Test

@@ -1,4 +1,4 @@
-package com.intellias.intellistart.interviewplanning.models.dto;
+package com.intellias.intellistart.interviewplanning.controllers.dto;
 
 import java.util.Objects;
 import lombok.Getter;
@@ -7,7 +7,7 @@ import lombok.Getter;
  * DTO from front end request.
  */
 @Getter
-public class BookingLimitRequest {
+public class BookingLimitDto {
 
   private final Integer bookingLimit;
   private final Integer weekNum;
@@ -18,7 +18,7 @@ public class BookingLimitRequest {
    * @param bookingLimit booking limit
    * @param weekNum      week number
    */
-  public BookingLimitRequest(Integer bookingLimit, Integer weekNum) {
+  public BookingLimitDto(Integer bookingLimit, Integer weekNum) {
 
     this.bookingLimit = bookingLimit;
     this.weekNum = weekNum;
@@ -32,7 +32,7 @@ public class BookingLimitRequest {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    BookingLimitRequest that = (BookingLimitRequest) o;
+    BookingLimitDto that = (BookingLimitDto) o;
     return Objects.equals(bookingLimit, that.bookingLimit) && Objects.equals(
         weekNum, that.weekNum);
   }

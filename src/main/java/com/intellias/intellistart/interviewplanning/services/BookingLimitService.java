@@ -1,9 +1,9 @@
 package com.intellias.intellistart.interviewplanning.services;
 
+import com.intellias.intellistart.interviewplanning.controllers.dto.BookingLimitDto;
 import com.intellias.intellistart.interviewplanning.exceptions.BadRequestException;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
-import com.intellias.intellistart.interviewplanning.models.dto.BookingLimitRequest;
 import com.intellias.intellistart.interviewplanning.repositories.BookingLimitRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import java.util.List;
@@ -35,7 +35,7 @@ public class BookingLimitService {
    */
   public BookingLimit saveBookingLimit(
       Long interviewerId,
-      BookingLimitRequest bookingLimitRequest) {
+      BookingLimitDto bookingLimitRequest) {
     if (!userRepository.existsById(interviewerId)) {
       throw NotFoundException.interviewerNotFound(interviewerId);
     }

@@ -7,11 +7,11 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
+import com.intellias.intellistart.interviewplanning.controllers.dto.BookingLimitDto;
 import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
 import com.intellias.intellistart.interviewplanning.exceptions.BadRequestException;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
-import com.intellias.intellistart.interviewplanning.models.dto.BookingLimitRequest;
 import com.intellias.intellistart.interviewplanning.services.BookingLimitService;
 import com.intellias.intellistart.interviewplanning.services.WeekService;
 import java.util.List;
@@ -44,7 +44,7 @@ public class BookingLimitControllerTest {
       notExistingUserId,
       nextWeekNum,
       limit + 1);
-  private static final BookingLimitRequest bookingLimitRequest = new BookingLimitRequest(limit,
+  private static final BookingLimitDto bookingLimitRequest = new BookingLimitDto(limit,
       nextWeekNum);
 
   @Test
@@ -70,7 +70,7 @@ public class BookingLimitControllerTest {
   @Test
   void testSetBookingLimitUserException() {
     when(bookingLimitService.saveBookingLimit(existingUserId, bookingLimitRequest))
-        .thenThrow(NotFoundException.userNotFound());
+        .thenThrow(NotFoundException.interviewerNotFound(existingUserId));
     assertThrows(ApplicationErrorException.class,
         () -> bookingLimitService.saveBookingLimit(existingUserId, bookingLimitRequest));
   }

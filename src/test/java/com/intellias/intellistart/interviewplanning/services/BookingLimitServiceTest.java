@@ -6,10 +6,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
+import com.intellias.intellistart.interviewplanning.controllers.dto.BookingLimitDto;
 import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
-import com.intellias.intellistart.interviewplanning.models.dto.BookingLimitRequest;
 import com.intellias.intellistart.interviewplanning.repositories.BookingLimitRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import java.util.List;
@@ -46,9 +46,9 @@ public class BookingLimitServiceTest {
       notExistingUserId,
       nextWeekNum,
       limit + 2);
-  private static final BookingLimitRequest bookingLimitRequest = new BookingLimitRequest(limit,
+  private static final BookingLimitDto bookingLimitRequest = new BookingLimitDto(limit,
       nextWeekNum);
-  private static final BookingLimitRequest badBookingLimitRequest = new BookingLimitRequest(limit,
+  private static final BookingLimitDto badBookingLimitRequest = new BookingLimitDto(limit,
       0);
 
   @Test

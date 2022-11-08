@@ -10,6 +10,7 @@ import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
+import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import java.util.HashSet;
@@ -42,12 +43,14 @@ class InterviewerServiceTest {
   private InterviewerTimeSlotRepository interviewerTimeSlotRepository;
   @Mock
   private UserRepository userRepository;
+  @Mock
+  private BookingRepository bookingRepository;
   private InterviewerService interviewerService;
 
   @BeforeEach
   void setService() {
     interviewerService = new InterviewerService(interviewerTimeSlotRepository,
-        userRepository);
+        userRepository, bookingRepository);
   }
 
   @Test

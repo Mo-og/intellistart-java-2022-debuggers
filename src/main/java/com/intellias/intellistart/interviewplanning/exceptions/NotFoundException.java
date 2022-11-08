@@ -13,10 +13,6 @@ public class NotFoundException extends ApplicationErrorException {
     return new NotFoundException(ErrorCode.USER_NOT_FOUND, " with email: " + email);
   }
 
-  public static NotFoundException userNotFound() {
-    return new NotFoundException(ErrorCode.USER_NOT_FOUND, "");
-  }
-
   public static NotFoundException candidateNotFound(Long id) {
     return new NotFoundException(ErrorCode.CANDIDATE_NOT_FOUND, " with id: " + id);
   }
