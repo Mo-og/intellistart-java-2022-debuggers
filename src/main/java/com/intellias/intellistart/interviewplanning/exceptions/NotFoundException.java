@@ -1,5 +1,8 @@
 package com.intellias.intellistart.interviewplanning.exceptions;
 
+/**
+ * Not found exception class.
+ */
 public class NotFoundException extends ApplicationErrorException {
 
   public NotFoundException(ErrorCode errorCode, String errorMessage) {
@@ -18,31 +21,19 @@ public class NotFoundException extends ApplicationErrorException {
     return new NotFoundException(ErrorCode.CANDIDATE_NOT_FOUND, " with id: " + id);
   }
 
-  public static NotFoundException candidateNotFound() {
-    return new NotFoundException(ErrorCode.CANDIDATE_NOT_FOUND, "");
-  }
 
   public static NotFoundException interviewerNotFound(Long id) {
     return new NotFoundException(ErrorCode.INTERVIEWER_NOT_FOUND, " with id: " + id);
   }
 
-  public static NotFoundException interviewerNotFound() {
-    return new NotFoundException(ErrorCode.INTERVIEWER_NOT_FOUND, "");
-  }
 
   public static NotFoundException coordinatorNotFound(Long id) {
     return new NotFoundException(ErrorCode.COORDINATOR_NOT_FOUND, " with id: " + id);
   }
 
-  public static NotFoundException coordinatorNotFound() {
-    return new NotFoundException(ErrorCode.COORDINATOR_NOT_FOUND, "");
-  }
 
   public static NotFoundException timeSlotNotFound(Long id) {
     return new NotFoundException(ErrorCode.SLOT_NOT_FOUND, " with id: " + id);
   }
 
-  public static NotFoundException timeSlotNotFound() {
-    return new NotFoundException(ErrorCode.SLOT_NOT_FOUND, "");
-  }
 }
