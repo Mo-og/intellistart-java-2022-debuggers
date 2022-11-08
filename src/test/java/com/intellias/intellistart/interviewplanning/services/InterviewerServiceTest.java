@@ -30,7 +30,7 @@ class InterviewerServiceTest {
       "18:00", "Mon", 202210);
   private static final InterviewerTimeSlot timeSlotWithUser = new InterviewerTimeSlot(
       "09:00",
-      "18:00", "Mon", 202210);
+      "18:00", "Mon", WeekService.getNextWeekNum());
 
   static {
     interviewer.setId(1L);
