@@ -66,14 +66,8 @@ public class ApplicationErrorException extends RuntimeException {
     public final HttpStatus httpStatus;
     public final String message;
 
-    ErrorCode(HttpStatus httpStatus, String code) {
-      this.code = code;
-      this.httpStatus = httpStatus;
-      message = "";
-    }
-
-    ErrorCode(HttpStatus httpStatus, String code, String errorMessage) {
-      this.code = code;
+    ErrorCode(HttpStatus httpStatus, String errorMessage) {
+      this.code = this.name().toLowerCase();
       this.httpStatus = httpStatus;
       this.message = errorMessage;
     }
