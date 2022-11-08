@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.http.HttpStatus;
 
 /**
- * Base container of error codes. Handled by global CustomExceptionHandler
+ * Base container of error codes. Handled by global CustomExceptionHandler.
  */
 @JsonIgnoreProperties({"cause", "stackTrace", "message", "suppressed", "localizedMessage"})
 public class ApplicationErrorException extends RuntimeException {
@@ -28,12 +28,6 @@ public class ApplicationErrorException extends RuntimeException {
     this.errorMessage = errorMessage;
   }
 
-  public ApplicationErrorException(ErrorCode errorCode) {
-    super(errorCode.message);
-    this.errorCode = errorCode;
-    this.errorMessage = errorCode.message;
-  }
-
   @JsonGetter
   public String getErrorCode() {
     return errorCode.code;
@@ -52,18 +46,21 @@ public class ApplicationErrorException extends RuntimeException {
    * API error codes enum that delivers necessary statuses.
    */
   public enum ErrorCode {
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "user_not_found", "No user found"),
-    CANDIDATE_NOT_FOUND(HttpStatus.NOT_FOUND, "candidate_not_found", "No candidate found"),
-    INTERVIEWER_NOT_FOUND(HttpStatus.NOT_FOUND, "interviewer_not_found", "No interviewer found"),
-    COORDINATOR_NOT_FOUND(HttpStatus.NOT_FOUND, "coordinator_not_found", "No coordinator found"),
-    SLOT_NOT_FOUND(HttpStatus.NOT_FOUND, "slot_not_found", "No slot found"),
+    //Not found error codes
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "No user found"),
+    CANDIDATE_NOT_FOUND(HttpStatus.NOT_FOUND, "No candidate found"),
+    INTERVIEWER_NOT_FOUND(HttpStatus.NOT_FOUND, "No interviewer found"),
+    COORDINATOR_NOT_FOUND(HttpStatus.NOT_FOUND, "No coordinator found"),
+    SLOT_NOT_FOUND(HttpStatus.NOT_FOUND, "No slot found"),
+
+    //Conflict error code
     SLOT_IS_OVERLAPPING(HttpStatus.CONFLICT, "slot_is_overlapping"),
-    INVALID_BOUNDARIES(HttpStatus.BAD_REQUEST, "invalid_boundaries"),
-    CANNOT_EDIT_WEEK(HttpStatus.METHOD_NOT_ALLOWED, "cannot_edit_week"),
-    INVALID_DAY_OF_WEEK(HttpStatus.BAD_REQUEST, "invalid_day_of_week"),
-    CANNOT_CREATE_OR_UPDATE_SLOT(HttpStatus.METHOD_NOT_ALLOWED, "cannot_create_or_update_slot"),
-    INVALID_BOOKING_LIMIT(HttpStatus.BAD_REQUEST, "invalid_booking_limit_number"),
-    CANNOT_EDIT_THIS_WEEK(HttpStatus.METHOD_NOT_ALLOWED, "cannot_edit_this_week");
+    INVALID_BOOKING_LIMIT(HttpStatus.CONFLICT, "Invalid booking limit number"),
+
+    //Bad request error codes
+    INVALID_BOUNDARIES(HttpStatus.BAD_REQUEST, "Invalid time boundaries"),
+    INVALID_DAY_OF_WEEK(HttpStatus.BAD_REQUEST, "Invalid day of week"),
+    INVALID_WEEK_NUM(HttpStatus.BAD_REQUEST, "Invalid week number");
 
     public final String code;
     public final HttpStatus httpStatus;
