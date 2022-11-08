@@ -123,9 +123,9 @@ class UserControllerTest {
 
   @Test
   void testGetNonExistingInterviewer() {
-    when(interviewerService.getById(-1L)).thenThrow(NotFoundException.interviewerNotFound(-1L));
+    when(interviewerService.getById(-1L)).thenThrow(NotFoundException.interviewer(-1L));
     checkResponseBad(get("/interviewers/{id}", -1L),
-        null, json(NotFoundException.interviewerNotFound(-1L)),
+        null, json(NotFoundException.interviewer(-1L)),
         status().is4xxClientError(), mockMvc);
   }
 

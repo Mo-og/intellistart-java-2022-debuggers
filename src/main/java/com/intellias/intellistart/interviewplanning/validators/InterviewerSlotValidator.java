@@ -1,6 +1,6 @@
 package com.intellias.intellistart.interviewplanning.validators;
 
-import com.intellias.intellistart.interviewplanning.exceptions.BadRequestException;
+import com.intellias.intellistart.interviewplanning.exceptions.InvalidInputException;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.services.WeekService;
 import java.time.DayOfWeek;
@@ -19,16 +19,16 @@ public class InterviewerSlotValidator {
    * Validate interviewer time slot to be created.
    *
    * @param interviewerTimeSlot interviewer time slot
-   * @throws BadRequestException if editing slot no to yhe next week
-   * @throws BadRequestException if editing slot on weekend
+   * @throws InvalidInputException if editing slot no to yhe next week
+   * @throws InvalidInputException if editing slot on weekend
    */
   public static void validate(InterviewerTimeSlot interviewerTimeSlot) {
     var now = LocalDate.now().getDayOfWeek();
     if (isWeekend(now)) {
-      throw BadRequestException.invalidDayOfWeek(
+      throw InvalidInputException.dayOfWeek(
           now);
     } else if (interviewerTimeSlot.getWeekNum() != WeekService.getNextWeekNum()) {
-      throw BadRequestException.invalidWeekNum(interviewerTimeSlot.getWeekNum());
+      throw InvalidInputException.weekNum(interviewerTimeSlot.getWeekNum());
     }
   }
 

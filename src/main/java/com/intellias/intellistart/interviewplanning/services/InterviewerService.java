@@ -79,7 +79,7 @@ public class InterviewerService {
    */
   public Set<InterviewerTimeSlot> getRelevantInterviewerSlots(Long interviewerId) {
     if (!userRepository.existsById(interviewerId)) {
-      throw NotFoundException.interviewerNotFound(interviewerId);
+      throw NotFoundException.interviewer(interviewerId);
     }
     return interviewerTimeSlotRepository
         .findByInterviewerIdAndWeekNumGreaterThanEqual(
@@ -96,7 +96,7 @@ public class InterviewerService {
    */
   public Set<InterviewerSlotDto> getSlotsByWeekId(Long interviewerId, int weekId) {
     if (!userRepository.existsByIdAndRole(interviewerId, UserRole.INTERVIEWER)) {
-      throw NotFoundException.interviewerNotFound(interviewerId);
+      throw NotFoundException.interviewer(interviewerId);
     }
 
     Set<InterviewerTimeSlot> slots = interviewerTimeSlotRepository
@@ -151,7 +151,7 @@ public class InterviewerService {
     try {
       return (User) Hibernate.unproxy(userRepository.getReferenceById(id));
     } catch (EntityNotFoundException e) {
-      throw NotFoundException.interviewerNotFound(id);
+      throw NotFoundException.interviewer(id);
     }
   }
 }

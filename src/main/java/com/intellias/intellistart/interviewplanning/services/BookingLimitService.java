@@ -1,7 +1,7 @@
 package com.intellias.intellistart.interviewplanning.services;
 
 import com.intellias.intellistart.interviewplanning.controllers.dto.BookingLimitDto;
-import com.intellias.intellistart.interviewplanning.exceptions.BadRequestException;
+import com.intellias.intellistart.interviewplanning.exceptions.InvalidInputException;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
 import com.intellias.intellistart.interviewplanning.repositories.BookingLimitRepository;
@@ -37,10 +37,10 @@ public class BookingLimitService {
       Long interviewerId,
       BookingLimitDto bookingLimitRequest) {
     if (!userRepository.existsById(interviewerId)) {
-      throw NotFoundException.interviewerNotFound(interviewerId);
+      throw NotFoundException.interviewer(interviewerId);
     }
     if (bookingLimitRequest.getWeekNum() != WeekService.getNextWeekNum()) {
-      throw BadRequestException.invalidWeekNum(bookingLimitRequest.getWeekNum());
+      throw InvalidInputException.weekNum(bookingLimitRequest.getWeekNum());
     }
     BookingLimit bookingLimit = bookingLimitRepository.findByInterviewerIdAndWeekNum(interviewerId,
         bookingLimitRequest.getWeekNum());
@@ -68,7 +68,7 @@ public class BookingLimitService {
    */
   public BookingLimit findBookingLimit(Long interviewerId, Integer weekNum) {
     if (!userRepository.existsById(interviewerId)) {
-      throw NotFoundException.interviewerNotFound(interviewerId);
+      throw NotFoundException.interviewer(interviewerId);
     }
     return bookingLimitRepository.findByInterviewerIdAndWeekNum(interviewerId, weekNum);
   }

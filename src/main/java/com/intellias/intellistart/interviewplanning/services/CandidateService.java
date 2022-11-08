@@ -68,7 +68,7 @@ public class CandidateService {
    */
   public Set<CandidateTimeSlot> getRelevantCandidateSlots(Long candidateId) {
     if (!userRepository.existsById(candidateId)) {
-      throw NotFoundException.candidateNotFound(candidateId);
+      throw NotFoundException.candidate(candidateId);
     }
     return candidateTimeSlotRepository
         .getCandidateTimeSlotForCandidateIdAndWeekGreaterOrEqual(
@@ -85,7 +85,7 @@ public class CandidateService {
     // validate from, to, date
     // check if current time is by end of Friday (00:00) of current week
     if (!candidateTimeSlotRepository.existsById(slotId)) {
-      throw NotFoundException.timeSlotNotFound(slotId);
+      throw NotFoundException.timeSlot(slotId);
     }
     CandidateTimeSlot timeSlot = candidateTimeSlotRepository.getReferenceById(slotId);
     timeSlot.setFrom(slot.getFrom());
@@ -104,7 +104,7 @@ public class CandidateService {
     try {
       return (User) Hibernate.unproxy(userRepository.getReferenceById(id));
     } catch (EntityNotFoundException e) {
-      throw NotFoundException.candidateNotFound(id);
+      throw NotFoundException.candidate(id);
     }
   }
 

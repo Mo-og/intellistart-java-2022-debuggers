@@ -49,11 +49,11 @@ public class BookingService {
 
     Long interviewerSlotId = bookingDto.getInterviewerSlotId();
     InterviewerTimeSlot interviewerSlot = interviewerTimeSlotRepository.findById(interviewerSlotId)
-        .orElseThrow(() -> NotFoundException.timeSlotNotFound(interviewerSlotId));
+        .orElseThrow(() -> NotFoundException.timeSlot(interviewerSlotId));
 
     Long candidateSlotId = bookingDto.getCandidateSlotId();
     CandidateTimeSlot candidateSlot = candidateTimeSlotRepository.findById(candidateSlotId)
-        .orElseThrow(() -> NotFoundException.timeSlotNotFound(candidateSlotId));
+        .orElseThrow(() -> NotFoundException.timeSlot(candidateSlotId));
 
     Booking booking = BookingMapper.mapToEntity(bookingDto, interviewerSlot, candidateSlot);
 

@@ -48,7 +48,7 @@ public class UserService {
     try {
       return (User) Hibernate.unproxy(userRepository.getReferenceById(id));
     } catch (EntityNotFoundException e) {
-      throw NotFoundException.coordinatorNotFound(id);
+      throw NotFoundException.coordinator(id);
     }
   }
 
@@ -61,7 +61,7 @@ public class UserService {
     try {
       userRepository.deleteById(id);
     } catch (EntityNotFoundException e) {
-      throw NotFoundException.coordinatorNotFound(id);
+      throw NotFoundException.coordinator(id);
     }
   }
 

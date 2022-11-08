@@ -9,7 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import com.intellias.intellistart.interviewplanning.controllers.dto.BookingLimitDto;
 import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
-import com.intellias.intellistart.interviewplanning.exceptions.BadRequestException;
+import com.intellias.intellistart.interviewplanning.exceptions.InvalidInputException;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
 import com.intellias.intellistart.interviewplanning.services.BookingLimitService;
@@ -62,7 +62,7 @@ public class BookingLimitControllerTest {
   void testSetBookingLimitWeekException() {
     when(bookingLimitService.saveBookingLimit(existingUserId, bookingLimitRequest))
         .thenThrow(
-            BadRequestException.invalidWeekNum(WeekService.getCurrentWeekNum()));
+            InvalidInputException.weekNum(WeekService.getCurrentWeekNum()));
     assertThrows(ApplicationErrorException.class,
         () -> bookingLimitService.saveBookingLimit(existingUserId, bookingLimitRequest));
   }
@@ -70,7 +70,7 @@ public class BookingLimitControllerTest {
   @Test
   void testSetBookingLimitUserException() {
     when(bookingLimitService.saveBookingLimit(existingUserId, bookingLimitRequest))
-        .thenThrow(NotFoundException.interviewerNotFound(existingUserId));
+        .thenThrow(NotFoundException.interviewer(existingUserId));
     assertThrows(ApplicationErrorException.class,
         () -> bookingLimitService.saveBookingLimit(existingUserId, bookingLimitRequest));
   }

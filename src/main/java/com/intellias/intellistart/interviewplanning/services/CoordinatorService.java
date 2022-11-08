@@ -150,7 +150,7 @@ public class CoordinatorService {
    */
   public User grantRole(String email, UserRole role) {
     User user = userRepository.findByEmail(email)
-        .orElseThrow(() -> NotFoundException.userNotFound(email));
+        .orElseThrow(() -> NotFoundException.user(email));
     user.setRole(role);
     return userRepository.save(user);
   }
@@ -163,7 +163,7 @@ public class CoordinatorService {
    */
   public User revokeInterviewerRole(Long id) {
     User user = userRepository.findByIdAndRole(id, UserRole.INTERVIEWER)
-        .orElseThrow(() -> NotFoundException.interviewerNotFound(id));
+        .orElseThrow(() -> NotFoundException.interviewer(id));
     return grantRole(user.getEmail(), UserRole.CANDIDATE);
   }
 
@@ -175,7 +175,7 @@ public class CoordinatorService {
    */
   public User revokeCoordinatorRole(Long id) {
     User user = userRepository.findByIdAndRole(id, UserRole.COORDINATOR)
-        .orElseThrow(() -> NotFoundException.coordinatorNotFound(id));
+        .orElseThrow(() -> NotFoundException.coordinator(id));
     return grantRole(user.getEmail(), UserRole.CANDIDATE);
   }
 
