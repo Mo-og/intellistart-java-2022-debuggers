@@ -7,7 +7,6 @@ import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import com.intellias.intellistart.interviewplanning.validators.InterviewerSlotValidator;
-import com.intellias.intellistart.interviewplanning.validators.InterviewerSlotValidator.Action;
 import java.util.Set;
 import javax.persistence.EntityNotFoundException;
 import org.hibernate.Hibernate;
@@ -45,7 +44,7 @@ public class InterviewerService {
    */
   public InterviewerTimeSlot createSlot(Long interviewerId,
       InterviewerTimeSlot interviewerTimeSlot) {
-    InterviewerSlotValidator.validate(interviewerTimeSlot, Action.CREATE);
+    InterviewerSlotValidator.validate(interviewerTimeSlot);
     User interviewer = userRepository.getReferenceById(interviewerId);
     interviewerTimeSlot.setInterviewer(interviewer);
     return interviewerTimeSlotRepository.saveAndFlush(interviewerTimeSlot);
@@ -100,7 +99,7 @@ public class InterviewerService {
    */
   public InterviewerTimeSlot updateSlot(Long interviewerId, Long slotId,
       InterviewerTimeSlot interviewerTimeSlot) {
-    InterviewerSlotValidator.validate(interviewerTimeSlot, Action.UPDATE);
+    InterviewerSlotValidator.validate(interviewerTimeSlot);
     User interviewer = userRepository.getReferenceById(interviewerId);
     InterviewerTimeSlot slot = getSlotById(slotId);
     slot.setFrom(interviewerTimeSlot.getFrom());
