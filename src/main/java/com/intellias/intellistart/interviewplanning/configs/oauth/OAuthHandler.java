@@ -49,8 +49,8 @@ public class OAuthHandler {
     @SneakyThrows
     public void oauthRedirectResponse(HttpServletRequest request, HttpServletResponse response,
         String url) {
-        url=url.replaceFirst("localhost", "http://localhost");
-        log.debug("oauthRedirectResponse");
+        url = url.replaceFirst("localhost", "http://localhost");
+        log.debug("oauthRedirectResponse\nurl: {}", url);
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter().write(String.format("{ \"redirectUrl\": \"%s\" }", url));
@@ -74,7 +74,7 @@ public class OAuthHandler {
     @SneakyThrows
     public void oauthSuccessResponse(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) {
-        log.debug("Auth success. Authentication: {}", response, authentication.toString());
+        log.debug("Auth success. Authentication: {}", authentication.toString());
         String accountId = AuthenticationHelper.retrieveAccountId(authentication);
         response.addHeader(HttpHeaders.SET_COOKIE,
             CookieHelper.generateExpiredCookie(OAUTH_COOKIE_NAME));

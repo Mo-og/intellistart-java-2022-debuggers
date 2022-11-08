@@ -13,11 +13,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * Spring security configuration.
@@ -37,6 +40,19 @@ public class WebSecurityConfig {
   private final CustomAuthorizationRequestResolver customAuthorizationRequestResolver;
   private final CustomStatelessAuthorizationRequestRepo customStatelessAuthorizationRequestRepo;
 
+  @Bean
+  public static PropertySourcesPlaceholderConfigurer ppc() {
+    return new PropertySourcesPlaceholderConfigurer();
+  }
+
+  @SneakyThrows
+  private void accessDenied(HttpServletRequest request, HttpServletResponse response,
+      Exception authException) {
+    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+    response.getWriter().write("{ \"error\": \"Access Denied\" }");
+  }
+
   /**
    * Requests filter to perform authorization.
    *
@@ -48,9 +64,9 @@ public class WebSecurityConfig {
     http.csrf().disable();
     http.cors().disable();
     http.httpBasic().disable();
-//
-//    http.sessionManagement(
-//        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+    http.sessionManagement(
+        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
     http.authorizeRequests(authorize -> authorize
 //            .anyRequest().permitAll() //!!
@@ -83,12 +99,9 @@ public class WebSecurityConfig {
     return http.build();
   }
 
-  @SneakyThrows
-  private void accessDenied(HttpServletRequest request, HttpServletResponse response,
-      Exception authException) {
-    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-    response.getWriter().write("{ \"error\": \"Access Denied\" }");
+  @Bean
+  public RestTemplate restTemplate() {
+    return new RestTemplate();
   }
 
 }

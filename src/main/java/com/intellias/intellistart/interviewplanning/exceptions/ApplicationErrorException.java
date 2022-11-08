@@ -46,25 +46,28 @@ public class ApplicationErrorException extends RuntimeException {
    * API error codes enum that delivers necessary statuses.
    */
   public enum ErrorCode {
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "user_not_found"),
-    CANDIDATE_NOT_FOUND(HttpStatus.NOT_FOUND, "candidate_not_found"),
-    INTERVIEWER_NOT_FOUND(HttpStatus.NOT_FOUND, "interviewer_not_found"),
-    COORDINATOR_NOT_FOUND(HttpStatus.NOT_FOUND, "coordinator_not_found"),
-    SLOT_NOT_FOUND(HttpStatus.NOT_FOUND, "slot_not_found"),
-    SLOT_IS_OVERLAPPING(HttpStatus.CONFLICT, "slot_is_overlapping"),
-    INVALID_BOUNDARIES(HttpStatus.BAD_REQUEST, "invalid_boundaries"),
-    CANNOT_EDIT_WEEK(HttpStatus.METHOD_NOT_ALLOWED, "cannot_edit_week"),
-    INVALID_DAY_OF_WEEK(HttpStatus.BAD_REQUEST, "invalid_day_of_week"),
-    CANNOT_CREATE_OR_UPDATE_SLOT(HttpStatus.METHOD_NOT_ALLOWED, "cannot_create_or_update_slot"),
-    INVALID_BOOKING_LIMIT(HttpStatus.BAD_REQUEST, "invalid_booking_limit_number"),
-    CANNOT_EDIT_THIS_WEEK(HttpStatus.METHOD_NOT_ALLOWED, "cannot_edit_this_week");
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND),
+    CANDIDATE_NOT_FOUND(HttpStatus.NOT_FOUND),
+    INTERVIEWER_NOT_FOUND(HttpStatus.NOT_FOUND),
+    COORDINATOR_NOT_FOUND(HttpStatus.NOT_FOUND),
+    SLOT_NOT_FOUND(HttpStatus.NOT_FOUND),
+    SLOT_IS_OVERLAPPING(HttpStatus.CONFLICT),
+    INVALID_BOUNDARIES(HttpStatus.BAD_REQUEST),
+    CANNOT_EDIT_WEEK(HttpStatus.METHOD_NOT_ALLOWED),
+    INVALID_DAY_OF_WEEK(HttpStatus.BAD_REQUEST),
+    CANNOT_CREATE_OR_UPDATE_SLOT(HttpStatus.METHOD_NOT_ALLOWED),
+    INVALID_BOOKING_LIMIT(HttpStatus.BAD_REQUEST),
+    CANNOT_EDIT_THIS_WEEK(HttpStatus.METHOD_NOT_ALLOWED),
+    INVALID_USER_CREDENTIALS(HttpStatus.BAD_REQUEST),
+    TOKEN_EXPIRED(HttpStatus.BAD_REQUEST),
+    NO_USER_DATA(HttpStatus.BAD_REQUEST);
 
     public final String code;
     public final HttpStatus httpStatus;
 
-    ErrorCode(HttpStatus httpStatus, String code) {
-      this.code = code;
+    ErrorCode(HttpStatus httpStatus) {
       this.httpStatus = httpStatus;
+      this.code = this.name().toLowerCase();
     }
   }
 
