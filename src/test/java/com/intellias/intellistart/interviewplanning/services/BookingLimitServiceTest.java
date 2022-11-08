@@ -6,8 +6,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
+import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
-import com.intellias.intellistart.interviewplanning.exceptions.WeekEditException;
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
 import com.intellias.intellistart.interviewplanning.models.dto.BookingLimitRequest;
 import com.intellias.intellistart.interviewplanning.repositories.BookingLimitRepository;
@@ -79,7 +79,7 @@ public class BookingLimitServiceTest {
   void testSetBookingThrowWeekNumException() {
     when(userRepository.existsById(existingUserId))
         .thenReturn(true);
-    assertThrows(WeekEditException.class,
+    assertThrows(ApplicationErrorException.class,
         () -> bookingLimitService.saveBookingLimit(existingUserId, badBookingLimitRequest));
   }
 
