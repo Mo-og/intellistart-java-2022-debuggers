@@ -15,14 +15,11 @@ public class PeriodValidator {
    * @param to   end time
    * @return true if period is valid
    */
-  public static boolean isValid(String from, String to) {
-    LocalTime fromTime = LocalTime.parse(from);
-    LocalTime toTime = LocalTime.parse(to);
-
-    return toTime.minusMinutes(89).isAfter(fromTime)
-        && Math.abs(toTime.getMinute() - fromTime.getMinute()) % 30 == 0
-        && fromTime.isAfter(LocalTime.of(7, 59))
-        && toTime.isBefore(LocalTime.of(22, 1));
+  public static boolean isValid(LocalTime from, LocalTime to) {
+    return to.minusMinutes(89).isAfter(from)
+        && Math.abs(to.getMinute() - from.getMinute()) % 30 == 0
+        && from.isAfter(LocalTime.of(7, 59))
+        && to.isBefore(LocalTime.of(22, 1));
   }
 
   /**
@@ -32,9 +29,9 @@ public class PeriodValidator {
    * @param to   end time
    * @throws InvalidInputException if period is invalid
    */
-  public static void validate(String from, String to) {
+  public static void validate(LocalTime from, LocalTime to) {
     if (!isValid(from, to)) {
-      throw InvalidInputException.boundaries(from, to);
+      throw InvalidInputException.boundaries(from.toString(), to.toString());
     }
   }
 
