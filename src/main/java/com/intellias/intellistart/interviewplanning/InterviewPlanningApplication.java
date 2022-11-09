@@ -26,7 +26,7 @@ public class InterviewPlanningApplication {
   CommandLineRunner createAdmin(UserService userService) {
     return args -> {
       if (!userService.existsWithEmail("mgorbiik@gmail.com")) {
-        userService.create("mgorbiik@gmail.com", UserRole.COORDINATOR);
+        userService.create("mgorbiik@gmail.com", UserRole.CANDIDATE);
         log.info("Initial admin user was created");
       } else {
         log.info("Admin is already present in database");

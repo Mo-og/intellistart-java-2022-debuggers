@@ -29,31 +29,48 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
+		<dependency>
+			<artifactId>h2</artifactId>
+			<groupId>com.h2database</groupId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<artifactId>lombok</artifactId>
+			<groupId>org.projectlombok</groupId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<artifactId>spring-security-test</artifactId>
+			<groupId>org.springframework.security</groupId>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<artifactId>spring-security-oauth2-client</artifactId>
 			<groupId>org.springframework.security</groupId>
 		</dependency>
+		<!--	Grouped <jsonwebtoken>	-->
 		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>runtime</scope>
+			<artifactId>jjwt-api</artifactId>
+			<groupId>io.jsonwebtoken</groupId>
+			<version>0.11.5</version>
 		</dependency>
 		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<optional>true</optional>
+			<artifactId>jjwt-impl</artifactId>
+			<groupId>io.jsonwebtoken</groupId>
+			<version>0.11.5</version>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
+			<artifactId>jjwt-jackson</artifactId>
+			<groupId>io.jsonwebtoken</groupId>
+			<version>0.11.5</version>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
-			<scope>test</scope>
-		</dependency>
+		<!--	<jsonwebtoken>	-->
+
 	</dependencies>
 
 	<build>

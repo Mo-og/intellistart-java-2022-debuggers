@@ -1,6 +1,5 @@
 package com.intellias.intellistart.interviewplanning.services;
 
-import com.intellias.intellistart.interviewplanning.configs.CustomOauth2User;
 import com.intellias.intellistart.interviewplanning.exceptions.CoordinatorNotFoundException;
 import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundException;
 import com.intellias.intellistart.interviewplanning.models.User;
@@ -10,8 +9,8 @@ import javax.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +19,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
-public class UserService {
+public class UserService implements UserDetailsService {
 
   private final UserRepository userRepository;
 
@@ -79,25 +78,6 @@ public class UserService {
   public User getByEmail(String email) {
     return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
   }
-
-  /**
-   * Utility temporary method to get User from database by params from authentication token.
-   *
-   * @param authentication Authentication object from controller
-   * @return User retrieved by email from authentication details if any available
-   */
-  public User resolveUser(Authentication authentication) {
-    var email = ((CustomOauth2User) authentication.getPrincipal()).getEmail();
-    return userRepository.findByEmail(email)
-        .orElseThrow(() -> new UserNotFoundException(email));
-  }
-
-/*  @Override
-  public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-    OAuth2User auth2User =  super.loadUser(userRequest);
-    User actualUser = userRepository.findByEmail(auth2User.getAttribute("email")).orElse(null);
-    return new CustomOauth2User(auth2User, actualUser);
-  }*/
 
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     return userRepository.findByEmail(username).orElseThrow(

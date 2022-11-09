@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
 import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException.ErrorCode;
 import com.intellias.intellistart.interviewplanning.models.User;
+import com.intellias.intellistart.interviewplanning.models.User.UserRole;
+import com.intellias.intellistart.interviewplanning.security.jwt.JwtTokenUtil;
 import com.intellias.intellistart.interviewplanning.services.UserService;
 import java.util.Collections;
 import java.util.List;
@@ -17,13 +19,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 @RestController
 @Slf4j
-public class LoginController {
+public class AuthController {
 
   private static final String FACEBOOK_GET_TOKEN_BY_CODE_URI =
       "https://graph.facebook.com/v15.0/oauth/access_token"
@@ -46,18 +51,21 @@ public class LoginController {
   private final FacebookAppAccessToken appAccessToken;
   private final Map<String, String> authLink;
   private final UserService userService;
+  private final JwtTokenUtil jwtTokenUtil;
 
 
   @Autowired
-  public LoginController(Environment env, RestTemplate restTemplate, UserService userService) {
+  public AuthController(Environment env, RestTemplate restTemplate, UserService userService,
+      JwtTokenUtil jwtTokenUtil) {
 
     this.restTemplate = restTemplate;
     clientId = env.getProperty("facebook.client-id");
     clientSecret = env.getProperty("facebook.client-secret");
     facebookAuthFullLink = env.getProperty(
         "spring.security.oauth2.client.provider.facebook.authorization-uri");
-    this.facebookAuthUri = env.getProperty("facebook.redirect-uri");
+    this.facebookAuthUri = env.getProperty("facebook.uri.redirect");
     this.userService = userService;
+    this.jwtTokenUtil = jwtTokenUtil;
     authLink = Collections.singletonMap("authLink", facebookAuthFullLink);
 
     //needs to be updated every ~60 days
@@ -91,8 +99,8 @@ public class LoginController {
     private Map<String, Object> principal;
   }
 
-  @GetMapping("/oauth2/redirect")
-  public FacebookUserProfile retrieveToken(@RequestParam String code) {
+  @GetMapping({"/oauth2/redirect"})
+  public JwtToken retrieveToken(@RequestParam String code) {
 
     FacebookTokenResponse token = restTemplate.getForObject(
         format(FACEBOOK_GET_TOKEN_BY_CODE_URI, clientId, facebookAuthUri, clientSecret, code),
@@ -125,15 +133,36 @@ public class LoginController {
       throw new ApplicationErrorException(ErrorCode.NO_USER_DATA,
           "Unable to get email of user from provider");
     }
-
-    if (!userService.existsWithEmail(userProfile.getEmail())) {
-      //todo jwt as candidate
+    //todo replace with OAuth2AccessToken
+    JwtToken generatedJwtToken;
+    if (userService.existsWithEmail(userProfile.getEmail())) {
+      User user = userService.getByEmail(userProfile.getEmail());
+      generatedJwtToken = new JwtToken(jwtTokenUtil.generateToken(user));
+    } else {
+      generatedJwtToken = new JwtToken(
+          jwtTokenUtil.generateToken(
+              new User(userProfile.getEmail(), UserRole.CANDIDATE)
+          )
+      );
     }
+    return generatedJwtToken;
+  }
 
-    User user = userService.getByEmail(userProfile.getEmail());
-    //todo jwt as actual user
+  @RequestMapping(value = "/authenticate", method = {RequestMethod.POST, RequestMethod.GET})
+  public JwtToken retrieveTokenByCodeJson(@RequestBody JwtCode jwtCode) {
+    return retrieveToken(jwtCode.code);
+  }
 
-    return userProfile;
+  @Data
+  static class JwtToken {
+
+    private final String token;
+  }
+
+  @Data
+  static class JwtCode {
+
+    private final String code;
   }
 
   @Data

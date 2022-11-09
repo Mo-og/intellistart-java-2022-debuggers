@@ -1,8 +1,6 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.intellias.intellistart.interviewplanning.configs.CustomOauth2User;
-import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundException;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.services.CoordinatorService;
@@ -13,8 +11,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -58,7 +54,6 @@ public class UserController {
     return String.valueOf(authentication);
   }
 
-
   /**
    * Me endpoint. Provides current user info
    *
@@ -66,16 +61,8 @@ public class UserController {
    * not a Candidate
    */
   @GetMapping("/me")
-  @PreAuthorize("authenticated") // hasAnyRole('CANDIDATE','COORDINATOR','INTERVIEWER')
-  public ResponseEntity<?> getUserInfo(Authentication authentication) {
-    User user;
-    CustomOauth2User auth2User = (CustomOauth2User) authentication.getPrincipal();
-    try {
-      user = userService.getByEmail(auth2User.getEmail());
-    } catch (UserNotFoundException e) {
-      return ResponseEntity.ok(new UserForm(auth2User.getEmail(), UserRole.CANDIDATE));
-    }
-    return ResponseEntity.ok(user);
+  public User getUserInfo(Authentication authentication) {
+    return (User) authentication.getPrincipal();
   }
 
 

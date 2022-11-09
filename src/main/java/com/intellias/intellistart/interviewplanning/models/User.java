@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -31,7 +33,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Setter
 @ToString
 @RequiredArgsConstructor
-@Table(name = "COORDINATOR")
+@Table(name = "USERS")
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User implements UserDetails {
@@ -42,6 +44,7 @@ public class User implements UserDetails {
   @Column(nullable = false)
   private Long id;
   private String email;
+  @Enumerated(EnumType.STRING)
   private UserRole role;
   @JsonIgnore
   @Transient
