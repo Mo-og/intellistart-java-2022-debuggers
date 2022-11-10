@@ -2,7 +2,7 @@ package com.intellias.intellistart.interviewplanning.models;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.intellias.intellistart.interviewplanning.Utils;
+import com.intellias.intellistart.interviewplanning.utils.Utils;
 import com.intellias.intellistart.interviewplanning.validators.PeriodValidator;
 import java.time.LocalTime;
 import java.util.Objects;

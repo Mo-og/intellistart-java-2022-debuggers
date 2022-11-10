@@ -25,4 +25,5 @@ public interface CandidateTimeSlotRepository extends JpaRepository<CandidateTime
   Set<CandidateTimeSlot> getCandidateTimeSlotForCandidateIdAndWeekNum(
       Long candidateId, LocalDate date);
 
+  Set<CandidateTimeSlot> findByDate(LocalDate date);
 }

@@ -1,8 +1,8 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.intellias.intellistart.interviewplanning.controllers.dto.DashboardDto;
 import com.intellias.intellistart.interviewplanning.services.CoordinatorService;
-import com.intellias.intellistart.interviewplanning.services.CoordinatorService.Dashboard;
 import com.intellias.intellistart.interviewplanning.services.WeekService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,7 +38,7 @@ public class WeekController {
   }
 
   @GetMapping("/weeks/{weekId}/dashboard")
-  public Dashboard getDashboard(@PathVariable("weekId") int weekId) {
+  public DashboardDto getWeekDashboard(@PathVariable("weekId") int weekId) {
     return coordinatorService.getWeekDashboard(weekId);
   }
 

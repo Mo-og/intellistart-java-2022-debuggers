@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
+import com.intellias.intellistart.interviewplanning.controllers.dto.BookingDto;
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
@@ -40,6 +41,16 @@ class BookingControllerTest {
           "some desc"
       );
 
+  private static final BookingDto bookingDto =
+      BookingDto.builder()
+          .from(LocalTime.of(8, 0))
+          .to(LocalTime.of(10, 0))
+          .subject("some subject")
+          .description("some desc")
+          .interviewerSlotId(interviewerSlot.getId())
+          .candidateSlotId(candidateSlot.getId())
+          .build();
+
   static {
     interviewerSlot.setId(1L);
   }
@@ -60,8 +71,8 @@ class BookingControllerTest {
   @Test
   void testCreateBooking() {
     when(bookingService
-        .createBooking(booking))
-        .thenReturn(booking);
+        .createBooking(bookingDto))
+        .thenReturn(bookingDto);
     checkResponseOk(
         post("/bookings"),
         json(booking), json(booking), mockMvc);

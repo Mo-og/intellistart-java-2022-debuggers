@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.http.HttpStatus;
 
 /**
- * Base container of error codes. Handled by global CustomExceptionHandler
+ * Base container of error codes. Handled by global CustomExceptionHandler.
  */
 @JsonIgnoreProperties({"cause", "stackTrace", "message", "suppressed", "localizedMessage"})
 public class ApplicationErrorException extends RuntimeException {
@@ -23,7 +23,7 @@ public class ApplicationErrorException extends RuntimeException {
    * @param errorMessage user-friendly error message
    */
   public ApplicationErrorException(ErrorCode errorCode, String errorMessage) {
-    super(errorMessage);
+    super(errorCode.message + errorMessage);
     this.errorCode = errorCode;
     this.errorMessage = errorMessage;
   }
@@ -46,28 +46,35 @@ public class ApplicationErrorException extends RuntimeException {
    * API error codes enum that delivers necessary statuses.
    */
   public enum ErrorCode {
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND),
-    CANDIDATE_NOT_FOUND(HttpStatus.NOT_FOUND),
-    INTERVIEWER_NOT_FOUND(HttpStatus.NOT_FOUND),
-    COORDINATOR_NOT_FOUND(HttpStatus.NOT_FOUND),
-    SLOT_NOT_FOUND(HttpStatus.NOT_FOUND),
-    SLOT_IS_OVERLAPPING(HttpStatus.CONFLICT),
-    INVALID_BOUNDARIES(HttpStatus.BAD_REQUEST),
-    CANNOT_EDIT_WEEK(HttpStatus.METHOD_NOT_ALLOWED),
-    INVALID_DAY_OF_WEEK(HttpStatus.BAD_REQUEST),
-    CANNOT_CREATE_OR_UPDATE_SLOT(HttpStatus.METHOD_NOT_ALLOWED),
-    INVALID_BOOKING_LIMIT(HttpStatus.BAD_REQUEST),
-    CANNOT_EDIT_THIS_WEEK(HttpStatus.METHOD_NOT_ALLOWED),
-    INVALID_USER_CREDENTIALS(HttpStatus.BAD_REQUEST),
-    TOKEN_EXPIRED(HttpStatus.BAD_REQUEST),
-    NO_USER_DATA(HttpStatus.BAD_REQUEST);
+    //Not found error codes
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "No user found"),
+    CANDIDATE_NOT_FOUND(HttpStatus.NOT_FOUND, "No candidate found"),
+    INTERVIEWER_NOT_FOUND(HttpStatus.NOT_FOUND, "No interviewer found"),
+    COORDINATOR_NOT_FOUND(HttpStatus.NOT_FOUND, "No coordinator found"),
+    SLOT_NOT_FOUND(HttpStatus.NOT_FOUND, "No slot found"),
+
+    //Conflict error code
+    SLOT_IS_OVERLAPPING(HttpStatus.CONFLICT, "slot_is_overlapping"),
+    INVALID_BOOKING_LIMIT(HttpStatus.CONFLICT, "Invalid booking limit number"),
+
+    //Bad request error codes
+    INVALID_BOUNDARIES(HttpStatus.BAD_REQUEST, "Invalid time boundaries"),
+    INVALID_DAY_OF_WEEK(HttpStatus.BAD_REQUEST, "Invalid day of week"),
+    INVALID_WEEK_NUM(HttpStatus.BAD_REQUEST, "Invalid week number"),
+
+    //Authentication related
+    INVALID_USER_CREDENTIALS(HttpStatus.BAD_REQUEST,"Invalid user credentials"),
+    TOKEN_EXPIRED(HttpStatus.BAD_REQUEST,"Provided token has expired"),
+    NO_USER_DATA(HttpStatus.BAD_REQUEST,"No data could be retrieved for provided credentials");
 
     public final String code;
     public final HttpStatus httpStatus;
+    public final String message;
 
-    ErrorCode(HttpStatus httpStatus) {
-      this.httpStatus = httpStatus;
+    ErrorCode(HttpStatus httpStatus, String errorMessage) {
       this.code = this.name().toLowerCase();
+      this.httpStatus = httpStatus;
+      this.message = errorMessage;
     }
   }
 

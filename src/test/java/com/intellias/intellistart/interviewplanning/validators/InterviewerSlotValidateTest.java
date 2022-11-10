@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.services.WeekService;
-import com.intellias.intellistart.interviewplanning.validators.InterviewerSlotValidator.Action;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
@@ -27,27 +26,27 @@ class InterviewerSlotValidateTest {
   @Test
   void validateSlotToBeUpdated() {
     if (LocalDate.now().getDayOfWeek().getValue() <= DayOfWeek.FRIDAY.getValue()) {
-      assertDoesNotThrow(() -> InterviewerSlotValidator.validate(nextWeekSlot, Action.UPDATE));
+      assertDoesNotThrow(() -> InterviewerSlotValidator.validate(nextWeekSlot));
     } else {
       assertThrows(ApplicationErrorException.class,
-          () -> InterviewerSlotValidator.validate(nextWeekSlot, Action.UPDATE));
+          () -> InterviewerSlotValidator.validate(nextWeekSlot));
     }
 
     assertThrows(ApplicationErrorException.class,
-        () -> InterviewerSlotValidator.validate(currentWeekSlot, Action.UPDATE));
+        () -> InterviewerSlotValidator.validate(currentWeekSlot));
   }
 
   @Test
   void validateSlotToBeCreated() {
     if (LocalDate.now().getDayOfWeek().getValue() <= DayOfWeek.FRIDAY.getValue()) {
-      assertDoesNotThrow(() -> InterviewerSlotValidator.validate(nextWeekSlot, Action.CREATE));
+      assertDoesNotThrow(() -> InterviewerSlotValidator.validate(nextWeekSlot));
     } else {
       assertThrows(ApplicationErrorException.class,
-          () -> InterviewerSlotValidator.validate(nextWeekSlot, Action.CREATE));
+          () -> InterviewerSlotValidator.validate(nextWeekSlot));
     }
 
     assertThrows(ApplicationErrorException.class,
-        () -> InterviewerSlotValidator.validate(currentWeekSlot, Action.CREATE));
+        () -> InterviewerSlotValidator.validate(currentWeekSlot));
   }
 
 }

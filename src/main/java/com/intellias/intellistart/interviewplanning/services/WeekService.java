@@ -1,5 +1,6 @@
 package com.intellias.intellistart.interviewplanning.services;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -50,5 +51,19 @@ public class WeekService {
   public static int getWeekNumByDate(LocalDate date) {
     return date.get(WeekFields.ISO.weekOfWeekBasedYear())
         + date.get(IsoFields.WEEK_BASED_YEAR) * 100;
+  }
+
+  /**
+   * Defines the date by number of the week and day of week.
+   *
+   * @param weekNum   number of week
+   * @param dayOfWeek day of week
+   * @return local date
+   */
+  public static LocalDate getDateByWeekNumAndDayOfWeek(int weekNum, DayOfWeek dayOfWeek) {
+    return LocalDate.now()
+        .with(IsoFields.WEEK_BASED_YEAR, weekNum / 100)
+        .with(WeekFields.ISO.weekOfWeekBasedYear(), weekNum % 100)
+        .with(WeekFields.ISO.dayOfWeek(), dayOfWeek.getValue());
   }
 }

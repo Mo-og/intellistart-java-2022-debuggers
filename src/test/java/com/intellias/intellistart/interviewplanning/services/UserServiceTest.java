@@ -7,7 +7,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
-import com.intellias.intellistart.interviewplanning.exceptions.CoordinatorNotFoundException;
+import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
@@ -143,13 +143,13 @@ class UserServiceTest {
     when(userRepository
         .getReferenceById(-1L))
         .thenThrow(new EntityNotFoundException());
-    assertThrows(CoordinatorNotFoundException.class, () -> service.getById(-1L));
+    assertThrows(NotFoundException.class, () -> service.getUserById(-1L));
   }
 
   @Test
   void testRemoveByWrongId() {
     doThrow(new EntityNotFoundException()).when(userRepository).deleteById(-1L);
-    assertThrows(CoordinatorNotFoundException.class, () -> service.removeById(-1L));
+    assertThrows(NotFoundException.class, () -> service.removeUserById(-1L));
   }
 
   @Test

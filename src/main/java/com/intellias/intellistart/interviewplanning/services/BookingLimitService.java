@@ -1,9 +1,9 @@
 package com.intellias.intellistart.interviewplanning.services;
 
-import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundException;
-import com.intellias.intellistart.interviewplanning.exceptions.WeekEditException;
+import com.intellias.intellistart.interviewplanning.controllers.dto.BookingLimitDto;
+import com.intellias.intellistart.interviewplanning.exceptions.InvalidInputException;
+import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
-import com.intellias.intellistart.interviewplanning.models.dto.BookingLimitRequest;
 import com.intellias.intellistart.interviewplanning.repositories.BookingLimitRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import java.util.List;
@@ -35,13 +35,12 @@ public class BookingLimitService {
    */
   public BookingLimit saveBookingLimit(
       Long interviewerId,
-      BookingLimitRequest bookingLimitRequest) {
+      BookingLimitDto bookingLimitRequest) {
     if (!userRepository.existsById(interviewerId)) {
-      throw new UserNotFoundException(interviewerId + "");
+      throw NotFoundException.interviewer(interviewerId);
     }
     if (bookingLimitRequest.getWeekNum() != WeekService.getNextWeekNum()) {
-      throw new WeekEditException(bookingLimitRequest.getWeekNum(),
-          bookingLimitRequest.getBookingLimit());
+      throw InvalidInputException.weekNum(bookingLimitRequest.getWeekNum());
     }
     BookingLimit bookingLimit = bookingLimitRepository.findByInterviewerIdAndWeekNum(interviewerId,
         bookingLimitRequest.getWeekNum());
@@ -69,7 +68,7 @@ public class BookingLimitService {
    */
   public BookingLimit findBookingLimit(Long interviewerId, Integer weekNum) {
     if (!userRepository.existsById(interviewerId)) {
-      throw new UserNotFoundException(interviewerId + "");
+      throw NotFoundException.interviewer(interviewerId);
     }
     return bookingLimitRepository.findByInterviewerIdAndWeekNum(interviewerId, weekNum);
   }

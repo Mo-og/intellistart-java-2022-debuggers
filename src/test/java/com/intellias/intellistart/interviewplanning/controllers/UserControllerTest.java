@@ -12,7 +12,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.intellias.intellistart.interviewplanning.exceptions.InterviewerNotFoundException;
+import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.security.jwt.JwtRequestFilter;
@@ -129,9 +129,9 @@ class UserControllerTest {
 
   @Test
   void testGetNonExistingInterviewer() {
-    when(interviewerService.getById(-1L)).thenThrow(new InterviewerNotFoundException(-1L));
+    when(interviewerService.getById(-1L)).thenThrow(NotFoundException.interviewer(-1L));
     checkResponseBad(get("/interviewers/{id}", -1L),
-        null, json(new InterviewerNotFoundException(-1L)),
+        null, json(NotFoundException.interviewer(-1L)),
         status().is4xxClientError(), mockMvc);
   }
 

@@ -1,5 +1,6 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
+import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.services.CandidateService;
@@ -53,12 +54,12 @@ public class SlotController {
   }
 
   @GetMapping("/interviewers/{interviewerId}/slots/weeks/current")
-  public Set<InterviewerTimeSlot> getCurrentWeekInterviewerSlots(@PathVariable Long interviewerId) {
+  public Set<InterviewerSlotDto> getCurrentWeekInterviewerSlots(@PathVariable Long interviewerId) {
     return interviewerService.getSlotsByWeekId(interviewerId, WeekService.getCurrentWeekNum());
   }
 
   @GetMapping("/interviewers/{interviewerId}/slots/weeks/next")
-  public Set<InterviewerTimeSlot> getNextWeekInterviewerSlots(@PathVariable Long interviewerId) {
+  public Set<InterviewerSlotDto> getNextWeekInterviewerSlots(@PathVariable Long interviewerId) {
     return interviewerService.getSlotsByWeekId(interviewerId, WeekService.getNextWeekNum());
   }
 }

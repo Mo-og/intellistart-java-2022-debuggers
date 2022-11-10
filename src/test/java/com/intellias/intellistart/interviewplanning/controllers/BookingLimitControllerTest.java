@@ -7,8 +7,10 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundException;
-import com.intellias.intellistart.interviewplanning.exceptions.WeekEditException;
+import com.intellias.intellistart.interviewplanning.controllers.dto.BookingLimitDto;
+import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
+import com.intellias.intellistart.interviewplanning.exceptions.InvalidInputException;
+import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
@@ -43,7 +45,7 @@ class BookingLimitControllerTest {
       notExistingUserId,
       nextWeekNum,
       limit + 1);
-  private static final BookingLimitRequest bookingLimitRequest = new BookingLimitRequest(limit,
+  private static final BookingLimitDto bookingLimitRequest = new BookingLimitDto(limit,
       nextWeekNum);
   @Autowired
   private MockMvc mockMvc;
@@ -68,16 +70,17 @@ class BookingLimitControllerTest {
   @Test
   void testSetBookingLimitWeekException() {
     when(bookingLimitService.saveBookingLimit(existingUserId, bookingLimitRequest))
-        .thenThrow(new WeekEditException(existingUserId + ""));
-    assertThrows(WeekEditException.class,
+        .thenThrow(
+            InvalidInputException.weekNum(WeekService.getCurrentWeekNum()));
+    assertThrows(ApplicationErrorException.class,
         () -> bookingLimitService.saveBookingLimit(existingUserId, bookingLimitRequest));
   }
 
   @Test
   void testSetBookingLimitUserException() {
     when(bookingLimitService.saveBookingLimit(existingUserId, bookingLimitRequest))
-        .thenThrow(new UserNotFoundException(notExistingUserId + ""));
-    assertThrows(UserNotFoundException.class,
+        .thenThrow(NotFoundException.interviewer(existingUserId));
+    assertThrows(ApplicationErrorException.class,
         () -> bookingLimitService.saveBookingLimit(existingUserId, bookingLimitRequest));
   }
 

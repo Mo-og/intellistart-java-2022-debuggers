@@ -1,7 +1,7 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
+import com.intellias.intellistart.interviewplanning.controllers.dto.BookingLimitDto;
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
-import com.intellias.intellistart.interviewplanning.models.dto.BookingLimitRequest;
 import com.intellias.intellistart.interviewplanning.services.BookingLimitService;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +25,7 @@ public class BookingLimitController {
 
   @PostMapping("/interviewers/{interviewerId}/bookingLimits")
   public BookingLimit setBookingLimit(@PathVariable Long interviewerId,
-      @RequestBody BookingLimitRequest request) {
+      @RequestBody BookingLimitDto request) {
     return bookingLimitService.saveBookingLimit(interviewerId, request);
   }
 

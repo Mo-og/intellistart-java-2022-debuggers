@@ -1,9 +1,11 @@
 package com.intellias.intellistart.interviewplanning.services;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.intellias.intellistart.interviewplanning.exceptions.CoordinatorNotFoundException;
-import com.intellias.intellistart.interviewplanning.exceptions.InterviewerNotFoundException;
-import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundException;
+import com.intellias.intellistart.interviewplanning.controllers.dto.BookingDto;
+import com.intellias.intellistart.interviewplanning.controllers.dto.CandidateSlotDto;
+import com.intellias.intellistart.interviewplanning.controllers.dto.DashboardDto;
+import com.intellias.intellistart.interviewplanning.controllers.dto.DayDashboardDto;
+import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
+import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
@@ -13,11 +15,18 @@ import com.intellias.intellistart.interviewplanning.repositories.BookingReposito
 import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
+import com.intellias.intellistart.interviewplanning.utils.mappers.BookingMapper;
+import com.intellias.intellistart.interviewplanning.utils.mappers.CandidateSlotMapper;
+import com.intellias.intellistart.interviewplanning.utils.mappers.InterviewerSlotMapper;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.util.Comparator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,58 +61,84 @@ public class CoordinatorService {
   }
 
   /**
-   * Create dashboard with bookings, interviewers and candidates slots by a specified number of
-   * week.
+   * Returns week dashboard with time slots and bookings by a specified number of week.
    *
-   * @param weekId number of the week
-   * @return dashboard with bookings and time slots for the week
+   * @param weekNum number of the week
+   * @return dashboard with time slots and bookings for the week
    */
-  public Dashboard getWeekDashboard(int weekId) {
-    return new Dashboard(getInterviewerTimeSlotsByWeekId(weekId),
-        getCandidateTimeSlotsByWeekId(weekId),
-        getBookingsByWeekId(weekId));
+  public DashboardDto getWeekDashboard(int weekNum) {
+    Set<DayDashboardDto> set = new TreeSet<>(Comparator.comparing(DayDashboardDto::getDate));
+    set.add(getDayDashboard(weekNum, DayOfWeek.MONDAY));
+    set.add(getDayDashboard(weekNum, DayOfWeek.TUESDAY));
+    set.add(getDayDashboard(weekNum, DayOfWeek.WEDNESDAY));
+    set.add(getDayDashboard(weekNum, DayOfWeek.THURSDAY));
+    set.add(getDayDashboard(weekNum, DayOfWeek.FRIDAY));
+    return new DashboardDto(set);
+
   }
 
   /**
-   * Searches for interviewers time slots by a specified number of week. Groups them by days of the
-   * week.
+   * Returns day dashboard with time slots and bookings by a specified week number and day of week.
    *
-   * @param weekId number of the week
-   * @return Map with interviewers slots grouped by days
+   * @param weekNum number of the week
+   * @param day     day of the week
+   * @return dashboard with time slots and bookings for the day
    */
-  public Map<DayOfWeek, TreeSet<InterviewerTimeSlot>> getInterviewerTimeSlotsByWeekId(int weekId) {
-    return interviewerTimeSlotRepository.findAll().stream()
-        .filter(slot -> slot.getWeekNum() == weekId)
-        .collect(Collectors.groupingBy(InterviewerTimeSlot::getDayOfWeek, Collectors.toCollection(
-            () -> new TreeSet<>(Comparator.comparing(InterviewerTimeSlot::getFrom)))));
+  public DayDashboardDto getDayDashboard(int weekNum, DayOfWeek day) {
+    LocalDate date = WeekService.getDateByWeekNumAndDayOfWeek(weekNum, day);
+
+    Set<InterviewerTimeSlot> interviewerSlots = interviewerTimeSlotRepository
+        .findByWeekNumAndDayOfWeek(weekNum, day);
+    Set<CandidateTimeSlot> candidateSlots = candidateTimeSlotRepository.findByDate(date);
+    Set<Booking> bookings = bookingRepository.findByCandidateSlotDate(date);
+
+    return DayDashboardDto.builder()
+        .date(date)
+        .dayOfWeek(day.getDisplayName(TextStyle.SHORT, Locale.US))
+        .interviewerSlots(getInterviewerSlotsWithBookings(interviewerSlots))
+        .candidateSlots(getCandidateSlotsWithBookings(candidateSlots))
+        .bookings(getBookingMap(bookings))
+        .build();
   }
 
   /**
-   * Searches for candidates time slots by a specified number of week. Groups them by days of the
-   * week.
+   * Returns interviewer slots with bookings.
    *
-   * @param weekId number of the week
-   * @return Map with candidates slots grouped by days
+   * @param slots interviewer time slots
+   * @return a set of interviewer time slots with bookings
    */
-  public Map<DayOfWeek, TreeSet<CandidateTimeSlot>> getCandidateTimeSlotsByWeekId(int weekId) {
-    return candidateTimeSlotRepository.findAll().stream()
-        .filter(slot -> WeekService.getWeekNumByDate(slot.getDate()) == weekId)
-        .collect(
-            Collectors.groupingBy(slot -> slot.getDate().getDayOfWeek(), Collectors.toCollection(
-                () -> new TreeSet<>(Comparator.comparing(CandidateTimeSlot::getFrom)))));
+  public Set<InterviewerSlotDto> getInterviewerSlotsWithBookings(Set<InterviewerTimeSlot> slots) {
+    return slots.stream()
+        .map(slot -> InterviewerSlotMapper.mapToDtoWithBookings(slot,
+            bookingRepository.findByInterviewerSlot(slot)))
+        .collect(Collectors.toCollection(
+            () -> new TreeSet<>(Comparator.comparing(InterviewerSlotDto::getFrom))));
   }
 
   /**
-   * Searches for bookings by a specified number of week. Groups them by days of the week.
+   * Returns candidate slots with bookings.
    *
-   * @param weekId number of the week
-   * @return Map with bookings grouped by days
+   * @param slots candidate time slots
+   * @return a set of candidate time slots with bookings
    */
-  public Map<DayOfWeek, TreeSet<Booking>> getBookingsByWeekId(int weekId) {
-    return bookingRepository.findAll().stream()
-        .filter(booking -> booking.getInterviewerSlot().getWeekNum() == weekId)
-        .collect(Collectors.groupingBy(booking -> booking.getInterviewerSlot().getDayOfWeek(),
-            Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Booking::getFrom)))));
+  public Set<CandidateSlotDto> getCandidateSlotsWithBookings(Set<CandidateTimeSlot> slots) {
+    return slots.stream()
+        .map(slot -> CandidateSlotMapper.mapToDtoWithBookings(slot,
+            bookingRepository.findByCandidateSlot(slot)))
+        .collect(Collectors.toCollection(
+            () -> new TreeSet<>(Comparator.comparing(CandidateSlotDto::getFrom))));
+  }
+
+  /**
+   * Grouping the bookings into a map.
+   *
+   * @param bookings set of bookings
+   * @return map of bookings as map bookingId bookingData
+   */
+  public Map<Long, BookingDto> getBookingMap(Set<Booking> bookings) {
+    return bookings.stream()
+        .map(BookingMapper::mapToDto)
+        .collect(Collectors.toMap(BookingDto::getId, Function.identity()));
   }
 
   /**
@@ -115,7 +150,7 @@ public class CoordinatorService {
    */
   public User grantRole(String email, UserRole role) {
     User user = userRepository.findByEmail(email)
-        .orElseThrow(() -> new UserNotFoundException(email));
+        .orElseThrow(() -> NotFoundException.user(email));
     user.setRole(role);
     return userRepository.save(user);
   }
@@ -128,7 +163,7 @@ public class CoordinatorService {
    */
   public User revokeInterviewerRole(Long id) {
     User user = userRepository.findByIdAndRole(id, UserRole.INTERVIEWER)
-        .orElseThrow(() -> new InterviewerNotFoundException(id));
+        .orElseThrow(() -> NotFoundException.interviewer(id));
     return grantRole(user.getEmail(), UserRole.CANDIDATE);
   }
 
@@ -140,7 +175,7 @@ public class CoordinatorService {
    */
   public User revokeCoordinatorRole(Long id) {
     User user = userRepository.findByIdAndRole(id, UserRole.COORDINATOR)
-        .orElseThrow(() -> new CoordinatorNotFoundException(id));
+        .orElseThrow(() -> NotFoundException.coordinator(id));
     return grantRole(user.getEmail(), UserRole.CANDIDATE);
   }
 
@@ -152,45 +187,5 @@ public class CoordinatorService {
    */
   public Set<User> getUsersWithRole(UserRole role) {
     return userRepository.findByRole(role);
-  }
-
-  /**
-   * Dashboard.
-   */
-  public static class Dashboard {
-
-    private final Map<DayOfWeek, TreeSet<InterviewerTimeSlot>> interviewerTimeSlots;
-    private final Map<DayOfWeek, TreeSet<CandidateTimeSlot>> candidateTimeSlots;
-    private final Map<DayOfWeek, TreeSet<Booking>> bookings;
-
-    /**
-     * Constructor.
-     *
-     * @param interviewerTimeSlots map with interviewer slots grouped by days
-     * @param candidateTimeSlots   map with candidates slots grouped by days
-     * @param bookings             map with bookings grouped by days
-     */
-    public Dashboard(Map<DayOfWeek, TreeSet<InterviewerTimeSlot>> interviewerTimeSlots,
-        Map<DayOfWeek, TreeSet<CandidateTimeSlot>> candidateTimeSlots,
-        Map<DayOfWeek, TreeSet<Booking>> bookings) {
-      this.interviewerTimeSlots = interviewerTimeSlots;
-      this.candidateTimeSlots = candidateTimeSlots;
-      this.bookings = bookings;
-    }
-
-    @JsonGetter("weekInterviewerSlots")
-    public Map<DayOfWeek, TreeSet<InterviewerTimeSlot>> getInterviewerTimeSlots() {
-      return interviewerTimeSlots;
-    }
-
-    @JsonGetter("weekCandidateSlots")
-    public Map<DayOfWeek, TreeSet<CandidateTimeSlot>> getCandidateTimeSlots() {
-      return candidateTimeSlots;
-    }
-
-    @JsonGetter("weekBookings")
-    public Map<DayOfWeek, TreeSet<Booking>> getBookings() {
-      return bookings;
-    }
   }
 }
