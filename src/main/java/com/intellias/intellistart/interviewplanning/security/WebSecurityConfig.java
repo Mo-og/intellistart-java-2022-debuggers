@@ -54,8 +54,9 @@ public class WebSecurityConfig {
     http.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
 
     http.authorizeRequests(authorize -> authorize
-        .antMatchers("/oauth2/**", "/authenticate", "/auth-link", "/").permitAll()
+        .antMatchers("/authenticate/**", "/auth-link", "/").permitAll()
         .antMatchers("/interviewers/**").hasAnyAuthority("COORDINATOR", "INTERVIEWER")
+        .antMatchers("/users/**").hasAuthority("COORDINATOR")
         .anyRequest().authenticated()
     );
 

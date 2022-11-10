@@ -7,6 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,8 +16,12 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+/**
+ * OncePerRequestFilter that tries to authorize user by their token.
+ */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtRequestFilter extends OncePerRequestFilter {
 
   private final UserDetailsService userDetailsService;
@@ -32,14 +37,15 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     String username = null;
     String jwtToken = null;
 
+    //trying to get username from token
     if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
       jwtToken = requestTokenHeader.substring(7);
       try {
         username = jwtTokenUtil.getUsernameFromToken(jwtToken);
       } catch (IllegalArgumentException e) {
-        System.out.println("Unable to get JWT Token");
+        log.debug("Unable to get JWT Token");
       } catch (ExpiredJwtException e) {
-        System.out.println("JWT Token has expired");
+        log.debug("JWT Token has expired");
       }
     }
 
@@ -52,13 +58,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     if (jwtTokenUtil.isTokenValid(jwtToken, userDetails)) {
       //TODO replace with OAuth2AuthenticationToken
-      UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-          new UsernamePasswordAuthenticationToken(
-              userDetails, null, userDetails.getAuthorities());
-      usernamePasswordAuthenticationToken
-          .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+      UsernamePasswordAuthenticationToken token =
+          new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+      token.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-      SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+      SecurityContextHolder.getContext().setAuthentication(token);
     }
     chain.doFilter(request, response);
   }

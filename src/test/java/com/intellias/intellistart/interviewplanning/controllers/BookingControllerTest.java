@@ -9,12 +9,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
+import com.intellias.intellistart.interviewplanning.security.jwt.JwtRequestFilter;
 import com.intellias.intellistart.interviewplanning.services.BookingService;
 import com.intellias.intellistart.interviewplanning.services.CandidateService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -42,6 +44,10 @@ class BookingControllerTest {
     interviewerSlot.setId(1L);
   }
 
+  @MockBean
+  private CommandLineRunner commandLineRunner;
+  @MockBean
+  private JwtRequestFilter jwtRequestFilter;
   @Autowired
   private MockMvc mockMvc;
   @MockBean

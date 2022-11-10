@@ -6,6 +6,7 @@ import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.services.CoordinatorService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import com.intellias.intellistart.interviewplanning.services.UserService;
+import java.util.List;
 import java.util.Set;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -43,22 +44,19 @@ public class UserController {
   //todo remove
   public String test(Authentication authentication) {
     if (authentication != null) {
-      System.out.println("Authentication class: " + authentication.getClass());
-      System.out.println("Authentication authorities: " + authentication.getAuthorities());
-      System.out.println(
-          "Authentication principal class: " + authentication.getPrincipal().getClass());
+      log.debug("Authentication class: " + authentication.getClass());
+      log.debug("Authentication authorities: " + authentication.getAuthorities());
+      log.debug("Authentication principal class: {}", authentication.getPrincipal().getClass());
     } else {
-      System.out.println("Not authenticated");
+      log.debug("Not authenticated");
     }
-
     return String.valueOf(authentication);
   }
 
   /**
    * Me endpoint. Provides current user info
    *
-   * @return current user info as json object containing email and role. Also contains id if user is
-   * not a Candidate
+   * @return current user info as json object containing email and role
    */
   @GetMapping("/me")
   public User getUserInfo(Authentication authentication) {
@@ -74,7 +72,13 @@ public class UserController {
   //to be removed
   @GetMapping("/users/{id}")
   public User getUser(@PathVariable Long id) {
-    return userService.getUserById(id);
+    return userService.getById(id);
+  }
+
+  //to be removed
+  @GetMapping("/users")
+  public List<User> getUser() {
+    return userService.getAll();
   }
 
   //to be removed

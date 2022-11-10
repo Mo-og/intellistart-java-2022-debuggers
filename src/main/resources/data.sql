@@ -1,4 +1,5 @@
-insert into USERS(ID, EMAIL, ROLE)
-values ((select nextval('USER_SEQUENCE')), 'interviewer@test.do', 'INTERVIEWER');
-insert into USERS(ID, EMAIL, ROLE)
-values ((select nextval('USER_SEQUENCE')), 'interviewercandidate@test.do', 'CANDIDATE');
+-- test data
+INSERT INTO USERS(ID, EMAIL, ROLE)
+    VALUES (NEXTVAL('USER_SEQUENCE'), 'interviewer@test.do', 'INTERVIEWER');
+INSERT INTO USERS(ID, EMAIL, ROLE)
+    VALUES (NEXTVAL('USER_SEQUENCE'), 'candidate@test.do', 'CANDIDATE');

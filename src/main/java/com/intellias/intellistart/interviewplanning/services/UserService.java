@@ -5,6 +5,7 @@ import com.intellias.intellistart.interviewplanning.exceptions.UserNotFoundExcep
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
+import java.util.List;
 import javax.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
@@ -50,7 +51,7 @@ public class UserService implements UserDetailsService {
    * @param id user id
    * @return user with any role
    */
-  public User getUserById(Long id) {
+  public User getById(Long id) {
     try {
       return (User) Hibernate.unproxy(userRepository.getReferenceById(id));
     } catch (EntityNotFoundException e) {
@@ -58,12 +59,16 @@ public class UserService implements UserDetailsService {
     }
   }
 
+  public List<User> getAll() {
+    return userRepository.findAll();
+  }
+
   /**
    * Removes coordinator from database if id is valid or throws CoordinatorNotFoundException.
    *
    * @param id id to delete by
    */
-  public void removeUserById(Long id) {
+  public void removeById(Long id) {
     try {
       userRepository.deleteById(id);
     } catch (EntityNotFoundException e) {

@@ -15,6 +15,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+/**
+ * Custom JWT tokens utility class. Includes token parsing, validating and generating
+ */
 @Component
 @Slf4j
 public class JwtTokenUtil implements Serializable {
@@ -47,6 +50,12 @@ public class JwtTokenUtil implements Serializable {
     return expiration.before(new Date());
   }
 
+  /**
+   * Generates token string with username, issued time, expire time and authorities.
+   *
+   * @param userDetails user data object to get username and authorities from
+   * @return token String
+   */
   public String generateToken(UserDetails userDetails) {
     Map<String, Object> claims = new HashMap<>();
     claims.put("authorities", userDetails.getAuthorities());
@@ -70,15 +79,20 @@ public class JwtTokenUtil implements Serializable {
   }
 
   private Key getKey() {
-    if (key == null) {
-      if (secret == null) {
-        log.debug("Secret is {}", (Object) null);
-        throw new NullPointerException("Secret for jwt token was not retrieved");
-      } else {
-        log.debug("Secret is {}", secret.isBlank() ? "not set" : "set successfully");
-      }
-      key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    if (key != null) {
+      return key;
     }
+    if (secret == null) {
+      log.error("JWT secret is null");
+      throw new NullPointerException("Secret for jwt token was not retrieved");
+    } else {
+      if (secret.isBlank()) {
+        log.error("Secret is not set");
+      } else {
+        log.debug("Secret is set successfully");
+      }
+    }
+    key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     return key;
   }
 }

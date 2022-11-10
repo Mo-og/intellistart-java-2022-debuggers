@@ -35,7 +35,11 @@ facebook:
   client-secret: ${facebook.client-secret}
   uri:
     auth: 'https://www.facebook.com/v15.0/dialog/oauth'
-    redirect: 'http://localhost:8080/oauth2/redirect'
+    redirect: 'http://localhost:8080/authenticate/redirect'
+    get_token_by_code: 'https://graph.facebook.com/v15.0/oauth/access_token?client_id=${facebook.client-id}&redirect_uri=${facebook.uri.redirect}&client_secret=${facebook.client-secret}&code={0}'
+    token_verify: 'https://graph.facebook.com/v15.0/debug_token?input_token={0}&access_token={1}'
+    get_app_token: 'https://graph.facebook.com/v15.0/oauth/access_token?client_id=${facebook.client-id}&client_secret=${facebook.client-secret}&grant_type=client_credentials'
+    user_data: 'https://graph.facebook.com/{0}?fields=email&access_token={1}'
 
 jwt:
   secret: ${jwt.secret}
