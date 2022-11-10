@@ -63,9 +63,9 @@ public class ApplicationErrorException extends RuntimeException {
     INVALID_WEEK_NUM(HttpStatus.BAD_REQUEST, "Invalid week number"),
 
     //Authentication related
-    INVALID_USER_CREDENTIALS(HttpStatus.BAD_REQUEST,"Invalid user credentials"),
-    TOKEN_EXPIRED(HttpStatus.BAD_REQUEST,"Provided token has expired"),
-    NO_USER_DATA(HttpStatus.BAD_REQUEST,"No data could be retrieved for provided credentials");
+    INVALID_USER_CREDENTIALS(HttpStatus.BAD_REQUEST, "Invalid user credentials"),
+    TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "Provided token has expired"),
+    NO_USER_DATA(HttpStatus.BAD_REQUEST, "No data could be retrieved for provided credentials");
 
     public final String code;
     public final HttpStatus httpStatus;
