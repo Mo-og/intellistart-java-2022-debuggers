@@ -22,6 +22,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -142,41 +143,74 @@ public class CoordinatorService {
   }
 
   /**
-   * Grant the user the specified role by email.
+   * Grant user the interviewer role by email.
    *
    * @param email user email
-   * @param role  user role
-   * @return user with the granted role
+   * @return user with the granted interviewer role
    */
-  public User grantRole(String email, UserRole role) {
+  public User grantInterviewerRole(String email) {
     User user = userRepository.findByEmail(email)
-        .orElseThrow(() -> NotFoundException.user(email));
-    user.setRole(role);
+        .orElseGet(() -> new User(email, null));
+    user.setRole(UserRole.INTERVIEWER);
     return userRepository.save(user);
+  }
+
+  /**
+   * Grant user the coordinator role by email.
+   *
+   * @param email user email
+   * @return user with the granted coordinator role
+   */
+  public User grantCoordinatorRole(String email) {
+    User user = userRepository.findByEmail(email)
+        .orElseGet(() -> new User(email, null));
+    if (user.getRole() == UserRole.INTERVIEWER) {
+      removeInterviewerSlotsAndBookings(user);
+    }
+    user.setRole(UserRole.COORDINATOR);
+    return userRepository.save(user);
+  }
+
+  /**
+   * Removes all interviewer slots and bookings.
+   *
+   * @param user interviewer
+   */
+  private void removeInterviewerSlotsAndBookings(User user) {
+    List<InterviewerTimeSlot> slots = interviewerTimeSlotRepository.findByInterviewer(user);
+    for (InterviewerTimeSlot slot : slots) {
+      Set<Booking> bookings = bookingRepository.findByInterviewerSlot(slot);
+      bookingRepository.deleteAll(bookings);
+      interviewerTimeSlotRepository.delete(slot);
+    }
   }
 
   /**
    * Revoke the interviewer role by id.
    *
    * @param id user id
-   * @return user with revoked role
+   * @return user whose role has been revoked
    */
   public User revokeInterviewerRole(Long id) {
     User user = userRepository.findByIdAndRole(id, UserRole.INTERVIEWER)
         .orElseThrow(() -> NotFoundException.interviewer(id));
-    return grantRole(user.getEmail(), UserRole.CANDIDATE);
+    removeInterviewerSlotsAndBookings(user);
+    userRepository.delete(user);
+    return user;
   }
 
   /**
    * Revoke the coordinator role by id.
    *
    * @param id user id
-   * @return user with revoked role
+   * @return user whose role has been revoked
    */
   public User revokeCoordinatorRole(Long id) {
     User user = userRepository.findByIdAndRole(id, UserRole.COORDINATOR)
         .orElseThrow(() -> NotFoundException.coordinator(id));
-    return grantRole(user.getEmail(), UserRole.CANDIDATE);
+    // Todo Coordinator cannot revoke himself
+    userRepository.delete(user);
+    return user;
   }
 
   /**
