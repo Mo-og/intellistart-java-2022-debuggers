@@ -196,9 +196,12 @@ class InterviewerServiceTest {
   @Test
   void testUpdateSlot() {
     if (LocalDate.now().getDayOfWeek().getValue() <= DayOfWeek.FRIDAY.getValue()) {
+      InterviewerTimeSlot interviewerTimeSlot = new InterviewerTimeSlot();
+      interviewerTimeSlot.setInterviewer(interviewer);
+      when(userRepository.getReferenceById(1L)).thenReturn(interviewer);
       when(interviewerTimeSlotRepository
           .getReferenceById(1L))
-          .thenReturn(new InterviewerTimeSlot());
+          .thenReturn(interviewerTimeSlot);
       when(interviewerTimeSlotRepository
           .save(any()))
           .thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));

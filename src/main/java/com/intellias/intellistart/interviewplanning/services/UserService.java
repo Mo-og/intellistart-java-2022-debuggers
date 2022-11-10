@@ -80,7 +80,7 @@ public class UserService implements UserDetailsService {
   }
 
   public User getByEmail(String email) {
-    return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
+    return userRepository.findByEmail(email).orElseThrow(() -> NotFoundException.user(email));
   }
 
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

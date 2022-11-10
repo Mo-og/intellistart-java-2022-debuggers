@@ -143,13 +143,13 @@ class UserServiceTest {
     when(userRepository
         .getReferenceById(-1L))
         .thenThrow(new EntityNotFoundException());
-    assertThrows(NotFoundException.class, () -> service.getUserById(-1L));
+    assertThrows(NotFoundException.class, () -> service.getById(-1L));
   }
 
   @Test
   void testRemoveByWrongId() {
     doThrow(new EntityNotFoundException()).when(userRepository).deleteById(-1L);
-    assertThrows(NotFoundException.class, () -> service.removeUserById(-1L));
+    assertThrows(NotFoundException.class, () -> service.removeById(-1L));
   }
 
   @Test
