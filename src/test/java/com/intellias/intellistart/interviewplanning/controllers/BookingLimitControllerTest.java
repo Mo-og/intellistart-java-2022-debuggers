@@ -24,7 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(BookingLimitController.class)
 @AutoConfigureMockMvc(addFilters = false)
-public class BookingLimitControllerTest {
+class BookingLimitControllerTest {
 
   @Autowired
   private MockMvc mockMvc;

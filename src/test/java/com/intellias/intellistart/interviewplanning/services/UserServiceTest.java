@@ -21,10 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-  public static final String CANDIDATE_EMAIL = "test.candidate@test.com";
   public static final String COORDINATOR_EMAIL = "test.coordinator@test.com";
-  private static final User newCandidate = new User(CANDIDATE_EMAIL, UserRole.CANDIDATE);
-  private static final User candidate = new User(CANDIDATE_EMAIL, UserRole.CANDIDATE);
   private static final User newInterviewer = new User(
       InterviewerServiceTest.INTERVIEWER_EMAIL, UserRole.INTERVIEWER);
   private static final User interviewer = new User(
@@ -35,7 +32,6 @@ class UserServiceTest {
       UserRole.COORDINATOR);
 
   static {
-    candidate.setId(1L);
     interviewer.setId(1L);
     coordinator.setId(1L);
   }
@@ -47,28 +43,6 @@ class UserServiceTest {
   @BeforeEach
   void setService() {
     service = new UserService(userRepository);
-  }
-
-  @Test
-  void testCreateCandidateByEmail() {
-    when(userRepository
-        .save(newCandidate))
-        .thenReturn(candidate);
-    var createdCandidate = service.create(CANDIDATE_EMAIL, UserRole.CANDIDATE);
-    assertEquals(candidate.getId(), createdCandidate.getId());
-    assertEquals(candidate.getRole(), createdCandidate.getRole());
-    assertEquals(candidate.getEmail(), createdCandidate.getEmail());
-  }
-
-  @Test
-  void testCreateCandidateByRole() {
-    when(userRepository
-        .save(newCandidate))
-        .thenReturn(candidate);
-    var createdCandidate = service.create(CANDIDATE_EMAIL, UserRole.CANDIDATE);
-    assertEquals(candidate.getId(), createdCandidate.getId());
-    assertEquals(candidate.getRole(), createdCandidate.getRole());
-    assertEquals(candidate.getEmail(), createdCandidate.getEmail());
   }
 
   @Test
@@ -92,17 +66,6 @@ class UserServiceTest {
     assertEquals(coordinator.getId(), savedCoordinator.getId());
     assertEquals(coordinator.getRole(), savedCoordinator.getRole());
     assertEquals(coordinator.getEmail(), savedCoordinator.getEmail());
-  }
-
-  @Test
-  void testSaveCandidateCorrectly() {
-    when(userRepository
-        .save(candidate))
-        .thenReturn(candidate);
-    var savedCandidate = service.save(candidate);
-    assertEquals(candidate.getId(), savedCandidate.getId());
-    assertEquals(candidate.getRole(), savedCandidate.getRole());
-    assertEquals(candidate.getEmail(), savedCandidate.getEmail());
   }
 
   @Test

@@ -10,7 +10,7 @@ import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.services.CandidateService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
-import java.util.HashSet;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -22,13 +22,15 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc(addFilters = false)
 class SlotControllerTest {
 
+  public static final String CANDIDATE_EMAIL = "test.candidate@test.com";
   private static final InterviewerTimeSlot interviewerSlot =
       new InterviewerTimeSlot("08:00", "10:00", "WEDNESDAY", 202240);
   private static final CandidateTimeSlot candidateSlot =
-      new CandidateTimeSlot("2022-11-03", "08:00", "10:00");
+      new CandidateTimeSlot(CANDIDATE_EMAIL, "2022-11-03", "08:00", "10:00");
 
   static {
     interviewerSlot.setId(1L);
+    candidateSlot.setId(1L);
   }
 
   @Autowired
@@ -40,14 +42,12 @@ class SlotControllerTest {
 
   @Test
   void testGetAllInterviewerSlots() {
-    var set = new HashSet<InterviewerTimeSlot>();
-    set.add(interviewerSlot);
     when(interviewerService
         .getRelevantInterviewerSlots(1L))
-        .thenReturn(set);
+        .thenReturn(Set.of(interviewerSlot));
     checkResponseOk(
         get("/interviewers/{interviewerId}/slots", 1L),
-        null, json(set), mockMvc);
+        null, json(Set.of(interviewerSlot)), mockMvc);
   }
 
   @Test
