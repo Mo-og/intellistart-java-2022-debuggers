@@ -41,8 +41,8 @@ public class User {
   /**
    * User.
    *
-   * @param email    mail
-   * @param role role
+   * @param email mail
+   * @param role  role
    */
   public User(String email, UserRole role) {
     this.email = email;
@@ -73,6 +73,6 @@ public class User {
    * User role.
    */
   public enum UserRole {
-    INTERVIEWER, CANDIDATE, COORDINATOR
+    INTERVIEWER, COORDINATOR
   }
 }
