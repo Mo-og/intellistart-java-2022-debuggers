@@ -27,10 +27,11 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc(addFilters = false)
 class BookingControllerTest {
 
+  public static final String CANDIDATE_EMAIL = "test.candidate@test.com";
   private static final InterviewerTimeSlot interviewerSlot =
       new InterviewerTimeSlot("08:00", "18:00", "WEDNESDAY", 202240);
   private static final CandidateTimeSlot candidateSlot =
-      new CandidateTimeSlot("2022-11-03", "08:00", "13:00");
+      new CandidateTimeSlot(CANDIDATE_EMAIL, "2022-11-03", "08:00", "13:00");
   private static final Booking booking =
       new Booking(
           LocalTime.of(8, 0),
@@ -53,6 +54,9 @@ class BookingControllerTest {
 
   static {
     interviewerSlot.setId(1L);
+    candidateSlot.setId(1L);
+    booking.setId(1L);
+    bookingDto.setId(1L);
   }
 
   @MockBean

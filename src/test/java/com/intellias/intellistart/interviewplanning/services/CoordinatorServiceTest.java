@@ -2,7 +2,6 @@ package com.intellias.intellistart.interviewplanning.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.intellias.intellistart.interviewplanning.controllers.dto.BookingDto;
@@ -36,14 +35,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class CoordinatorServiceTest {
 
+  public static final String CANDIDATE_EMAIL = "test.candidate@test.com";
   private static final User coordinator = new User("coordinator@gmail.com",
       UserRole.COORDINATOR);
-  private static final User candidate = new User("cand@gmail.com",
-      UserRole.CANDIDATE);
   private static final User interviewer = new User("interviewer@gmail.com",
       UserRole.INTERVIEWER);
-  private static final CandidateTimeSlot candidateSlot =
-      new CandidateTimeSlot(WeekService.getCurrentDate().toString(), "08:00", "13:00");
+  private static final CandidateTimeSlot candidateSlot = new CandidateTimeSlot(CANDIDATE_EMAIL,
+      WeekService.getCurrentDate().toString(), "08:00", "13:00");
   private static final CandidateSlotDto candidateSlotDto =
       CandidateSlotDto.builder()
           .date(WeekService.getCurrentDate())
@@ -116,10 +114,8 @@ class CoordinatorServiceTest {
     interviewer.setId(1L);
     interviewerSlot.setId(1L);
     interviewerSlot.setInterviewer(interviewer);
-    candidate.setId(2L);
     candidateSlot.setId(1L);
-    candidateSlot.setCandidate(candidate);
-    coordinator.setId(3L);
+    coordinator.setId(1L);
 
     booking.setCandidateSlot(candidateSlot);
     booking.setInterviewerSlot(interviewerSlot);
@@ -210,8 +206,7 @@ class CoordinatorServiceTest {
   @Test
   void testGetCandidateSlotsWithBookings() {
     when(bookingRepository.findByCandidateSlot(candidateSlot)).thenReturn(Set.of(booking));
-    var result =
-        service.getCandidateSlotsWithBookings(Set.of(candidateSlot));
+    var result = service.getCandidateSlotsWithBookings(Set.of(candidateSlot));
     assertEquals(candidateSlotDtoSet, result);
   }
 
@@ -222,34 +217,30 @@ class CoordinatorServiceTest {
   }
 
   @Test
-  void testGrantRole() {
+  void testGrantInterviewerRole() {
     when(userRepository.findByEmail("interviewer@gmail.com"))
         .thenReturn(Optional.of(interviewer));
     when(userRepository.save(interviewer))
         .thenReturn(interviewer);
-    var result =
-        service.grantRole("interviewer@gmail.com", UserRole.INTERVIEWER);
+    var result = service.grantInterviewerRole("interviewer@gmail.com");
     assertEquals(interviewer, result);
   }
 
   @Test
-  void testGrantRoleInvalidUser() {
-    when(userRepository.findByEmail("invalid@gmail.com"))
-        .thenReturn(Optional.empty());
-    assertThrows(NotFoundException.class,
-        () -> service.grantRole("invalid@gmail.com", UserRole.INTERVIEWER));
+  void testGrantCoordinatorRole() {
+    when(userRepository.findByEmail("coordinator@gmail.com"))
+        .thenReturn(Optional.of(coordinator));
+    when(userRepository.save(coordinator))
+        .thenReturn(coordinator);
+    var result = service.grantCoordinatorRole("coordinator@gmail.com");
+    assertEquals(coordinator, result);
   }
 
   @Test
   void testRevokeInterviewerRole() {
-    when(userRepository.save(any()))
-        .thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
-    when(userRepository.findByEmail("interviewer@gmail.com"))
-        .thenReturn(Optional.of(new User()));
     when(userRepository.findByIdAndRole(1L, UserRole.INTERVIEWER))
         .thenReturn(Optional.of(interviewer));
-    assertEquals(UserRole.CANDIDATE,
-        service.revokeInterviewerRole(1L).getRole());
+    assertEquals(UserRole.INTERVIEWER, service.revokeInterviewerRole(1L).getRole());
   }
 
   @Test
@@ -264,12 +255,7 @@ class CoordinatorServiceTest {
   void testRevokeCoordinatorRole() {
     when(userRepository.findByIdAndRole(1L, UserRole.COORDINATOR))
         .thenReturn(Optional.of(coordinator));
-    when(userRepository.findByEmail(coordinator.getEmail()))
-        .thenReturn(Optional.of(candidate));
-    when(userRepository.save(any()))
-        .thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
-    assertEquals(candidate,
-        service.revokeCoordinatorRole(1L));
+    assertEquals(UserRole.COORDINATOR, service.revokeCoordinatorRole(1L).getRole());
   }
 
   @Test

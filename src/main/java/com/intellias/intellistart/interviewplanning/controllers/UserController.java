@@ -82,12 +82,6 @@ public class UserController {
   }
 
   //to be removed
-  @PostMapping("/users")
-  public User postUser(@RequestBody TextNode email) {
-    return userService.create(email.asText(), UserRole.CANDIDATE);
-  }
-
-  //to be removed
   @PostMapping("/interviewers")
   public User postInterviewer(@RequestBody TextNode email) {
     return userService.create(email.asText(), UserRole.INTERVIEWER);
@@ -95,7 +89,7 @@ public class UserController {
 
   @PostMapping("/users/interviewers")
   public User grantInterviewerRole(@RequestBody TextNode email) {
-    return coordinatorService.grantRole(email.asText(), UserRole.INTERVIEWER);
+    return coordinatorService.grantInterviewerRole(email.asText());
   }
 
   @DeleteMapping("/users/interviewers/{interviewerId}")
@@ -110,7 +104,7 @@ public class UserController {
 
   @PostMapping("/users/coordinators")
   public User grantCoordinatorRole(@RequestBody TextNode email) {
-    return coordinatorService.grantRole(email.asText(), UserRole.COORDINATOR);
+    return coordinatorService.grantCoordinatorRole(email.asText());
   }
 
   @DeleteMapping("/users/coordinators/{coordinatorId}")

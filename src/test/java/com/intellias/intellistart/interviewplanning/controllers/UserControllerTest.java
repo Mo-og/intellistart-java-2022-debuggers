@@ -73,7 +73,6 @@ class UserControllerTest {
     assertThat(captor.getValue()).isEqualTo(email);
   }
 
-
   @Test
   void testGetInterviewer() {
     when(interviewerService.getById(1L)).thenReturn(testInterviewer);
@@ -83,16 +82,16 @@ class UserControllerTest {
 
   @Test
   void testGrantInterviewerRole() {
-    when(coordinatorService.grantRole(email, UserRole.INTERVIEWER)).thenReturn(testInterviewer);
+    when(coordinatorService.grantInterviewerRole(email)).thenReturn(testInterviewer);
     System.out.println("JSON: " + json(testInterviewer));
     checkResponseOk(post("/users/interviewers"), json(email), json(testInterviewer), mockMvc);
   }
 
   @Test
   void testRevokeInterviewerRole() {
-    when(coordinatorService.revokeInterviewerRole(1L)).thenReturn(testCandidate);
+    when(coordinatorService.revokeInterviewerRole(1L)).thenReturn(testInterviewer);
     checkResponseOk(delete("/users/interviewers/{interviewerId}", 1L),
-        null, json(testCandidate), mockMvc);
+        null, json(testInterviewer), mockMvc);
   }
 
   @Test
@@ -106,16 +105,16 @@ class UserControllerTest {
 
   @Test
   void testGrantCoordinatorRole() {
-    when(coordinatorService.grantRole(email, UserRole.COORDINATOR)).thenReturn(testCoordinator);
+    when(coordinatorService.grantCoordinatorRole(email)).thenReturn(testCoordinator);
     checkResponseOk(post("/users/coordinators"),
         json(email), json(testCoordinator), mockMvc);
   }
 
   @Test
   void testRevokeCoordinatorRole() {
-    when(coordinatorService.revokeCoordinatorRole(1L)).thenReturn(testCandidate);
+    when(coordinatorService.revokeCoordinatorRole(1L)).thenReturn(testCoordinator);
     checkResponseOk(delete("/users/coordinators/{coordinatorId}", 1),
-        null, json(testCandidate), mockMvc);
+        null, json(testCoordinator), mockMvc);
   }
 
   @Test
@@ -148,6 +147,4 @@ class UserControllerTest {
     checkResponseOk(get("/users/{id}", 1),
         null, json(testCoordinator), mockMvc);
   }
-
-
 }

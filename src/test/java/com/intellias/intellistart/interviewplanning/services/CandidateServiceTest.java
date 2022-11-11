@@ -8,11 +8,8 @@ import static org.mockito.Mockito.when;
 import com.intellias.intellistart.interviewplanning.controllers.dto.CandidateSlotDto;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
-import com.intellias.intellistart.interviewplanning.models.User;
-import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
 import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSlotRepository;
-import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collections;
@@ -28,8 +25,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class CandidateServiceTest {
 
+  public static final String CANDIDATE_EMAIL = "test.candidate@test.com";
   private static final CandidateTimeSlot candidateSlot =
-      new CandidateTimeSlot("2022-11-03", "08:00", "13:00");
+      new CandidateTimeSlot(CANDIDATE_EMAIL, "2022-11-03", "08:00", "13:00");
   private static final CandidateSlotDto candidateSlotDto =
       CandidateSlotDto.builder()
           .date(LocalDate.of(2022, 11, 3))
@@ -42,18 +40,16 @@ class CandidateServiceTest {
           .from(LocalTime.of(8, 0))
           .to(LocalTime.of(13, 0))
           .build();
-  private static final User candidate = new User("test.cand@gmail.com", UserRole.CANDIDATE);
 
   static {
-    candidate.setId(1L);
-    candidateSlot.setCandidate(candidate);
+    candidateSlot.setId(1L);
+    candidateSlotDto.setId(1L);
+    candidateSlotDtoWithBookings.setId(1L);
     candidateSlotDtoWithBookings.setBookings(Collections.emptySet());
   }
 
   @Mock
   CandidateTimeSlotRepository candidateSlotRepository;
-  @Mock
-  UserRepository userRepository;
   @Mock
   BookingRepository bookingRepository;
 
@@ -61,15 +57,13 @@ class CandidateServiceTest {
 
   @BeforeEach
   void setService() {
-    service = new CandidateService(candidateSlotRepository, userRepository, bookingRepository);
+    service = new CandidateService(candidateSlotRepository, bookingRepository);
   }
 
   @Test
   void testCreateSlot() {
-    when(userRepository.getReferenceById(1L)).thenReturn(candidate);
     when(candidateSlotRepository.save(candidateSlot)).thenReturn(candidateSlot);
-
-    var slot = service.createSlot(1L, candidateSlotDto);
+    var slot = service.createSlot(CANDIDATE_EMAIL, candidateSlotDto);
     assertEquals(candidateSlotDto, slot);
   }
 
@@ -88,22 +82,15 @@ class CandidateServiceTest {
 
   @Test
   void testAllCandidateSlots() {
-    when(userRepository.existsByIdAndRole(1L, UserRole.CANDIDATE)).thenReturn(true);
-    when(candidateSlotRepository.findAll()).thenReturn(List.of(candidateSlot));
-    assertEquals(Set.of(candidateSlotDtoWithBookings), service.getAllCandidateSlots(1L));
+    when(candidateSlotRepository.findByEmail(CANDIDATE_EMAIL)).thenReturn(List.of(candidateSlot));
+    assertEquals(Set.of(candidateSlotDtoWithBookings),
+        service.getAllCandidateSlots(CANDIDATE_EMAIL));
   }
 
   @Test
   void testGetCandidateSlotsWithBookings() {
     var result = service.getCandidateSlotsWithBookings(List.of(candidateSlot));
     assertEquals(Set.of(candidateSlotDtoWithBookings), result);
-  }
-
-  @Test
-  void testGetAllCandidateSlotsWrongId() {
-    when(userRepository.existsByIdAndRole(-1L, UserRole.CANDIDATE)).thenReturn(false);
-    assertThrows(NotFoundException.class,
-        () -> service.getAllCandidateSlots(-1L));
   }
 
   @Test
@@ -122,17 +109,5 @@ class CandidateServiceTest {
     when(candidateSlotRepository.existsById(-1L)).thenReturn(false);
     assertThrows(NotFoundException.class,
         () -> service.updateSlot(-1L, candidateSlot));
-  }
-
-  @Test
-  void testGetById() {
-    when(userRepository.getReferenceById(1L)).thenReturn(candidate);
-    assertEquals(candidate, service.getById(1L));
-  }
-
-  @Test
-  void testGetByIdNonExisting() {
-    when(userRepository.getReferenceById(-1L)).thenThrow(EntityNotFoundException.class);
-    assertThrows(NotFoundException.class, () -> service.getById(-1L));
   }
 }

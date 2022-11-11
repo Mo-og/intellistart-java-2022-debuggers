@@ -27,10 +27,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class BookingServiceTest {
 
+  public static final String CANDIDATE_EMAIL = "test.candidate@test.com";
   private static final InterviewerTimeSlot interviewerSlot =
       new InterviewerTimeSlot("08:00", "18:00", "WEDNESDAY", 202240);
   private static final CandidateTimeSlot candidateSlot =
-      new CandidateTimeSlot("2022-11-03", "08:00", "13:00");
+      new CandidateTimeSlot(CANDIDATE_EMAIL, "2022-11-03", "08:00", "13:00");
   private static final Booking booking =
       new Booking(
           LocalTime.of(8, 0),
@@ -54,8 +55,8 @@ class BookingServiceTest {
     candidateSlot.setId(1L);
     booking.setId(1L);
     bookingDto.setId(1L);
-    bookingDto.setInterviewerSlotId(interviewerSlot.getId());
-    bookingDto.setCandidateSlotId(candidateSlot.getId());
+    bookingDto.setInterviewerSlotId(1L);
+    bookingDto.setCandidateSlotId(1L);
   }
 
   @Mock
@@ -97,7 +98,6 @@ class BookingServiceTest {
     assertEquals(booking.getSubject(), retrievedBooking.getSubject());
     assertEquals(booking.getDescription(), retrievedBooking.getDescription());
   }
-
 
   @Test
   void testSaveBooking() {
