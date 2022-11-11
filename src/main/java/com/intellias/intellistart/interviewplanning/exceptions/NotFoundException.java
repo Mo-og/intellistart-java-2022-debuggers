@@ -32,4 +32,9 @@ public class NotFoundException extends ApplicationErrorException {
     return new NotFoundException(ErrorCode.SLOT_NOT_FOUND, " with id: " + id);
   }
 
+  public static NotFoundException bookingLimit(Long interviewerId, Integer weekNum) {
+    return new NotFoundException(ErrorCode.BOOKING_LIMIT_NOT_FOUND,
+        String.format(": interviewer %d does not have ani booking limit on week %d",
+            interviewerId, weekNum));
+  }
 }
