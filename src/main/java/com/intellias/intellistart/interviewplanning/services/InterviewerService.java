@@ -1,6 +1,7 @@
 package com.intellias.intellistart.interviewplanning.services;
 
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
+import com.intellias.intellistart.interviewplanning.exceptions.InvalidInputException;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.User;
@@ -11,6 +12,7 @@ import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import com.intellias.intellistart.interviewplanning.utils.Utils;
 import com.intellias.intellistart.interviewplanning.utils.mappers.InterviewerSlotMapper;
 import com.intellias.intellistart.interviewplanning.validators.InterviewerSlotValidator;
+import com.intellias.intellistart.interviewplanning.validators.PeriodValidator;
 import java.time.DayOfWeek;
 import java.util.Comparator;
 import java.util.Set;
@@ -55,6 +57,7 @@ public class InterviewerService {
    */
   public InterviewerTimeSlot createSlot(Long interviewerId,
       InterviewerTimeSlot interviewerTimeSlot) {
+    PeriodValidator.validate(interviewerTimeSlot.getFrom(), interviewerTimeSlot.getTo());
     InterviewerSlotValidator.validate(interviewerTimeSlot);
     User interviewer = userRepository.getReferenceById(interviewerId);
     interviewerTimeSlot.setInterviewer(interviewer);
@@ -130,9 +133,15 @@ public class InterviewerService {
    */
   public InterviewerTimeSlot updateSlot(Long interviewerId, Long slotId,
       InterviewerTimeSlot interviewerTimeSlot) {
+    PeriodValidator.validate(interviewerTimeSlot.getFrom(), interviewerTimeSlot.getTo());
     InterviewerSlotValidator.validate(interviewerTimeSlot);
-    User interviewer = userRepository.getReferenceById(interviewerId);
+
     InterviewerTimeSlot slot = getSlotById(slotId);
+    InterviewerSlotValidator.validate(slot);
+    if (!slot.getInterviewer().getId().equals(interviewerId)) {
+      throw InvalidInputException.interviewerId(slotId, interviewerId);
+    }
+    User interviewer = userRepository.getReferenceById(interviewerId);
     slot.setFrom(interviewerTimeSlot.getFrom());
     slot.setTo(interviewerTimeSlot.getTo());
     slot.setDayOfWeek(interviewerTimeSlot.getDayOfWeek());
@@ -154,4 +163,5 @@ public class InterviewerService {
       throw NotFoundException.interviewer(id);
     }
   }
+
 }

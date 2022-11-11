@@ -25,8 +25,7 @@ public class InterviewerSlotValidator {
   public static void validate(InterviewerTimeSlot interviewerTimeSlot) {
     var now = LocalDate.now().getDayOfWeek();
     if (isWeekend(now)) {
-      throw InvalidInputException.dayOfWeek(
-          now);
+      throw InvalidInputException.dayOfWeek(now);
     } else if (interviewerTimeSlot.getWeekNum() != WeekService.getNextWeekNum()) {
       throw InvalidInputException.weekNum(interviewerTimeSlot.getWeekNum());
     }

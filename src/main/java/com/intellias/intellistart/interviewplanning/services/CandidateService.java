@@ -9,6 +9,7 @@ import com.intellias.intellistart.interviewplanning.repositories.BookingReposito
 import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import com.intellias.intellistart.interviewplanning.utils.mappers.CandidateSlotMapper;
+import com.intellias.intellistart.interviewplanning.validators.PeriodValidator;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -52,7 +53,7 @@ public class CandidateService {
    * @return slot
    */
   public CandidateSlotDto createSlot(Long candidateId, CandidateSlotDto candidateSlotDto) {
-    //todo validation of slot
+    PeriodValidator.validate(candidateSlotDto.getFrom(), candidateSlotDto.getTo());
     User candidate = userRepository.getReferenceById(candidateId);
     CandidateTimeSlot candidateSlot = CandidateSlotMapper.mapToEntity(candidateSlotDto, candidate);
     return CandidateSlotMapper.mapToDto(candidateTimeSlotRepository.save(candidateSlot));
@@ -103,7 +104,7 @@ public class CandidateService {
    * @param slot   candidate time slot
    */
   public CandidateTimeSlot updateSlot(Long slotId, CandidateTimeSlot slot) {
-    // validate from, to, date
+    PeriodValidator.validate(slot.getFrom(), slot.getTo());
     // check if current time is by end of Friday (00:00) of current week
     if (!candidateTimeSlotRepository.existsById(slotId)) {
       throw NotFoundException.timeSlot(slotId);
@@ -128,4 +129,5 @@ public class CandidateService {
       throw NotFoundException.candidate(id);
     }
   }
+
 }

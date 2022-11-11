@@ -9,6 +9,7 @@ import com.intellias.intellistart.interviewplanning.repositories.BookingReposito
 import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.utils.mappers.BookingMapper;
+import com.intellias.intellistart.interviewplanning.validators.PeriodValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +47,7 @@ public class BookingService {
    */
   public BookingDto createBooking(BookingDto bookingDto) {
     //Todo calculate possible time
-
+    PeriodValidator.validate(bookingDto.getFrom(), bookingDto.getTo());
     Long interviewerSlotId = bookingDto.getInterviewerSlotId();
     InterviewerTimeSlot interviewerSlot = interviewerTimeSlotRepository.findById(interviewerSlotId)
         .orElseThrow(() -> NotFoundException.timeSlot(interviewerSlotId));
@@ -68,6 +69,7 @@ public class BookingService {
    * @return booking with new parameters
    */
   public Booking updateBooking(Long id, Booking newBooking) {
+    PeriodValidator.validate(newBooking.getFrom(), newBooking.getTo());
     Booking booking = bookingRepository.getReferenceById(id);
     booking.setFrom(newBooking.getFrom());
     booking.setTo(newBooking.getTo());

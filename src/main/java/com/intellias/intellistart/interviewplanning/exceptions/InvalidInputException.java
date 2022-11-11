@@ -45,5 +45,10 @@ public class InvalidInputException extends ApplicationErrorException {
             bookingLimit, bookingNum));
   }
 
+  public static InvalidInputException interviewerId(Long slotId, Long interviewerId) {
+    return new InvalidInputException(ErrorCode.INVALID_INTERVIEWER_ID,
+        String.format(": slot with id \"%d\" do not belongs to interviewer with id \"%d\"",
+            slotId, interviewerId));
+  }
 
 }

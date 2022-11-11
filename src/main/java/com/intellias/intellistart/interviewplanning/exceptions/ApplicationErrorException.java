@@ -60,7 +60,8 @@ public class ApplicationErrorException extends RuntimeException {
     //Bad request error codes
     INVALID_BOUNDARIES(HttpStatus.BAD_REQUEST, "Invalid time boundaries"),
     INVALID_DAY_OF_WEEK(HttpStatus.BAD_REQUEST, "Invalid day of week"),
-    INVALID_WEEK_NUM(HttpStatus.BAD_REQUEST, "Invalid week number");
+    INVALID_WEEK_NUM(HttpStatus.BAD_REQUEST, "Invalid week number"),
+    INVALID_INTERVIEWER_ID(HttpStatus.BAD_REQUEST, "Invalid interviewer id");
 
     public final String code;
     public final HttpStatus httpStatus;

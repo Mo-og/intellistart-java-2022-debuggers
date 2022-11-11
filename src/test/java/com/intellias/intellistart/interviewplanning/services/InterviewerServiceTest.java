@@ -202,15 +202,19 @@ class InterviewerServiceTest {
       when(interviewerTimeSlotRepository
           .save(any()))
           .thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
+      when(interviewerService.getSlotById(1L)).thenReturn(timeSlotWithUser);
+
       var slot = interviewerService
-          .updateSlot(1L, 1L, timeSlot);
-      assertEquals(timeSlot.getFrom(), slot.getFrom());
-      assertEquals(timeSlot.getTo(), slot.getTo());
-      assertEquals(timeSlot.getDayOfWeek(), slot.getDayOfWeek());
-      assertEquals(timeSlot.getWeekNum(), slot.getWeekNum());
+          .updateSlot(1L, 1L, timeSlotWithUser);
+
+
+      assertEquals(timeSlotWithUser.getFrom(), slot.getFrom());
+      assertEquals(timeSlotWithUser.getTo(), slot.getTo());
+      assertEquals(timeSlotWithUser.getDayOfWeek(), slot.getDayOfWeek());
+      assertEquals(timeSlotWithUser.getWeekNum(), slot.getWeekNum());
     } else {
       assertThrows(ApplicationErrorException.class,
-          () -> interviewerService.updateSlot(1L, 1L, timeSlot));
+          () -> interviewerService.updateSlot(1L, 1L, timeSlotWithUser));
     }
   }
 
