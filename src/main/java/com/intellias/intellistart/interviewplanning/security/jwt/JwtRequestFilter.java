@@ -1,5 +1,7 @@
 package com.intellias.intellistart.interviewplanning.security.jwt;
 
+import com.intellias.intellistart.interviewplanning.models.User;
+import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import io.jsonwebtoken.ExpiredJwtException;
 import java.io.IOException;
 import javax.servlet.FilterChain;
@@ -12,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -54,7 +57,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
       return;
     }
 
-    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+    UserDetails userDetails;
+    try {
+      userDetails = userDetailsService.loadUserByUsername(username);
+    } catch (UsernameNotFoundException e) {
+      userDetails = new User(username, UserRole.CANDIDATE);
+    }
 
     if (jwtTokenUtil.isTokenValid(jwtToken, userDetails)) {
       //TODO replace with OAuth2AuthenticationToken

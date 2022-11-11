@@ -2,6 +2,8 @@ package com.intellias.intellistart.interviewplanning.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -36,6 +38,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Table(name = "USERS")
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(Include.NON_NULL)
 public class User implements UserDetails {
 
   @Id
