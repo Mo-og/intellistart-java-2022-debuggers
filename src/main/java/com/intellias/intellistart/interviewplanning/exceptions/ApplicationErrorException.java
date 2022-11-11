@@ -64,7 +64,6 @@ public class ApplicationErrorException extends RuntimeException {
 
     //Authentication related
     INVALID_USER_CREDENTIALS(HttpStatus.BAD_REQUEST, "Invalid user credentials"),
-    TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "Provided token has expired"),
     NO_USER_DATA(HttpStatus.BAD_REQUEST, "No data could be retrieved for provided credentials");
 
     public final String code;
