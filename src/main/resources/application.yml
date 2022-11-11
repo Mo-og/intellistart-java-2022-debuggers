@@ -5,13 +5,10 @@ spring:
     properties:
       hibernate:
         hbm2ddl:
-          import_files: schema-h2.sql
+          import_files: schema-h2.sql, data.sql
     hibernate:
       ddl-auto: create
     show-sql: true
-  sql:
-    init:
-      data-locations: data.sql
   datasource:
     driverClassName: org.h2.Driver
     username: sa
@@ -32,7 +29,6 @@ spring:
             user-info-uri: https://graph.facebook.com/v3.0/me?fields=id,first_name,middle_name,last_name,name,email
   profiles:
     active: dev
-
 
 facebook:
   client-id: ${facebook.client-id}
