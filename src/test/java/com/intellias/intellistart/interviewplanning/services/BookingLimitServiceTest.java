@@ -13,6 +13,7 @@ import com.intellias.intellistart.interviewplanning.models.BookingLimit;
 import com.intellias.intellistart.interviewplanning.repositories.BookingLimitRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,7 +55,7 @@ public class BookingLimitServiceTest {
   @Test
   void testSetBooking() {
     when(bookingLimitRepository.findByInterviewerIdAndWeekNum(existingUserId, nextWeekNum))
-        .thenReturn(bookingLimit);
+        .thenReturn(Optional.of(bookingLimit));
     when(userRepository.existsById(existingUserId))
         .thenReturn(true);
     when(bookingLimitRepository.save(bookingLimit))
@@ -86,7 +87,7 @@ public class BookingLimitServiceTest {
   @Test
   void testSetBookingNewBooking() {
     when(bookingLimitRepository.findByInterviewerIdAndWeekNum(existingUserId, nextWeekNum))
-        .thenReturn(null);
+        .thenReturn(Optional.of(bookingLimit));
     when(userRepository.existsById(existingUserId))
         .thenReturn(true);
     when(bookingLimitRepository.save(any()))
@@ -112,7 +113,7 @@ public class BookingLimitServiceTest {
     lenient().when(userRepository.existsById(existingUserId))
         .thenReturn(true);
     when(bookingLimitRepository.findByInterviewerIdAndWeekNum(existingUserId, nextWeekNum))
-        .thenReturn(bookingLimit);
+        .thenReturn(Optional.of(bookingLimit));
     assertEquals(bookingLimitService.findBookingLimit(existingUserId, nextWeekNum),
         bookingLimit);
   }
