@@ -33,9 +33,7 @@ public class BookingLimitService {
    * @param bookingLimitRequest request DTO
    * @return Booking limit
    */
-  public BookingLimit saveBookingLimit(
-      Long interviewerId,
-      BookingLimitDto bookingLimitRequest) {
+  public BookingLimit saveBookingLimit(Long interviewerId, BookingLimitDto bookingLimitRequest) {
     if (!userRepository.existsById(interviewerId)) {
       throw NotFoundException.interviewer(interviewerId);
     }
@@ -43,15 +41,10 @@ public class BookingLimitService {
       throw InvalidInputException.weekNum(bookingLimitRequest.getWeekNum());
     }
     BookingLimit bookingLimit = bookingLimitRepository.findByInterviewerIdAndWeekNum(interviewerId,
-        bookingLimitRequest.getWeekNum());
-    if (bookingLimit != null) {
-      bookingLimit.setBookingLimit(bookingLimitRequest.getBookingLimit());
-    } else {
-      bookingLimit = new BookingLimit(interviewerId,
-          bookingLimitRequest.getWeekNum(),
-          bookingLimitRequest.getBookingLimit());
-    }
-
+        bookingLimitRequest.getWeekNum())
+        .orElse(new BookingLimit(interviewerId));
+    bookingLimit.setWeekNum(bookingLimitRequest.getWeekNum());
+    bookingLimit.setBookingLimit(bookingLimitRequest.getBookingLimit());
     return bookingLimitRepository.save(bookingLimit);
   }
 
@@ -70,6 +63,7 @@ public class BookingLimitService {
     if (!userRepository.existsById(interviewerId)) {
       throw NotFoundException.interviewer(interviewerId);
     }
-    return bookingLimitRepository.findByInterviewerIdAndWeekNum(interviewerId, weekNum);
+    return bookingLimitRepository.findByInterviewerIdAndWeekNum(interviewerId, weekNum)
+        .orElseThrow(() -> NotFoundException.bookingLimit(interviewerId, weekNum));
   }
 }
