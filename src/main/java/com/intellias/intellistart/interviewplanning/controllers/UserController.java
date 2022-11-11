@@ -69,19 +69,19 @@ public class UserController {
     return interviewerService.getById(interviewerId);
   }
 
-  //to be removed
+  //todo remove
   @GetMapping("/users/{id}")
   public User getUser(@PathVariable Long id) {
     return userService.getById(id);
   }
 
-  //to be removed
+  //todo remove
   @GetMapping("/users")
   public List<User> getUser() {
     return userService.getAll();
   }
 
-  //to be removed
+  //todo remove
   @PostMapping("/interviewers")
   public User postInterviewer(@RequestBody TextNode email) {
     return userService.create(email.asText(), UserRole.INTERVIEWER);

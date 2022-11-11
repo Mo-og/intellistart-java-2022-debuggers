@@ -57,12 +57,6 @@ class UserControllerTest {
   private UserService userService;
 
   @Test
-  void testCreateUser() {
-    when(userService.create(email, UserRole.CANDIDATE)).thenReturn(testCandidate);
-    checkResponseOk(post("/users"), json(email), json(testCandidate), mockMvc);
-  }
-
-  @Test
   void testCreateInterviewer() {
     when(userService.create(email, UserRole.INTERVIEWER)).thenReturn(testInterviewer);
     checkResponseOk(post("/interviewers"), json(email), json(testInterviewer),
