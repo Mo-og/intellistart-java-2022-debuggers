@@ -41,7 +41,7 @@ public class NotFoundException extends ApplicationErrorException {
    */
   public static NotFoundException bookingLimit(Long interviewerId, Integer weekNum) {
     return new NotFoundException(ErrorCode.BOOKING_LIMIT_NOT_FOUND,
-        String.format(": interviewer %d does not have ani booking limit on week %d",
+        String.format(": interviewer %d does not have any booking limit on week %d",
             interviewerId, weekNum));
   }
 }
