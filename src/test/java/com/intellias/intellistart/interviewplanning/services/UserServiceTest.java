@@ -172,4 +172,3 @@ class UserServiceTest {
     assertEquals(List.of(interviewer, coordinator, newInterviewer, newCoordinator),result);
   }
 }
-//:white_check_mark: cover UserController with test to 63%
