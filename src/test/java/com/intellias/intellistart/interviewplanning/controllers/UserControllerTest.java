@@ -20,6 +20,7 @@ import com.intellias.intellistart.interviewplanning.services.CoordinatorService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import com.intellias.intellistart.interviewplanning.services.UserService;
 import java.util.HashSet;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -140,5 +141,15 @@ class UserControllerTest {
     when(userService.getById(1L)).thenReturn(testCoordinator);
     checkResponseOk(get("/users/{id}", 1),
         null, json(testCoordinator), mockMvc);
+  }
+
+  @Test
+  void testGetAllUsers() {
+    when(userService.getAll())
+        .thenReturn(List.of(testCandidate, testCoordinator, testInterviewer));
+    checkResponseOk(
+        get("/users"),
+        null, json(List.of(testCandidate, testCoordinator, testInterviewer)),
+        mockMvc);
   }
 }
