@@ -230,4 +230,13 @@ class InterviewerServiceTest {
         .thenThrow(new EntityNotFoundException());
     assertThrows(NotFoundException.class, () -> interviewerService.getById(-1L));
   }
+
+  @Test
+  void testThrowExceptionGetSlotsByWeekId() {
+    when(userRepository
+        .existsByIdAndRole(1L, UserRole.INTERVIEWER))
+        .thenReturn(false);
+    assertThrows(NotFoundException.class,
+        () -> interviewerService.getSlotsByWeekId(1L, WeekService.getCurrentWeekNum()));
+  }
 }

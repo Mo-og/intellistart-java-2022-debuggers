@@ -1,8 +1,6 @@
 package com.intellias.intellistart.interviewplanning.services;
 
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
-import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
-import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException.ErrorCode;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.User;
@@ -136,8 +134,7 @@ public class InterviewerService {
     User interviewer = userRepository.getReferenceById(interviewerId);
     InterviewerTimeSlot slot = getSlotById(slotId);
     if (!slot.getInterviewer().equals(interviewer)) {
-      throw new ApplicationErrorException(ErrorCode.SLOT_NOT_FOUND,
-          "Slot of given id does not belong to specified interviewer");
+      throw NotFoundException.timeSlot(slotId, interviewerId);
     }
     slot.setFrom(interviewerTimeSlot.getFrom());
     slot.setTo(interviewerTimeSlot.getTo());
