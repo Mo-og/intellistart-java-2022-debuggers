@@ -169,6 +169,6 @@ class UserServiceTest {
     when(userRepository.findAll())
         .thenReturn(List.of(interviewer, coordinator, newInterviewer, newCoordinator));
     var result = service.getAll();
-    assertEquals(List.of(interviewer, coordinator, newInterviewer, newCoordinator),result);
+    assertEquals(List.of(interviewer, coordinator, newInterviewer, newCoordinator), result);
   }
 }
