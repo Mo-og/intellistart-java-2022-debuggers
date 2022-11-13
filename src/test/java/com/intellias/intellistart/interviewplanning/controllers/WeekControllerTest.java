@@ -6,13 +6,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import com.intellias.intellistart.interviewplanning.security.jwt.JwtRequestFilter;
 import com.intellias.intellistart.interviewplanning.services.CoordinatorService;
-import com.intellias.intellistart.interviewplanning.services.WeekService;
+import com.intellias.intellistart.interviewplanning.services.WeekServiceImp;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(WeekController.class)
@@ -27,17 +28,19 @@ class WeekControllerTest {
   private CommandLineRunner commandLineRunner;
   @MockBean
   private JwtRequestFilter jwtRequestFilter;
+  @SpyBean
+  private WeekServiceImp weekService;
 
   @Test
   void testGetCurrentWeek() {
-    checkResponseOk(get("/weeks/current"), json(WeekService.getCurrentWeekNum()),
-        json(new WeekController.WeekNum(WeekService.getCurrentWeekNum())), mockMvc);
+    checkResponseOk(get("/weeks/current"), json(weekService.getCurrentWeekNum()),
+        json(new WeekController.WeekNum(weekService.getCurrentWeekNum())), mockMvc);
   }
 
   @Test
   void testGetNextWeek() {
-    checkResponseOk(get("/weeks/next"), json(WeekService.getNextWeekNum()),
-        json(new WeekController.WeekNum(WeekService.getNextWeekNum())), mockMvc);
+    checkResponseOk(get("/weeks/next"), json(weekService.getNextWeekNum()),
+        json(new WeekController.WeekNum(weekService.getNextWeekNum())), mockMvc);
   }
 
   @Test

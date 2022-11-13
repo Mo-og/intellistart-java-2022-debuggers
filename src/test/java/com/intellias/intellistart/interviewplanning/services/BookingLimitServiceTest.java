@@ -12,6 +12,7 @@ import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
 import com.intellias.intellistart.interviewplanning.repositories.BookingLimitRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
+import com.intellias.intellistart.interviewplanning.services.interfaces.WeekService;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,26 +29,27 @@ public class BookingLimitServiceTest {
   private BookingLimitRepository bookingLimitRepository;
   @Mock
   private UserRepository userRepository;
+  private final WeekService weekService = new WeekServiceImp();
 
   @BeforeEach
   void setService() {
-    bookingLimitService = new BookingLimitService(bookingLimitRepository, userRepository);
+    bookingLimitService = new BookingLimitService(bookingLimitRepository, userRepository, weekService);
   }
 
   private static final int limit = 5;
-  private static final int nextWeekNum = WeekService.getNextWeekNum();
+  private final int nextWeekNum = weekService.getNextWeekNum();
   private static final Long existingUserId = 1L;
   private static final Long notExistingUserId = 2L;
 
-  private static final BookingLimit bookingLimit = new BookingLimit(
+  private final BookingLimit bookingLimit = new BookingLimit(
       existingUserId,
       nextWeekNum,
       limit);
-  private static final BookingLimit bookingLimit2 = new BookingLimit(
+  private final BookingLimit bookingLimit2 = new BookingLimit(
       notExistingUserId,
       nextWeekNum,
       limit + 2);
-  private static final BookingLimitDto bookingLimitRequest = new BookingLimitDto(limit,
+  private final BookingLimitDto bookingLimitRequest = new BookingLimitDto(limit,
       nextWeekNum);
   private static final BookingLimitDto badBookingLimitRequest = new BookingLimitDto(limit,
       0);

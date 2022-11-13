@@ -6,21 +6,22 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.IsoFields;
 import java.time.temporal.WeekFields;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 /**
  * Provides week info.
  */
-public class WeekService {
-
-  private WeekService() {
-  }
+@Service
+@Qualifier("WeekService")
+public class WeekServiceImp implements WeekService {
 
   /**
    * Returns current zoned date.
    *
    * @return LocalDate representation of zoned date
    */
-  public static LocalDate getCurrentDate() {
+  public LocalDate getCurrentDate() {
     return ZonedDateTime.now(ZoneId.of("Europe/Kiev")).toLocalDate();
   }
 
@@ -29,7 +30,7 @@ public class WeekService {
    *
    * @return number of week
    */
-  public static int getCurrentWeekNum() {
+  public int getCurrentWeekNum() {
     return getWeekNumByDate(getCurrentDate());
   }
 
@@ -38,7 +39,7 @@ public class WeekService {
    *
    * @return number of week
    */
-  public static int getNextWeekNum() {
+  public int getNextWeekNum() {
     return getWeekNumByDate(getCurrentDate().plusWeeks(1));
   }
 
@@ -48,7 +49,7 @@ public class WeekService {
    * @param date local date
    * @return number of week
    */
-  public static int getWeekNumByDate(LocalDate date) {
+  public int getWeekNumByDate(LocalDate date) {
     return date.get(WeekFields.ISO.weekOfWeekBasedYear())
         + date.get(IsoFields.WEEK_BASED_YEAR) * 100;
   }
@@ -60,7 +61,7 @@ public class WeekService {
    * @param dayOfWeek day of week
    * @return local date
    */
-  public static LocalDate getDateByWeekNumAndDayOfWeek(int weekNum, DayOfWeek dayOfWeek) {
+  public LocalDate getDateByWeekNumAndDayOfWeek(int weekNum, DayOfWeek dayOfWeek) {
     return LocalDate.now()
         .with(IsoFields.WEEK_BASED_YEAR, weekNum / 100)
         .with(WeekFields.ISO.weekOfWeekBasedYear(), weekNum % 100)

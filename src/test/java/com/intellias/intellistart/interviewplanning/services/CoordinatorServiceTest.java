@@ -19,9 +19,11 @@ import com.intellias.intellistart.interviewplanning.repositories.BookingReposito
 import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
+import com.intellias.intellistart.interviewplanning.services.interfaces.WeekService;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -35,31 +37,33 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class CoordinatorServiceTest {
 
+  private final WeekService weekService = new WeekServiceImp();
+
   public static final String CANDIDATE_EMAIL = "test.candidate@test.com";
   private static final User coordinator = new User("coordinator@gmail.com",
       UserRole.COORDINATOR);
   private static final User interviewer = new User("interviewer@gmail.com",
       UserRole.INTERVIEWER);
-  private static final CandidateTimeSlot candidateSlot = new CandidateTimeSlot(CANDIDATE_EMAIL,
-      WeekService.getCurrentDate().toString(), "08:00", "13:00");
-  private static final CandidateSlotDto candidateSlotDto =
+  private final CandidateTimeSlot candidateSlot = new CandidateTimeSlot(CANDIDATE_EMAIL,
+      weekService.getCurrentDate().toString(), "08:00", "13:00");
+  private final CandidateSlotDto candidateSlotDto =
       CandidateSlotDto.builder()
-          .date(WeekService.getCurrentDate())
+          .date(weekService.getCurrentDate())
           .from(LocalTime.of(8, 0))
           .to(LocalTime.of(13, 0))
           .build();
-  private static final InterviewerTimeSlot interviewerSlot =
+  private final InterviewerTimeSlot interviewerSlot =
       new InterviewerTimeSlot("09:00", "18:00", "Mon",
-          WeekService.getCurrentWeekNum());
+          weekService.getCurrentWeekNum());
 
-  private static final InterviewerSlotDto interviewerSlotDto =
+  private final InterviewerSlotDto interviewerSlotDto =
       InterviewerSlotDto.builder()
-          .weekNum(WeekService.getCurrentWeekNum())
+          .weekNum(weekService.getCurrentWeekNum())
           .dayOfWeek("Mon")
           .from(LocalTime.of(9, 0))
           .to(LocalTime.of(18, 0))
           .build();
-  private static final Booking booking =
+  private final Booking booking =
       new Booking(
           LocalTime.of(8, 0),
           LocalTime.of(10, 0),
@@ -68,7 +72,7 @@ class CoordinatorServiceTest {
           "some subject",
           "some desc"
       );
-  private static final BookingDto bookingDto =
+  private final BookingDto bookingDto =
       BookingDto.builder()
           .from(LocalTime.of(8, 0))
           .to(LocalTime.of(10, 0))
@@ -77,28 +81,28 @@ class CoordinatorServiceTest {
           .interviewerSlotId(interviewerSlot.getId())
           .candidateSlotId(candidateSlot.getId())
           .build();
-  private static final DayDashboardDto mon = DayDashboardDto.builder()
-      .date(WeekService.getDateByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(),
+  private final DayDashboardDto mon = DayDashboardDto.builder()
+      .date(weekService.getDateByWeekNumAndDayOfWeek(weekService.getCurrentWeekNum(),
           DayOfWeek.MONDAY))
       .dayOfWeek("Mon")
       .build();
-  private static final DayDashboardDto tue = DayDashboardDto.builder()
-      .date(WeekService.getDateByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(),
+  private final DayDashboardDto tue = DayDashboardDto.builder()
+      .date(weekService.getDateByWeekNumAndDayOfWeek(weekService.getCurrentWeekNum(),
           DayOfWeek.TUESDAY))
       .dayOfWeek("Tue")
       .build();
-  private static final DayDashboardDto wed = DayDashboardDto.builder()
-      .date(WeekService.getDateByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(),
+  private final DayDashboardDto wed = DayDashboardDto.builder()
+      .date(weekService.getDateByWeekNumAndDayOfWeek(weekService.getCurrentWeekNum(),
           DayOfWeek.WEDNESDAY))
       .dayOfWeek("Wed")
       .build();
-  private static final DayDashboardDto thu = DayDashboardDto.builder()
-      .date(WeekService.getDateByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(),
+  private final DayDashboardDto thu = DayDashboardDto.builder()
+      .date(weekService.getDateByWeekNumAndDayOfWeek(weekService.getCurrentWeekNum(),
           DayOfWeek.THURSDAY))
       .dayOfWeek("Thu")
       .build();
-  private static final DayDashboardDto fri = DayDashboardDto.builder()
-      .date(WeekService.getDateByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(),
+  private final DayDashboardDto fri = DayDashboardDto.builder()
+      .date(weekService.getDateByWeekNumAndDayOfWeek(weekService.getCurrentWeekNum(),
           DayOfWeek.FRIDAY))
       .dayOfWeek("Fri")
       .build();
@@ -110,7 +114,7 @@ class CoordinatorServiceTest {
   private static final Set<CandidateSlotDto> candidateSlotDtoSet = new TreeSet<>(
       Comparator.comparing(CandidateSlotDto::getFrom));
 
-  static {
+  {
     interviewer.setId(1L);
     interviewerSlot.setId(1L);
     interviewerSlot.setInterviewer(interviewer);
@@ -151,47 +155,47 @@ class CoordinatorServiceTest {
 
   @BeforeEach
   void setService() {
-    service = new CoordinatorService(interviewerTimeSlotRepository, candidateTimeSlotRepository,
-        bookingRepository, userRepository);
+    service = new CoordinatorService(weekService, interviewerTimeSlotRepository,
+        candidateTimeSlotRepository, bookingRepository, userRepository);
   }
 
   @Test
   void testGetWeekDashboard() {
     when(interviewerTimeSlotRepository
-        .findByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(), DayOfWeek.MONDAY))
+        .findByWeekNumAndDayOfWeek(weekService.getCurrentWeekNum(), DayOfWeek.MONDAY))
         .thenReturn(Set.of(interviewerSlot));
     when(candidateTimeSlotRepository
-        .findByDate(WeekService
-            .getDateByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(), DayOfWeek.MONDAY)))
+        .findByDate(weekService
+            .getDateByWeekNumAndDayOfWeek(weekService.getCurrentWeekNum(), DayOfWeek.MONDAY)))
         .thenReturn(Set.of(candidateSlot));
     when(bookingRepository
         .findByCandidateSlotDate(
-            WeekService
-                .getDateByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(), DayOfWeek.MONDAY)))
+            weekService
+                .getDateByWeekNumAndDayOfWeek(weekService.getCurrentWeekNum(), DayOfWeek.MONDAY)))
         .thenReturn(Set.of(booking));
     when(bookingRepository.findByInterviewerSlot(interviewerSlot)).thenReturn(Set.of(booking));
     when(bookingRepository.findByCandidateSlot(candidateSlot)).thenReturn(Set.of(booking));
-    var dashboard = service.getWeekDashboard(WeekService.getCurrentWeekNum());
+    var dashboard = service.getWeekDashboard(weekService.getCurrentWeekNum());
     assertEquals(weekDashboard, dashboard);
   }
 
   @Test
   void testGetDayDashboard() {
     when(interviewerTimeSlotRepository
-        .findByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(), DayOfWeek.MONDAY))
+        .findByWeekNumAndDayOfWeek(weekService.getCurrentWeekNum(), DayOfWeek.MONDAY))
         .thenReturn(Set.of(interviewerSlot));
     when(candidateTimeSlotRepository
-        .findByDate(WeekService.getDateByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(),
+        .findByDate(weekService.getDateByWeekNumAndDayOfWeek(weekService.getCurrentWeekNum(),
             DayOfWeek.MONDAY)))
         .thenReturn(Set.of(candidateSlot));
     when(bookingRepository
-        .findByCandidateSlotDate(WeekService
-            .getDateByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(), DayOfWeek.MONDAY)))
+        .findByCandidateSlotDate(weekService
+            .getDateByWeekNumAndDayOfWeek(weekService.getCurrentWeekNum(), DayOfWeek.MONDAY)))
         .thenReturn(Set.of(booking));
     when(bookingRepository.findByInterviewerSlot(interviewerSlot)).thenReturn(Set.of(booking));
     when(bookingRepository.findByCandidateSlot(candidateSlot)).thenReturn(Set.of(booking));
     var dashboard =
-        service.getDayDashboard(WeekService.getCurrentWeekNum(), DayOfWeek.MONDAY);
+        service.getDayDashboard(weekService.getCurrentWeekNum(), DayOfWeek.MONDAY);
     assertEquals(mon, dashboard);
   }
 
@@ -229,9 +233,10 @@ class CoordinatorServiceTest {
   @Test
   void testGrantCoordinatorRole() {
     when(userRepository.findByEmail("coordinator@gmail.com"))
-        .thenReturn(Optional.of(coordinator));
-    when(userRepository.save(coordinator))
+        .thenReturn(Optional.of(interviewer));
+    when(userRepository.save(interviewer))
         .thenReturn(coordinator);
+    when(interviewerTimeSlotRepository.findByInterviewer(interviewer)).thenReturn(List.of(interviewerSlot));
     var result = service.grantCoordinatorRole("coordinator@gmail.com");
     assertEquals(coordinator, result);
   }
