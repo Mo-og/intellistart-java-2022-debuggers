@@ -148,7 +148,6 @@ class UserServiceTest {
     when(userRepository.findByEmail(InterviewerServiceTest.INTERVIEWER_EMAIL))
         .thenReturn(Optional.of(newInterviewer));
     var savedInterviewer = service.loadUserByUsername(InterviewerServiceTest.INTERVIEWER_EMAIL);
-    System.out.println(savedInterviewer);
     assertEquals(InterviewerServiceTest.INTERVIEWER_EMAIL, savedInterviewer.getUsername());
     assertEquals(newInterviewer.getRole(), ((User) savedInterviewer).getRole());
     assertEquals(newInterviewer.getId(), ((User) savedInterviewer).getId());
@@ -170,5 +169,14 @@ class UserServiceTest {
         .thenReturn(List.of(interviewer, coordinator, newInterviewer, newCoordinator));
     var result = service.getAll();
     assertEquals(List.of(interviewer, coordinator, newInterviewer, newCoordinator), result);
+  }
+
+  @Test
+  void testThrowExceptionLoadUserByUsername() {
+    when(userRepository.findByEmail(InterviewerServiceTest.INTERVIEWER_EMAIL))
+        .thenThrow(new UsernameNotFoundException(
+            "No user found with username " + InterviewerServiceTest.INTERVIEWER_EMAIL));
+    assertThrows(UsernameNotFoundException.class,
+        () -> service.loadUserByUsername(InterviewerServiceTest.INTERVIEWER_EMAIL));
   }
 }
