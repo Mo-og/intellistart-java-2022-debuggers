@@ -127,4 +127,11 @@ public class BookingLimitServiceTest {
     assertThrows(NotFoundException.class,
         () -> bookingLimitService.findBookingLimit(existingUserId, nextWeekNum));
   }
+  @Test
+  void testThrowBookingLimitExceptionFindBookingLimit(){
+    when(bookingLimitRepository.findByInterviewerIdAndWeekNum(existingUserId, nextWeekNum))
+        .thenThrow(NotFoundException.bookingLimit(existingUserId, nextWeekNum));
+    assertThrows(NotFoundException.class,
+        ()->bookingLimitRepository.findByInterviewerIdAndWeekNum(existingUserId, nextWeekNum));
+  }
 }
