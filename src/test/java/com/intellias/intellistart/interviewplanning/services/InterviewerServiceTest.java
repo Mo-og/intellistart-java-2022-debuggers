@@ -29,6 +29,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 @ExtendWith(MockitoExtension.class)
 class InterviewerServiceTest {
 
@@ -194,7 +195,6 @@ class InterviewerServiceTest {
   @Test
   void testUpdateSlot() {
     when(weekService.getNowDay()).thenReturn(DayOfWeek.MONDAY);
-    System.out.println(weekService.getNowDay());
     InterviewerTimeSlot interviewerTimeSlot = new InterviewerTimeSlot();
     interviewerTimeSlot.setInterviewer(interviewer);
     when(userRepository.getReferenceById(1L)).thenReturn(interviewer);
@@ -205,7 +205,6 @@ class InterviewerServiceTest {
         .save(any()))
         .thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
     when(weekService.getNextWeekNum()).thenCallRealMethod();
-    System.out.println(weekService.getNextWeekNum());
     var slot = interviewerService
         .updateSlot(1L, 1L, timeSlot);
     assertEquals(timeSlot.getFrom(), slot.getFrom());
@@ -240,8 +239,14 @@ class InterviewerServiceTest {
   }
 
   @Test
-  void test() {
+  void testThrowExceptionUpdateSlot() {
     when(weekService.getNowDay()).thenReturn(DayOfWeek.MONDAY);
-    System.out.println(weekService.getNowDay());
+    InterviewerTimeSlot interviewerTimeSlot = new InterviewerTimeSlot();
+    interviewerTimeSlot.setInterviewer(interviewer);
+    when(interviewerTimeSlotRepository
+        .getReferenceById(1L))
+        .thenReturn(interviewerTimeSlot);
+    assertThrows(NotFoundException.class,
+        () -> interviewerService.updateSlot(1L, 1L, timeSlot));
   }
 }
