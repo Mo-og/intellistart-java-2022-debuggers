@@ -38,7 +38,7 @@ public class BookingLimitService {
       throw InvalidInputException.weekNum(bookingLimitRequest.getWeekNum());
     }
     BookingLimit bookingLimit = bookingLimitRepository.findByInterviewerIdAndWeekNum(interviewerId,
-        bookingLimitRequest.getWeekNum())
+            bookingLimitRequest.getWeekNum())
         .orElseGet(() -> new BookingLimit(interviewerId));
     bookingLimit.setWeekNum(bookingLimitRequest.getWeekNum());
     bookingLimit.setBookingLimit(bookingLimitRequest.getBookingLimit());

@@ -29,7 +29,6 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc(addFilters = false)
 class BookingLimitControllerTest {
 
-  private static final UserDetails user = new User("test.user@test.com", UserRole.COORDINATOR);
   private static final int limit = 5;
   private static final WeekService weekService = new WeekServiceImp();
   private static final int nextWeekNum = weekService.getNextWeekNum();
