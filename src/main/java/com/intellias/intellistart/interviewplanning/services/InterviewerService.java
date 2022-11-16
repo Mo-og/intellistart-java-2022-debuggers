@@ -97,7 +97,10 @@ public class InterviewerService {
    * @throws NotFoundException if no interviewer is found
    */
   public Set<InterviewerSlotDto> getSlotsByWeekId(Long interviewerId, int weekId) {
-    if (!userRepository.existsByIdAndRole(interviewerId, UserRole.INTERVIEWER)) {
+    User user = userRepository.findById(interviewerId)
+        .orElseThrow(() -> NotFoundException.user(interviewerId));
+
+    if (user.getRole() != UserRole.INTERVIEWER) {
       throw NotFoundException.interviewer(interviewerId);
     }
 
