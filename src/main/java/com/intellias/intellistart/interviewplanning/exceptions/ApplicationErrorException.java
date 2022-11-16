@@ -62,6 +62,13 @@ public class ApplicationErrorException extends RuntimeException {
     INVALID_DAY_OF_WEEK(HttpStatus.BAD_REQUEST, "Invalid day of week"),
     INVALID_WEEK_NUM(HttpStatus.BAD_REQUEST, "Invalid week number"),
 
+    // Forbidden error code
+    SELF_ROLE_REVOKING(HttpStatus.FORBIDDEN, "Forbidden to revoke yourself"),
+
+    // Method not allowed
+    REVOKE_USER_WITH_BOOKINGS(HttpStatus.METHOD_NOT_ALLOWED,
+        "Not allowed to revoke user with active bookings"),
+
     //Authentication related
     INVALID_USER_CREDENTIALS(HttpStatus.BAD_REQUEST, "Invalid user credentials"),
     NO_USER_DATA(HttpStatus.BAD_REQUEST, "No data could be retrieved for provided credentials");
