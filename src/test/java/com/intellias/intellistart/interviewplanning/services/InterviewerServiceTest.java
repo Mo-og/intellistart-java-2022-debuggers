@@ -21,6 +21,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import javax.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -150,8 +151,8 @@ class InterviewerServiceTest {
   @Test
   void testGetSlotsByWeekId() {
     when(userRepository
-        .existsByIdAndRole(1L, UserRole.INTERVIEWER))
-        .thenReturn(true);
+        .findById(1L))
+        .thenReturn(Optional.of(interviewer));
     when(interviewerTimeSlotRepository
         .findByInterviewerIdAndWeekNum(1L, WeekService.getNextWeekNum()))
         .thenReturn(Set.of(timeSlot));
@@ -166,8 +167,8 @@ class InterviewerServiceTest {
   @Test
   void testGetSlotsByWeekIdWithWrongInterviewerId() {
     when(userRepository
-        .existsByIdAndRole(-1L, UserRole.INTERVIEWER))
-        .thenThrow(NotFoundException.interviewer(-1L));
+        .findById(-1L))
+        .thenThrow(NotFoundException.user(-1L));
     int weekNum = WeekService.getNextWeekNum();
     assertThrows(NotFoundException.class,
         () -> interviewerService.getSlotsByWeekId(-1L, weekNum));
@@ -176,7 +177,7 @@ class InterviewerServiceTest {
   @Test
   void testGetSlotsByWeekIdWithWrongInterviewerRole() {
     when(userRepository
-        .existsByIdAndRole(2L, UserRole.INTERVIEWER))
+        .findById(2L))
         .thenThrow(NotFoundException.interviewer(2L));
     int weekNum = WeekService.getNextWeekNum();
     assertThrows(NotFoundException.class,

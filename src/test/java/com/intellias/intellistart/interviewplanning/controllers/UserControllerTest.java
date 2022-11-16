@@ -10,8 +10,12 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.intellias.intellistart.interviewplanning.SpringSecurityTestUtils;
+import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
+import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException.ErrorCode;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
@@ -25,14 +29,20 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(UserController.class)
+@SpringBootTest(
+    classes = SpringSecurityTestUtils.class
+)
 @AutoConfigureMockMvc(addFilters = false)
 class UserControllerTest {
 
+  private static final String coordinatorEmail = "coordinator@test.com";
+  private static final User coordinator = new User("coordinator@test.com", UserRole.COORDINATOR);
   private static final String email = "test.user@gmail.com";
   private static final User testCandidate = new User(email, UserRole.CANDIDATE);
   private static final User testCoordinator = new User(email, UserRole.COORDINATOR);
@@ -41,6 +51,7 @@ class UserControllerTest {
   static {
     testCandidate.setId(1L);
     testInterviewer.setId(1L);
+    coordinator.setId(2L);
   }
 
   @MockBean
@@ -75,10 +86,33 @@ class UserControllerTest {
   }
 
   @Test
-  void testGrantInterviewerRole() {
-    when(coordinatorService.grantInterviewerRole(email)).thenReturn(testInterviewer);
-    System.out.println("JSON: " + json(testInterviewer));
-    checkResponseOk(post("/users/interviewers"), json(email), json(testInterviewer), mockMvc);
+  @WithUserDetails(coordinatorEmail)
+  void testGrantInterviewerRole() throws Exception {
+    when(coordinatorService.grantInterviewerRole(email, coordinatorEmail))
+        .thenReturn(testInterviewer);
+    mockMvc.perform(post("/users/interviewers")
+            .content("{\n"
+                + "\"email\": \"test.user@gmail.com\"\n"
+                + "}")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().json(json(testInterviewer)));
+  }
+
+  @Test
+  @WithUserDetails(coordinatorEmail)
+  void testSelfGrantInterviewerRole() throws Exception {
+    when(coordinatorService.grantInterviewerRole(coordinatorEmail, coordinatorEmail))
+        .thenThrow(new ApplicationErrorException(ErrorCode.SELF_ROLE_REVOKING,
+            "Can not grant another role for yourself"));
+    mockMvc.perform(post("/users/interviewers")
+            .content("{\n"
+                + "\"email\": \"coordinator@test.com\"\n"
+                + "}")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isForbidden());
   }
 
   @Test
@@ -105,10 +139,31 @@ class UserControllerTest {
   }
 
   @Test
-  void testRevokeCoordinatorRole() {
-    when(coordinatorService.revokeCoordinatorRole(1L)).thenReturn(testCoordinator);
-    checkResponseOk(delete("/users/coordinators/{coordinatorId}", 1),
-        null, json(testCoordinator), mockMvc);
+  @WithUserDetails(coordinatorEmail)
+  void testRevokeCoordinatorRole() throws Exception {
+    when(userService.loadUserByUsername(coordinatorEmail))
+        .thenReturn(coordinator);
+    when(coordinatorService.revokeCoordinatorRole(1L, 2L))
+        .thenReturn(testCoordinator);
+    this.mockMvc.perform(delete("/users/coordinators/{coordinatorId}", 1)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().json(json(testCoordinator)));
+  }
+
+  @Test
+  @WithUserDetails(coordinatorEmail)
+  void testSelfRevokeCoordinatorRole() throws Exception {
+    when(userService.loadUserByUsername(coordinatorEmail))
+        .thenReturn(coordinator);
+    when(coordinatorService.revokeCoordinatorRole(2L, 2L))
+        .thenThrow(new ApplicationErrorException(ErrorCode.SELF_ROLE_REVOKING,
+            "Can not revoke role for yourself"));
+    this.mockMvc.perform(delete("/users/coordinators/{coordinatorId}", 2)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isForbidden());
   }
 
   @Test

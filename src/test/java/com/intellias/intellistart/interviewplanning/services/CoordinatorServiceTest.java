@@ -9,6 +9,7 @@ import com.intellias.intellistart.interviewplanning.controllers.dto.CandidateSlo
 import com.intellias.intellistart.interviewplanning.controllers.dto.DashboardDto;
 import com.intellias.intellistart.interviewplanning.controllers.dto.DayDashboardDto;
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
+import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
@@ -35,11 +36,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class CoordinatorServiceTest {
 
+  public static final String COORDINATOR_EMAIL = "coordinator@gmail.com";
+  public static final String INTERVIEWER_EMAIL = "interviewer@gmail.com";
   public static final String CANDIDATE_EMAIL = "test.candidate@test.com";
-  private static final User coordinator = new User("coordinator@gmail.com",
-      UserRole.COORDINATOR);
-  private static final User interviewer = new User("interviewer@gmail.com",
-      UserRole.INTERVIEWER);
+  private static final User coordinator = new User(COORDINATOR_EMAIL, UserRole.COORDINATOR);
+  private static final User interviewer = new User(INTERVIEWER_EMAIL, UserRole.INTERVIEWER);
   private static final CandidateTimeSlot candidateSlot = new CandidateTimeSlot(CANDIDATE_EMAIL,
       WeekService.getCurrentDate().toString(), "08:00", "13:00");
   private static final CandidateSlotDto candidateSlotDto =
@@ -218,34 +219,40 @@ class CoordinatorServiceTest {
 
   @Test
   void testGrantInterviewerRole() {
-    when(userRepository.findByEmail("interviewer@gmail.com"))
+    when(userRepository.findByEmail(INTERVIEWER_EMAIL))
         .thenReturn(Optional.of(interviewer));
     when(userRepository.save(interviewer))
         .thenReturn(interviewer);
-    var result = service.grantInterviewerRole("interviewer@gmail.com");
+    var result = service.grantInterviewerRole(INTERVIEWER_EMAIL, COORDINATOR_EMAIL);
     assertEquals(interviewer, result);
   }
 
   @Test
+  void testSelfGrantInterviewerRole() {
+    assertThrows(ApplicationErrorException.class,
+        () -> service.grantInterviewerRole(COORDINATOR_EMAIL, COORDINATOR_EMAIL));
+  }
+
+  @Test
   void testGrantCoordinatorRole() {
-    when(userRepository.findByEmail("coordinator@gmail.com"))
+    when(userRepository.findByEmail(COORDINATOR_EMAIL))
         .thenReturn(Optional.of(coordinator));
     when(userRepository.save(coordinator))
         .thenReturn(coordinator);
-    var result = service.grantCoordinatorRole("coordinator@gmail.com");
+    var result = service.grantCoordinatorRole(COORDINATOR_EMAIL);
     assertEquals(coordinator, result);
   }
 
   @Test
   void testRevokeInterviewerRole() {
-    when(userRepository.findByIdAndRole(1L, UserRole.INTERVIEWER))
+    when(userRepository.findById(1L))
         .thenReturn(Optional.of(interviewer));
     assertEquals(UserRole.INTERVIEWER, service.revokeInterviewerRole(1L).getRole());
   }
 
   @Test
   void testRevokeInterviewerRoleWrongId() {
-    when(userRepository.findByIdAndRole(-1L, UserRole.INTERVIEWER))
+    when(userRepository.findById(-1L))
         .thenReturn(Optional.empty());
     assertThrows(NotFoundException.class,
         () -> service.revokeInterviewerRole(-1L));
@@ -253,17 +260,23 @@ class CoordinatorServiceTest {
 
   @Test
   void testRevokeCoordinatorRole() {
-    when(userRepository.findByIdAndRole(1L, UserRole.COORDINATOR))
+    when(userRepository.findById(1L))
         .thenReturn(Optional.of(coordinator));
-    assertEquals(UserRole.COORDINATOR, service.revokeCoordinatorRole(1L).getRole());
+    assertEquals(UserRole.COORDINATOR, service.revokeCoordinatorRole(1L, 2L).getRole());
+  }
+
+  @Test
+  void testSelfRevokeCoordinatorRole() {
+    assertThrows(ApplicationErrorException.class,
+        () -> service.revokeCoordinatorRole(1L, 1L));
   }
 
   @Test
   void testRevokeCoordinatorRoleWrongId() {
-    when(userRepository.findByIdAndRole(-1L, UserRole.COORDINATOR))
+    when(userRepository.findById(-1L))
         .thenReturn(Optional.empty());
     assertThrows(NotFoundException.class,
-        () -> service.revokeCoordinatorRole(-1L));
+        () -> service.revokeCoordinatorRole(-1L, 1L));
   }
 
   @Test
