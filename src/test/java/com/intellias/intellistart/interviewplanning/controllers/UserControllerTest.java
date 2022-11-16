@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
+import com.intellias.intellistart.interviewplanning.security.jwt.JwtRequestFilter;
 import com.intellias.intellistart.interviewplanning.services.CoordinatorService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import com.intellias.intellistart.interviewplanning.services.UserService;
@@ -22,6 +23,7 @@ import java.util.HashSet;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -31,14 +33,6 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc(addFilters = false)
 class UserControllerTest {
 
-  @Autowired
-  private MockMvc mockMvc;
-  @MockBean
-  private InterviewerService interviewerService;
-  @MockBean
-  private CoordinatorService coordinatorService;
-  @MockBean
-  private UserService userService;
   private static final String email = "test.user@gmail.com";
   private static final User testCandidate = new User(email, UserRole.CANDIDATE);
   private static final User testCoordinator = new User(email, UserRole.COORDINATOR);
@@ -49,12 +43,18 @@ class UserControllerTest {
     testInterviewer.setId(1L);
   }
 
-
-  @Test
-  void testCreateUser() {
-    when(userService.create(email, UserRole.CANDIDATE)).thenReturn(testCandidate);
-    checkResponseOk(post("/users"), json(email), json(testCandidate), mockMvc);
-  }
+  @MockBean
+  private CommandLineRunner commandLineRunner;
+  @MockBean
+  private JwtRequestFilter jwtRequestFilter;
+  @Autowired
+  private MockMvc mockMvc;
+  @MockBean
+  private InterviewerService interviewerService;
+  @MockBean
+  private CoordinatorService coordinatorService;
+  @MockBean
+  private UserService userService;
 
   @Test
   void testCreateInterviewer() {
@@ -67,7 +67,6 @@ class UserControllerTest {
     assertThat(captor.getValue()).isEqualTo(email);
   }
 
-
   @Test
   void testGetInterviewer() {
     when(interviewerService.getById(1L)).thenReturn(testInterviewer);
@@ -77,16 +76,16 @@ class UserControllerTest {
 
   @Test
   void testGrantInterviewerRole() {
-    when(coordinatorService.grantRole(email, UserRole.INTERVIEWER)).thenReturn(testInterviewer);
+    when(coordinatorService.grantInterviewerRole(email)).thenReturn(testInterviewer);
     System.out.println("JSON: " + json(testInterviewer));
     checkResponseOk(post("/users/interviewers"), json(email), json(testInterviewer), mockMvc);
   }
 
   @Test
   void testRevokeInterviewerRole() {
-    when(coordinatorService.revokeInterviewerRole(1L)).thenReturn(testCandidate);
+    when(coordinatorService.revokeInterviewerRole(1L)).thenReturn(testInterviewer);
     checkResponseOk(delete("/users/interviewers/{interviewerId}", 1L),
-        null, json(testCandidate), mockMvc);
+        null, json(testInterviewer), mockMvc);
   }
 
   @Test
@@ -100,16 +99,16 @@ class UserControllerTest {
 
   @Test
   void testGrantCoordinatorRole() {
-    when(coordinatorService.grantRole(email, UserRole.COORDINATOR)).thenReturn(testCoordinator);
+    when(coordinatorService.grantCoordinatorRole(email)).thenReturn(testCoordinator);
     checkResponseOk(post("/users/coordinators"),
         json(email), json(testCoordinator), mockMvc);
   }
 
   @Test
   void testRevokeCoordinatorRole() {
-    when(coordinatorService.revokeCoordinatorRole(1L)).thenReturn(testCandidate);
+    when(coordinatorService.revokeCoordinatorRole(1L)).thenReturn(testCoordinator);
     checkResponseOk(delete("/users/coordinators/{coordinatorId}", 1),
-        null, json(testCandidate), mockMvc);
+        null, json(testCoordinator), mockMvc);
   }
 
   @Test
@@ -138,10 +137,8 @@ class UserControllerTest {
 
   @Test
   void testGetUser() {
-    when(userService.getUserById(1L)).thenReturn(testCoordinator);
+    when(userService.getById(1L)).thenReturn(testCoordinator);
     checkResponseOk(get("/users/{id}", 1),
         null, json(testCoordinator), mockMvc);
   }
-
-
 }

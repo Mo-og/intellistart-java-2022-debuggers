@@ -12,30 +12,30 @@ import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorE
 import com.intellias.intellistart.interviewplanning.exceptions.InvalidInputException;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
+import com.intellias.intellistart.interviewplanning.models.User;
+import com.intellias.intellistart.interviewplanning.models.User.UserRole;
+import com.intellias.intellistart.interviewplanning.security.jwt.JwtRequestFilter;
 import com.intellias.intellistart.interviewplanning.services.BookingLimitService;
 import com.intellias.intellistart.interviewplanning.services.WeekService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(BookingLimitController.class)
 @AutoConfigureMockMvc(addFilters = false)
-public class BookingLimitControllerTest {
+class BookingLimitControllerTest {
 
-  @Autowired
-  private MockMvc mockMvc;
-  @MockBean
-  private BookingLimitService bookingLimitService;
-
+  private static final UserDetails user = new User("test.user@test.com", UserRole.COORDINATOR);
   private static final int limit = 5;
   private static final int nextWeekNum = WeekService.getNextWeekNum();
   private static final Long existingUserId = 1L;
   private static final Long notExistingUserId = 2L;
-
   private static final BookingLimit bookingLimit = new BookingLimit(
       existingUserId,
       nextWeekNum,
@@ -46,6 +46,14 @@ public class BookingLimitControllerTest {
       limit + 1);
   private static final BookingLimitDto bookingLimitRequest = new BookingLimitDto(limit,
       nextWeekNum);
+  @Autowired
+  private MockMvc mockMvc;
+  @MockBean
+  private BookingLimitService bookingLimitService;
+  @MockBean
+  private CommandLineRunner commandLineRunner;
+  @MockBean
+  private JwtRequestFilter jwtRequestFilter;
 
   @Test
   void testSetBookingLimit() {

@@ -1,7 +1,6 @@
 package com.intellias.intellistart.interviewplanning.models;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.intellias.intellistart.interviewplanning.utils.Utils;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -11,13 +10,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Candidate time slot.
@@ -26,41 +24,34 @@ import org.springframework.transaction.annotation.Transactional;
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
 public class CandidateTimeSlot {
-  @ManyToOne
-  @JsonIgnore
-  User candidate;
 
   @Id
   @SequenceGenerator(name = "cnd_seq", sequenceName = "candidate_slot_sequence", allocationSize = 5)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cnd_seq")
   @Column(nullable = false)
   private Long id;
+  private String email;
+  private LocalDate date;
   @Column(name = "from_time")
   private LocalTime from;
   @Column(name = "to_time")
   private LocalTime to;
-  private LocalDate date;
 
   /**
    * Constructor.
    *
-   * @param date date
-   * @param from start time
-   * @param to   end time
+   * @param email candidate email
+   * @param date  date
+   * @param from  start time
+   * @param to    end time
    */
-  public CandidateTimeSlot(String date, String from, String to) {
+  public CandidateTimeSlot(String email, String date, String from, String to) {
+    this.email = email;
     this.date = LocalDate.parse(date);
     this.from = LocalTime.parse(from);
     this.to = LocalTime.parse(to);
-  }
-
-  public CandidateTimeSlot() {
-  }
-
-  @Transactional
-  public void setCandidate(User candidate) {
-    this.candidate = candidate;
   }
 
   @JsonGetter("from")
@@ -90,7 +81,8 @@ public class CandidateTimeSlot {
     if (id != null) {
       return Objects.equals(id, that.id);
     }
-    return Objects.equals(from, that.from)
+    return Objects.equals(email, that.email)
+        && Objects.equals(from, that.from)
         && Objects.equals(to, that.to)
         && Objects.equals(date, that.date);
   }

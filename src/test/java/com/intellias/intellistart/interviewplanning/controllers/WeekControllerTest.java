@@ -4,10 +4,12 @@ import static com.intellias.intellistart.interviewplanning.TestUtils.checkRespon
 import static com.intellias.intellistart.interviewplanning.TestUtils.json;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
+import com.intellias.intellistart.interviewplanning.security.jwt.JwtRequestFilter;
 import com.intellias.intellistart.interviewplanning.services.CoordinatorService;
 import com.intellias.intellistart.interviewplanning.services.WeekService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,6 +23,10 @@ class WeekControllerTest {
   private MockMvc mockMvc;
   @MockBean
   private CoordinatorService coordinatorService;
+  @MockBean
+  private CommandLineRunner commandLineRunner;
+  @MockBean
+  private JwtRequestFilter jwtRequestFilter;
 
   @Test
   void testGetCurrentWeek() {

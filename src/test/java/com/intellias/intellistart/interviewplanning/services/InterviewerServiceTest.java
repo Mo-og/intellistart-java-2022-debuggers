@@ -35,14 +35,13 @@ class InterviewerServiceTest {
   public static final String INTERVIEWER_EMAIL = "test.interviewer@test.com";
   public static final String CANDIDATE_EMAIL = "test.candidate@test.com";
   private static final User interviewer = new User(INTERVIEWER_EMAIL, UserRole.INTERVIEWER);
-  private static final User candidate = new User(CANDIDATE_EMAIL, UserRole.CANDIDATE);
   private static final InterviewerTimeSlot timeSlot = new InterviewerTimeSlot("09:00",
       "18:00", "Mon", WeekService.getNextWeekNum());
   private static final InterviewerTimeSlot timeSlotWithUser = new InterviewerTimeSlot(
       "09:00",
       "18:00", "Mon", WeekService.getNextWeekNum());
   private static final CandidateTimeSlot candidateSlot =
-      new CandidateTimeSlot(WeekService
+      new CandidateTimeSlot(CANDIDATE_EMAIL, WeekService
           .getDateByWeekNumAndDayOfWeek(WeekService.getNextWeekNum(), DayOfWeek.MONDAY).toString(),
           "08:00", "13:00");
   private static final InterviewerSlotDto interviewerSlotDto =
@@ -78,7 +77,6 @@ class InterviewerServiceTest {
     interviewerSlotDto.setId(1L);
     interviewerSlotDto.setBookings(Set.of(bookingDto));
     interviewer.setId(1L);
-    candidate.setId(2L);
     timeSlotWithUser.setId(1L);
     timeSlotWithUser.setInterviewer(interviewer);
     candidateSlot.setId(2L);
@@ -196,9 +194,12 @@ class InterviewerServiceTest {
   @Test
   void testUpdateSlot() {
     if (LocalDate.now().getDayOfWeek().getValue() <= DayOfWeek.FRIDAY.getValue()) {
+      InterviewerTimeSlot interviewerTimeSlot = new InterviewerTimeSlot();
+      interviewerTimeSlot.setInterviewer(interviewer);
+      when(userRepository.getReferenceById(1L)).thenReturn(interviewer);
       when(interviewerTimeSlotRepository
           .getReferenceById(1L))
-          .thenReturn(new InterviewerTimeSlot());
+          .thenReturn(interviewerTimeSlot);
       when(interviewerTimeSlotRepository
           .save(any()))
           .thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));

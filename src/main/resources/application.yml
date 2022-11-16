@@ -1,0 +1,59 @@
+spring:
+  jpa:
+    database-platform:
+      org.hibernate.dialect.H2Dialect
+    properties:
+      hibernate:
+        hbm2ddl:
+          import_files: schema-h2.sql, data.sql
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+  datasource:
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+    url: jdbc:h2:file:./data/demo;AUTO_SERVER=TRUE;
+  security:
+    oauth2:
+      client:
+        registration:
+          facebook:
+            client-id: ${facebook.client-id}
+            client-secret: ${facebook.client-secret}
+            redirect-uri: ${facebook.uri.redirect}
+        provider:
+          facebook:
+            authorization-uri: "${facebook.uri.auth}?response_type=code&client_id=${facebook.client-id}&redirect_uri=${facebook.uri.redirect}"
+            token-uri: https://graph.facebook.com/v15.0/oauth/access_token
+            user-info-uri: https://graph.facebook.com/v3.0/me?fields=id,first_name,middle_name,last_name,name,email
+  profiles:
+    active: dev
+
+facebook:
+  client-id: ${facebook.client-id}
+  client-secret: ${facebook.client-secret}
+  uri:
+    auth: 'https://www.facebook.com/v15.0/dialog/oauth'
+    redirect: 'http://localhost:8080/authenticate/redirect'
+    get_token_by_code: 'https://graph.facebook.com/v15.0/oauth/access_token?client_id=${facebook.client-id}&redirect_uri=${facebook.uri.redirect}&client_secret=${facebook.client-secret}&code={0}'
+    token_verify: 'https://graph.facebook.com/v15.0/debug_token?input_token={0}&access_token={1}'
+    get_app_token: 'https://graph.facebook.com/v15.0/oauth/access_token?client_id=${facebook.client-id}&client_secret=${facebook.client-secret}&grant_type=client_credentials'
+    user_data: 'https://graph.facebook.com/{0}?fields=email&access_token={1}'
+
+jwt:
+  secret: ${jwt.secret}
+
+
+logging:
+  level:
+    org:
+      springframework: info
+    com:
+      intellias:
+        intellistart:
+          interviewplanning:
+            configs: debug
+            controllers: debug
+  pattern:
+    console: "%clr(%d{dd.MM.yyyy HH:mm:ss}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%5.5t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"

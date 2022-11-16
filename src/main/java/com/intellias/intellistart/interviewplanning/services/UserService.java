@@ -4,16 +4,22 @@ import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
+import java.util.List;
 import javax.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 /**
  * User service.
  */
 @Service
-public class UserService {
+@Slf4j
+public class UserService implements UserDetailsService {
 
   private final UserRepository userRepository;
 
@@ -44,7 +50,7 @@ public class UserService {
    * @param id user id
    * @return user with any role
    */
-  public User getUserById(Long id) {
+  public User getById(Long id) {
     try {
       return (User) Hibernate.unproxy(userRepository.getReferenceById(id));
     } catch (EntityNotFoundException e) {
@@ -52,17 +58,35 @@ public class UserService {
     }
   }
 
+  public List<User> getAll() {
+    return userRepository.findAll();
+  }
+
   /**
    * Removes coordinator from database if id is valid or throws CoordinatorNotFoundException.
    *
    * @param id id to delete by
    */
-  public void removeUserById(Long id) {
+  public void removeById(Long id) {
     try {
       userRepository.deleteById(id);
     } catch (EntityNotFoundException e) {
       throw NotFoundException.coordinator(id);
     }
   }
+
+  public boolean existsWithEmail(String email) {
+    return userRepository.existsByEmail(email);
+  }
+
+  public User getByEmail(String email) {
+    return userRepository.findByEmail(email).orElseThrow(() -> NotFoundException.user(email));
+  }
+
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    return userRepository.findByEmail(username).orElseThrow(
+        () -> new UsernameNotFoundException("No user found with username " + username));
+  }
+
 
 }

@@ -3,7 +3,6 @@ package com.intellias.intellistart.interviewplanning.utils.mappers;
 import com.intellias.intellistart.interviewplanning.controllers.dto.CandidateSlotDto;
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
-import com.intellias.intellistart.interviewplanning.models.User;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 
@@ -55,15 +54,16 @@ public class CandidateSlotMapper {
   /**
    * to CandidateTimeSlot.
    *
+   * @param email   candidate email
    * @param slotDto slot dto
    * @return CandidateSlotDto
    */
-  public CandidateTimeSlot mapToEntity(CandidateSlotDto slotDto, User candidate) {
+  public CandidateTimeSlot mapToEntity(String email, CandidateSlotDto slotDto) {
     if (slotDto == null) {
       return null;
     }
     CandidateTimeSlot candidateSlot = new CandidateTimeSlot();
-    candidateSlot.setCandidate(candidate);
+    candidateSlot.setEmail(email);
     candidateSlot.setDate(slotDto.getDate());
     candidateSlot.setFrom(slotDto.getFrom());
     candidateSlot.setTo(slotDto.getTo());
