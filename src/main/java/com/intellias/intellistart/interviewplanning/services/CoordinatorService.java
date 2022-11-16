@@ -5,6 +5,8 @@ import com.intellias.intellistart.interviewplanning.controllers.dto.CandidateSlo
 import com.intellias.intellistart.interviewplanning.controllers.dto.DashboardDto;
 import com.intellias.intellistart.interviewplanning.controllers.dto.DayDashboardDto;
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
+import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
+import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException.ErrorCode;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
@@ -145,12 +147,18 @@ public class CoordinatorService {
   /**
    * Grant user the interviewer role by email.
    *
-   * @param email user email
+   * @param email                   email of the user
+   * @param currentCoordinatorEmail email of the current coordinator
    * @return user with the granted interviewer role
+   * @throws ApplicationErrorException if coordinator grant himself
    */
-  public User grantInterviewerRole(String email) {
+  public User grantInterviewerRole(String email, String currentCoordinatorEmail) {
+    if (email.equals(currentCoordinatorEmail)) {
+      throw new ApplicationErrorException(ErrorCode.SELF_ROLE_REVOKING,
+          "Can not grant another role for yourself");
+    }
     User user = userRepository.findByEmail(email)
-        .orElseGet(() -> new User(email, null));
+        .orElseGet(() -> new User(email, UserRole.INTERVIEWER));
     user.setRole(UserRole.INTERVIEWER);
     return userRepository.save(user);
   }
@@ -160,10 +168,11 @@ public class CoordinatorService {
    *
    * @param email user email
    * @return user with the granted coordinator role
+   * @throws ApplicationErrorException if user is interviewer and has active bookings
    */
   public User grantCoordinatorRole(String email) {
     User user = userRepository.findByEmail(email)
-        .orElseGet(() -> new User(email, null));
+        .orElseGet(() -> new User(email, UserRole.COORDINATOR));
     if (user.getRole() == UserRole.INTERVIEWER) {
       removeInterviewerSlotsAndBookings(user);
     }
@@ -172,43 +181,43 @@ public class CoordinatorService {
   }
 
   /**
-   * Removes all interviewer slots and bookings.
+   * Revoke the interviewer role by user id.
    *
-   * @param user interviewer
-   */
-  private void removeInterviewerSlotsAndBookings(User user) {
-    List<InterviewerTimeSlot> slots = interviewerTimeSlotRepository.findByInterviewer(user);
-    for (InterviewerTimeSlot slot : slots) {
-      Set<Booking> bookings = bookingRepository.findByInterviewerSlot(slot);
-      bookingRepository.deleteAll(bookings);
-      interviewerTimeSlotRepository.delete(slot);
-    }
-  }
-
-  /**
-   * Revoke the interviewer role by id.
-   *
-   * @param id user id
-   * @return user whose role has been revoked
+   * @param id id of the user whose role will be revoked
+   * @return user whose interviewer role has been revoked
+   * @throws NotFoundException         if interviewer with the specified id is not found
+   * @throws ApplicationErrorException if interviewer has active bookings
    */
   public User revokeInterviewerRole(Long id) {
-    User user = userRepository.findByIdAndRole(id, UserRole.INTERVIEWER)
-        .orElseThrow(() -> NotFoundException.interviewer(id));
+    User user = userRepository.findById(id).orElseThrow(() -> NotFoundException.user(id));
+    if (user.getRole() != UserRole.INTERVIEWER) {
+      throw NotFoundException.interviewer(id);
+    }
     removeInterviewerSlotsAndBookings(user);
     userRepository.delete(user);
     return user;
   }
 
   /**
-   * Revoke the coordinator role by id.
+   * Revoke the coordinator role by user id.
    *
-   * @param id user id
-   * @return user whose role has been revoked
+   * @param id                   id of the user whose role will be revoked
+   * @param currentCoordinatorId id of the current coordinator
+   * @return user whose coordinator role has been revoked
+   * @throws NotFoundException         if coordinator with the specified id is not found
+   * @throws ApplicationErrorException if coordinator revoke himself
    */
-  public User revokeCoordinatorRole(Long id) {
-    User user = userRepository.findByIdAndRole(id, UserRole.COORDINATOR)
-        .orElseThrow(() -> NotFoundException.coordinator(id));
-    // Todo Coordinator cannot revoke himself
+  public User revokeCoordinatorRole(Long id, Long currentCoordinatorId) {
+    if (id.equals(currentCoordinatorId)) {
+      throw new ApplicationErrorException(ErrorCode.SELF_ROLE_REVOKING,
+          "Can not revoke role for yourself");
+    }
+
+    User user = userRepository.findById(id).orElseThrow(() -> NotFoundException.user(id));
+    if (user.getRole() != UserRole.COORDINATOR) {
+      throw NotFoundException.coordinator(id);
+    }
+
     userRepository.delete(user);
     return user;
   }
@@ -217,9 +226,30 @@ public class CoordinatorService {
    * Provides all users with the specified role.
    *
    * @param role user role
-   * @return set of users with specified role
+   * @return set of users with the specified role
    */
   public Set<User> getUsersWithRole(UserRole role) {
     return userRepository.findByRole(role);
+  }
+
+  /**
+   * Removes all interviewer slots and bookings.
+   *
+   * @param user interviewer
+   * @throws ApplicationErrorException if interviewer has active bookings
+   */
+  private void removeInterviewerSlotsAndBookings(User user) {
+    List<InterviewerTimeSlot> slots = interviewerTimeSlotRepository.findByInterviewer(user);
+    for (InterviewerTimeSlot slot : slots) {
+      Set<Booking> bookings = bookingRepository.findByInterviewerSlot(slot);
+      for (Booking booking : bookings) {
+        if (booking.getCandidateSlot().getDate().isAfter(WeekService.getCurrentDate())) {
+          throw new ApplicationErrorException(ErrorCode.REVOKE_USER_WITH_BOOKINGS,
+              "Can not revoke interviewer with active bookings");
+        }
+        bookingRepository.delete(booking);
+      }
+      interviewerTimeSlotRepository.delete(slot);
+    }
   }
 }

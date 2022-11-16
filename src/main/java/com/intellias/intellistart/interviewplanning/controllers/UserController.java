@@ -1,6 +1,7 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.intellias.intellistart.interviewplanning.controllers.dto.EmailDto;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.services.CoordinatorService;
@@ -11,6 +12,7 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -86,8 +88,9 @@ public class UserController {
   }
 
   @PostMapping("/users/interviewers")
-  public User grantInterviewerRole(@RequestBody TextNode email) {
-    return coordinatorService.grantInterviewerRole(email.asText());
+  public User grantInterviewerRole(@RequestBody EmailDto emailDto) {
+    String coordinatorEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+    return coordinatorService.grantInterviewerRole(emailDto.getEmail(), coordinatorEmail);
   }
 
   @DeleteMapping("/users/interviewers/{interviewerId}")
@@ -101,13 +104,21 @@ public class UserController {
   }
 
   @PostMapping("/users/coordinators")
-  public User grantCoordinatorRole(@RequestBody TextNode email) {
-    return coordinatorService.grantCoordinatorRole(email.asText());
+  public User grantCoordinatorRole(@RequestBody EmailDto emailDto) {
+    return coordinatorService.grantCoordinatorRole(emailDto.getEmail());
   }
 
+  /**
+   * Revoke the coordinator role by user id.
+   *
+   * @param coordinatorId id of the current coordinator
+   * @return user whose coordinator role has been revoked
+   */
   @DeleteMapping("/users/coordinators/{coordinatorId}")
   public User revokeCoordinatorRole(@PathVariable Long coordinatorId) {
-    return coordinatorService.revokeCoordinatorRole(coordinatorId);
+    String coordinatorEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+    User coordinator = (User) userService.loadUserByUsername(coordinatorEmail);
+    return coordinatorService.revokeCoordinatorRole(coordinatorId, coordinator.getId());
   }
 
   @GetMapping("/users/coordinators")
