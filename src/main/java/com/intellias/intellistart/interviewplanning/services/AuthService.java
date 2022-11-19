@@ -50,6 +50,9 @@ public class AuthService {
     facebookTokenVerifyUri = env.getProperty("facebook.uri.token_verify");
     facebookUserDataUri = env.getProperty("facebook.uri.user_data");
 
+    log.debug("\n\n*******************************\nGET APP TOKEN URI:{}\n\n*********************",
+        env.getProperty("facebook.uri.get_app_token"));
+
     //needs to be updated every ~60 days
     appAccessToken = restTemplate.getForObject(
         Objects.requireNonNull(env.getProperty("facebook.uri.get_app_token")),
