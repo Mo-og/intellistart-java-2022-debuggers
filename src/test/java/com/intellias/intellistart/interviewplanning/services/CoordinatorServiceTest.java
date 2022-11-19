@@ -23,6 +23,7 @@ import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -106,16 +107,16 @@ class CoordinatorServiceTest {
   private static final Set<DayDashboardDto> days = new TreeSet<>(
       Comparator.comparing(DayDashboardDto::getDate));
   private static final DashboardDto weekDashboard = new DashboardDto();
-  private static final Set<InterviewerSlotDto> interviewerSlotDtoSet = new TreeSet<>(
-      Comparator.comparing(InterviewerSlotDto::getFrom));
-  private static final Set<CandidateSlotDto> candidateSlotDtoSet = new TreeSet<>(
-      Comparator.comparing(CandidateSlotDto::getFrom));
 
   static {
     interviewer.setId(1L);
     interviewerSlot.setId(1L);
+    interviewerSlotDto.setId(1L);
     interviewerSlot.setInterviewer(interviewer);
+    interviewerSlotDto.setBookings(List.of(bookingDto));
     candidateSlot.setId(1L);
+    candidateSlotDto.setId(1L);
+    candidateSlotDto.setBookings(List.of(bookingDto));
     coordinator.setId(1L);
 
     booking.setCandidateSlot(candidateSlot);
@@ -125,11 +126,8 @@ class CoordinatorServiceTest {
     bookingDto.setCandidateSlotId(candidateSlot.getId());
     bookingDto.setInterviewerSlotId(interviewerSlot.getId());
 
-    interviewerSlotDtoSet.add(interviewerSlotDto);
-    candidateSlotDtoSet.add(candidateSlotDto);
-
-    mon.setInterviewerSlots(interviewerSlotDtoSet);
-    mon.setCandidateSlots(candidateSlotDtoSet);
+    mon.setInterviewerSlots(List.of(interviewerSlotDto));
+    mon.setCandidateSlots(List.of(candidateSlotDto));
     mon.setBookings(Map.of(bookingDto.getId(), bookingDto));
     days.add(mon);
     days.add(tue);
@@ -160,18 +158,18 @@ class CoordinatorServiceTest {
   void testGetWeekDashboard() {
     when(interviewerTimeSlotRepository
         .findByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(), DayOfWeek.MONDAY))
-        .thenReturn(Set.of(interviewerSlot));
+        .thenReturn(List.of(interviewerSlot));
     when(candidateTimeSlotRepository
         .findByDate(WeekService
             .getDateByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(), DayOfWeek.MONDAY)))
-        .thenReturn(Set.of(candidateSlot));
+        .thenReturn(List.of(candidateSlot));
     when(bookingRepository
         .findByCandidateSlotDate(
             WeekService
                 .getDateByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(), DayOfWeek.MONDAY)))
-        .thenReturn(Set.of(booking));
-    when(bookingRepository.findByInterviewerSlot(interviewerSlot)).thenReturn(Set.of(booking));
-    when(bookingRepository.findByCandidateSlot(candidateSlot)).thenReturn(Set.of(booking));
+        .thenReturn(List.of(booking));
+    when(bookingRepository.findByInterviewerSlot(interviewerSlot)).thenReturn(List.of(booking));
+    when(bookingRepository.findByCandidateSlot(candidateSlot)).thenReturn(List.of(booking));
     var dashboard = service.getWeekDashboard(WeekService.getCurrentWeekNum());
     assertEquals(weekDashboard, dashboard);
   }
@@ -180,17 +178,17 @@ class CoordinatorServiceTest {
   void testGetDayDashboard() {
     when(interviewerTimeSlotRepository
         .findByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(), DayOfWeek.MONDAY))
-        .thenReturn(Set.of(interviewerSlot));
+        .thenReturn(List.of(interviewerSlot));
     when(candidateTimeSlotRepository
         .findByDate(WeekService.getDateByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(),
             DayOfWeek.MONDAY)))
-        .thenReturn(Set.of(candidateSlot));
+        .thenReturn(List.of(candidateSlot));
     when(bookingRepository
         .findByCandidateSlotDate(WeekService
             .getDateByWeekNumAndDayOfWeek(WeekService.getCurrentWeekNum(), DayOfWeek.MONDAY)))
-        .thenReturn(Set.of(booking));
-    when(bookingRepository.findByInterviewerSlot(interviewerSlot)).thenReturn(Set.of(booking));
-    when(bookingRepository.findByCandidateSlot(candidateSlot)).thenReturn(Set.of(booking));
+        .thenReturn(List.of(booking));
+    when(bookingRepository.findByInterviewerSlot(interviewerSlot)).thenReturn(List.of(booking));
+    when(bookingRepository.findByCandidateSlot(candidateSlot)).thenReturn(List.of(booking));
     var dashboard =
         service.getDayDashboard(WeekService.getCurrentWeekNum(), DayOfWeek.MONDAY);
     assertEquals(mon, dashboard);
@@ -198,22 +196,22 @@ class CoordinatorServiceTest {
 
   @Test
   void testInterviewerSlotsWithBookings() {
-    when(bookingRepository.findByInterviewerSlot(interviewerSlot)).thenReturn(Set.of(booking));
+    when(bookingRepository.findByInterviewerSlot(interviewerSlot)).thenReturn(List.of(booking));
     var result = service
-        .getInterviewerSlotsWithBookings(Set.of(interviewerSlot));
-    assertEquals(interviewerSlotDtoSet, result);
+        .getInterviewerSlotsWithBookings(List.of(interviewerSlot));
+    assertEquals(List.of(interviewerSlotDto), result);
   }
 
   @Test
   void testGetCandidateSlotsWithBookings() {
-    when(bookingRepository.findByCandidateSlot(candidateSlot)).thenReturn(Set.of(booking));
-    var result = service.getCandidateSlotsWithBookings(Set.of(candidateSlot));
-    assertEquals(candidateSlotDtoSet, result);
+    when(bookingRepository.findByCandidateSlot(candidateSlot)).thenReturn(List.of(booking));
+    var result = service.getCandidateSlotsWithBookings(List.of(candidateSlot));
+    assertEquals(List.of(candidateSlotDto), result);
   }
 
   @Test
   void testGetBookingMap() {
-    var result = service.getBookingMap(Set.of(booking));
+    var result = service.getBookingMap(List.of(booking));
     assertEquals(Map.of(bookingDto.getId(), bookingDto), result);
   }
 
@@ -281,8 +279,7 @@ class CoordinatorServiceTest {
 
   @Test
   void testGetUsersWithRole() {
-    Set<User> set = Set.of(interviewer);
-    when(userRepository.findByRole(UserRole.INTERVIEWER)).thenReturn(set);
-    assertEquals(set, service.getUsersWithRole(UserRole.INTERVIEWER));
+    when(userRepository.findByRole(UserRole.INTERVIEWER)).thenReturn(List.of(interviewer));
+    assertEquals(List.of(interviewer), service.getUsersWithRole(UserRole.INTERVIEWER));
   }
 }

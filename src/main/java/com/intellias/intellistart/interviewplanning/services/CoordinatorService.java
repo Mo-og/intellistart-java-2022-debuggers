@@ -90,10 +90,10 @@ public class CoordinatorService {
   public DayDashboardDto getDayDashboard(int weekNum, DayOfWeek day) {
     LocalDate date = WeekService.getDateByWeekNumAndDayOfWeek(weekNum, day);
 
-    Set<InterviewerTimeSlot> interviewerSlots = interviewerTimeSlotRepository
+    List<InterviewerTimeSlot> interviewerSlots = interviewerTimeSlotRepository
         .findByWeekNumAndDayOfWeek(weekNum, day);
-    Set<CandidateTimeSlot> candidateSlots = candidateTimeSlotRepository.findByDate(date);
-    Set<Booking> bookings = bookingRepository.findByCandidateSlotDate(date);
+    List<CandidateTimeSlot> candidateSlots = candidateTimeSlotRepository.findByDate(date);
+    List<Booking> bookings = bookingRepository.findByCandidateSlotDate(date);
 
     return DayDashboardDto.builder()
         .date(date)
@@ -108,37 +108,37 @@ public class CoordinatorService {
    * Returns interviewer slots with bookings.
    *
    * @param slots interviewer time slots
-   * @return a set of interviewer time slots with bookings
+   * @return a list of interviewer time slots with bookings
    */
-  public Set<InterviewerSlotDto> getInterviewerSlotsWithBookings(Set<InterviewerTimeSlot> slots) {
+  public List<InterviewerSlotDto> getInterviewerSlotsWithBookings(List<InterviewerTimeSlot> slots) {
     return slots.stream()
         .map(slot -> InterviewerSlotMapper.mapToDtoWithBookings(slot,
             bookingRepository.findByInterviewerSlot(slot)))
-        .collect(Collectors.toCollection(
-            () -> new TreeSet<>(Comparator.comparing(InterviewerSlotDto::getFrom))));
+        .sorted(Comparator.comparing(InterviewerSlotDto::getFrom))
+        .collect(Collectors.toList());
   }
 
   /**
    * Returns candidate slots with bookings.
    *
    * @param slots candidate time slots
-   * @return a set of candidate time slots with bookings
+   * @return a list of candidate time slots with bookings
    */
-  public Set<CandidateSlotDto> getCandidateSlotsWithBookings(Set<CandidateTimeSlot> slots) {
+  public List<CandidateSlotDto> getCandidateSlotsWithBookings(List<CandidateTimeSlot> slots) {
     return slots.stream()
         .map(slot -> CandidateSlotMapper.mapToDtoWithBookings(slot,
             bookingRepository.findByCandidateSlot(slot)))
-        .collect(Collectors.toCollection(
-            () -> new TreeSet<>(Comparator.comparing(CandidateSlotDto::getFrom))));
+        .sorted(Comparator.comparing(CandidateSlotDto::getFrom))
+        .collect(Collectors.toList());
   }
 
   /**
    * Grouping the bookings into a map.
    *
-   * @param bookings set of bookings
+   * @param bookings list of bookings
    * @return map of bookings as map bookingId bookingData
    */
-  public Map<Long, BookingDto> getBookingMap(Set<Booking> bookings) {
+  public Map<Long, BookingDto> getBookingMap(List<Booking> bookings) {
     return bookings.stream()
         .map(BookingMapper::mapToDto)
         .collect(Collectors.toMap(BookingDto::getId, Function.identity()));
@@ -226,9 +226,9 @@ public class CoordinatorService {
    * Provides all users with the specified role.
    *
    * @param role user role
-   * @return set of users with the specified role
+   * @return a list of users with the specified role
    */
-  public Set<User> getUsersWithRole(UserRole role) {
+  public List<User> getUsersWithRole(UserRole role) {
     return userRepository.findByRole(role);
   }
 
@@ -241,7 +241,7 @@ public class CoordinatorService {
   private void removeInterviewerSlotsAndBookings(User user) {
     List<InterviewerTimeSlot> slots = interviewerTimeSlotRepository.findByInterviewer(user);
     for (InterviewerTimeSlot slot : slots) {
-      Set<Booking> bookings = bookingRepository.findByInterviewerSlot(slot);
+      List<Booking> bookings = bookingRepository.findByInterviewerSlot(slot);
       for (Booking booking : bookings) {
         if (booking.getCandidateSlot().getDate().isAfter(WeekService.getCurrentDate())) {
           throw new ApplicationErrorException(ErrorCode.REVOKE_USER_WITH_BOOKINGS,

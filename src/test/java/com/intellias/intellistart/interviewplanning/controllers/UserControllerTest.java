@@ -23,7 +23,7 @@ import com.intellias.intellistart.interviewplanning.security.jwt.JwtRequestFilte
 import com.intellias.intellistart.interviewplanning.services.CoordinatorService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import com.intellias.intellistart.interviewplanning.services.UserService;
-import java.util.HashSet;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,11 +124,10 @@ class UserControllerTest {
 
   @Test
   void testGetInterviewers() {
-    var set = new HashSet<User>();
-    set.add(testInterviewer);
-    when(coordinatorService.getUsersWithRole(UserRole.INTERVIEWER)).thenReturn(set);
+    when(coordinatorService.getUsersWithRole(UserRole.INTERVIEWER))
+        .thenReturn(List.of(testInterviewer));
     checkResponseOk(get("/users/interviewers"),
-        null, json(set), mockMvc);
+        null, json(List.of(testInterviewer)), mockMvc);
   }
 
   @Test
@@ -168,11 +167,10 @@ class UserControllerTest {
 
   @Test
   void testGetCoordinators() {
-    var set = new HashSet<User>();
-    set.add(testCoordinator);
-    when(coordinatorService.getUsersWithRole(UserRole.COORDINATOR)).thenReturn(set);
+    when(coordinatorService.getUsersWithRole(UserRole.COORDINATOR))
+        .thenReturn(List.of(testCoordinator));
     checkResponseOk(get("/users/coordinators"),
-        null, json(set), mockMvc);
+        null, json(List.of(testCoordinator)), mockMvc);
   }
 
   @Test

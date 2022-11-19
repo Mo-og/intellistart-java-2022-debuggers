@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Set;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,5 +27,5 @@ public class CandidateSlotDto {
   private LocalTime to;
   private LocalDate date;
   @JsonInclude(Include.NON_EMPTY)
-  private Set<BookingDto> bookings;
+  private List<BookingDto> bookings;
 }

@@ -8,7 +8,6 @@ import com.intellias.intellistart.interviewplanning.services.CoordinatorService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import com.intellias.intellistart.interviewplanning.services.UserService;
 import java.util.List;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -99,7 +98,7 @@ public class UserController {
   }
 
   @GetMapping("/users/interviewers")
-  public Set<User> getInterviewers() {
+  public List<User> getInterviewers() {
     return coordinatorService.getUsersWithRole(UserRole.INTERVIEWER);
   }
 
@@ -122,7 +121,7 @@ public class UserController {
   }
 
   @GetMapping("/users/coordinators")
-  public Set<User> getCoordinators() {
+  public List<User> getCoordinators() {
     return coordinatorService.getUsersWithRole(UserRole.COORDINATOR);
   }
 }

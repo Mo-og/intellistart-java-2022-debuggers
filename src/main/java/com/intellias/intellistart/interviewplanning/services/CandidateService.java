@@ -8,8 +8,6 @@ import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSl
 import com.intellias.intellistart.interviewplanning.utils.mappers.CandidateSlotMapper;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -65,7 +63,7 @@ public class CandidateService {
    * @param email email of candidate to get slots from
    * @return time slots of requested candidate
    */
-  public Set<CandidateSlotDto> getAllCandidateSlots(String email) {
+  public List<CandidateSlotDto> getAllCandidateSlots(String email) {
     return getCandidateSlotsWithBookings(candidateTimeSlotRepository.findByEmail(email));
   }
 
@@ -73,15 +71,15 @@ public class CandidateService {
    * Returns candidate slots with bookings.
    *
    * @param slots candidate time slots
-   * @return a set of candidate time slots with bookings
+   * @return a list of candidate time slots with bookings
    */
-  public Set<CandidateSlotDto> getCandidateSlotsWithBookings(List<CandidateTimeSlot> slots) {
+  public List<CandidateSlotDto> getCandidateSlotsWithBookings(List<CandidateTimeSlot> slots) {
     return slots.stream()
         .map(slot -> CandidateSlotMapper
             .mapToDtoWithBookings(slot, bookingRepository.findByCandidateSlot(slot)))
-        .collect(Collectors.toCollection(
-            () -> new TreeSet<>(Comparator.comparing(CandidateSlotDto::getDate)
-                .thenComparing(CandidateSlotDto::getFrom))));
+        .sorted(Comparator.comparing(CandidateSlotDto::getDate)
+            .thenComparing(CandidateSlotDto::getFrom))
+        .collect(Collectors.toList());
   }
 
   /**

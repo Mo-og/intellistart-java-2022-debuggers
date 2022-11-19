@@ -11,7 +11,7 @@ import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.security.jwt.JwtRequestFilter;
 import com.intellias.intellistart.interviewplanning.services.CandidateService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
-import java.util.Set;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -50,10 +50,10 @@ class SlotControllerTest {
   void testGetAllInterviewerSlots() {
     when(interviewerService
         .getRelevantInterviewerSlots(1L))
-        .thenReturn(Set.of(interviewerSlot));
+        .thenReturn(List.of(interviewerSlot));
     checkResponseOk(
         get("/interviewers/{interviewerId}/slots", 1L),
-        null, json(Set.of(interviewerSlot)), mockMvc);
+        null, json(List.of(interviewerSlot)), mockMvc);
   }
 
   @Test

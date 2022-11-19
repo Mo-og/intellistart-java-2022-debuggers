@@ -15,8 +15,7 @@ import com.intellias.intellistart.interviewplanning.utils.mappers.InterviewerSlo
 import com.intellias.intellistart.interviewplanning.validators.InterviewerSlotValidator;
 import java.time.DayOfWeek;
 import java.util.Comparator;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
 import org.hibernate.Hibernate;
@@ -79,7 +78,7 @@ public class InterviewerService {
    * @param interviewerId id of interviewer to get slots from
    * @return time slots of requested interviewer for current week and future weeks
    */
-  public Set<InterviewerTimeSlot> getRelevantInterviewerSlots(Long interviewerId) {
+  public List<InterviewerTimeSlot> getRelevantInterviewerSlots(Long interviewerId) {
     if (!userRepository.existsById(interviewerId)) {
       throw NotFoundException.interviewer(interviewerId);
     }
@@ -93,10 +92,10 @@ public class InterviewerService {
    *
    * @param interviewerId id of interviewer
    * @param weekId        id of week
-   * @return a set of interviewer time slots
+   * @return a list of interviewer time slots
    * @throws NotFoundException if no interviewer is found
    */
-  public Set<InterviewerSlotDto> getSlotsByWeekId(Long interviewerId, int weekId) {
+  public List<InterviewerSlotDto> getSlotsByWeekId(Long interviewerId, int weekId) {
     User user = userRepository.findById(interviewerId)
         .orElseThrow(() -> NotFoundException.user(interviewerId));
 
@@ -104,7 +103,7 @@ public class InterviewerService {
       throw NotFoundException.interviewer(interviewerId);
     }
 
-    Set<InterviewerTimeSlot> slots = interviewerTimeSlotRepository
+    List<InterviewerTimeSlot> slots = interviewerTimeSlotRepository
         .findByInterviewerIdAndWeekNum(interviewerId, weekId);
 
     return getInterviewerSlotsWithBookings(slots);
@@ -114,16 +113,16 @@ public class InterviewerService {
    * Returns interviewer slots with bookings.
    *
    * @param slots interviewer time slots
-   * @return a set of interviewer time slots with bookings
+   * @return a list of interviewer time slots with bookings
    */
-  public Set<InterviewerSlotDto> getInterviewerSlotsWithBookings(Set<InterviewerTimeSlot> slots) {
+  public List<InterviewerSlotDto> getInterviewerSlotsWithBookings(List<InterviewerTimeSlot> slots) {
     return slots.stream()
         .map(slot -> InterviewerSlotMapper.mapToDtoWithBookings(slot,
             bookingRepository.findByInterviewerSlot(slot)))
-        .collect(Collectors.toCollection(
-            () -> new TreeSet<>(Comparator.comparing((InterviewerSlotDto dto) ->
-                    DayOfWeek.from(Utils.DAY_OF_WEEK_FORMATTER.parse(dto.getDayOfWeek())))
-                .thenComparing(InterviewerSlotDto::getFrom))));
+        .sorted(Comparator.comparing((InterviewerSlotDto dto) ->
+                DayOfWeek.from(Utils.DAY_OF_WEEK_FORMATTER.parse(dto.getDayOfWeek())))
+            .thenComparing(InterviewerSlotDto::getFrom))
+        .collect(Collectors.toList());
   }
 
   /**

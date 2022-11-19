@@ -3,7 +3,7 @@ package com.intellias.intellistart.interviewplanning.utils.mappers;
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
-import java.util.Set;
+import java.util.List;
 import lombok.experimental.UtilityClass;
 
 /**
@@ -19,7 +19,7 @@ public class InterviewerSlotMapper {
    * @param bookings BookingDto
    * @return InterviewerSlotDto
    */
-  public InterviewerSlotDto mapToDtoWithBookings(InterviewerTimeSlot slot, Set<Booking> bookings) {
+  public InterviewerSlotDto mapToDtoWithBookings(InterviewerTimeSlot slot, List<Booking> bookings) {
     if (slot == null) {
       return null;
     }
