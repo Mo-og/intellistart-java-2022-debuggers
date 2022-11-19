@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-
+    environment: dev
     runs-on: ubuntu-latest
     env:
       FACEBOOK_CLIENT_ID: ${{secrets.FACEBOOK_CLIENT_ID}}
