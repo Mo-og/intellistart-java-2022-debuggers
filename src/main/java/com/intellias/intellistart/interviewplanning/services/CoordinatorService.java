@@ -154,8 +154,7 @@ public class CoordinatorService {
    */
   public User grantInterviewerRole(String email, String currentCoordinatorEmail) {
     if (email.equals(currentCoordinatorEmail)) {
-      throw new ApplicationErrorException(ErrorCode.SELF_ROLE_REVOKING,
-          "Can not grant another role for yourself");
+      throw new ApplicationErrorException(ErrorCode.SELF_ROLE_REVOKING);
     }
     User user = userRepository.findByEmail(email)
         .orElseGet(() -> new User(email, UserRole.INTERVIEWER));
@@ -168,13 +167,13 @@ public class CoordinatorService {
    *
    * @param email user email
    * @return user with the granted coordinator role
-   * @throws ApplicationErrorException if user is interviewer and has active bookings
+   * @throws ApplicationErrorException if user is interviewer and has active slots
    */
   public User grantCoordinatorRole(String email) {
     User user = userRepository.findByEmail(email)
         .orElseGet(() -> new User(email, UserRole.COORDINATOR));
-    if (user.getRole() == UserRole.INTERVIEWER) {
-      removeInterviewerSlotsAndBookings(user);
+    if (user.getRole() == UserRole.INTERVIEWER && hasActiveSlots(user)) {
+      throw new ApplicationErrorException(ErrorCode.REVOKE_USER_WITH_SLOT);
     }
     user.setRole(UserRole.COORDINATOR);
     return userRepository.save(user);
@@ -184,18 +183,20 @@ public class CoordinatorService {
    * Revoke the interviewer role by user id.
    *
    * @param id id of the user whose role will be revoked
-   * @return user whose interviewer role has been revoked
+   * @return user with revoked interviewer role
    * @throws NotFoundException         if interviewer with the specified id is not found
-   * @throws ApplicationErrorException if interviewer has active bookings
+   * @throws ApplicationErrorException if interviewer has active slots
    */
   public User revokeInterviewerRole(Long id) {
     User user = userRepository.findById(id).orElseThrow(() -> NotFoundException.user(id));
     if (user.getRole() != UserRole.INTERVIEWER) {
       throw NotFoundException.interviewer(id);
     }
-    removeInterviewerSlotsAndBookings(user);
-    userRepository.delete(user);
-    return user;
+    if (hasActiveSlots(user)) {
+      throw new ApplicationErrorException(ErrorCode.REVOKE_USER_WITH_SLOT);
+    }
+    user.setRole(UserRole.CANDIDATE);
+    return userRepository.save(user);
   }
 
   /**
@@ -203,23 +204,20 @@ public class CoordinatorService {
    *
    * @param id                   id of the user whose role will be revoked
    * @param currentCoordinatorId id of the current coordinator
-   * @return user whose coordinator role has been revoked
+   * @return user with revoked coordinator role
    * @throws NotFoundException         if coordinator with the specified id is not found
    * @throws ApplicationErrorException if coordinator revoke himself
    */
   public User revokeCoordinatorRole(Long id, Long currentCoordinatorId) {
     if (id.equals(currentCoordinatorId)) {
-      throw new ApplicationErrorException(ErrorCode.SELF_ROLE_REVOKING,
-          "Can not revoke role for yourself");
+      throw new ApplicationErrorException(ErrorCode.SELF_ROLE_REVOKING);
     }
-
     User user = userRepository.findById(id).orElseThrow(() -> NotFoundException.user(id));
     if (user.getRole() != UserRole.COORDINATOR) {
       throw NotFoundException.coordinator(id);
     }
-
-    userRepository.delete(user);
-    return user;
+    user.setRole(UserRole.CANDIDATE);
+    return userRepository.save(user);
   }
 
   /**
@@ -233,23 +231,20 @@ public class CoordinatorService {
   }
 
   /**
-   * Removes all interviewer slots and bookings.
+   * Checks if the user has slots in the future.
    *
    * @param user interviewer
-   * @throws ApplicationErrorException if interviewer has active bookings
+   * @return true if user has active slots, otherwise - false
    */
-  private void removeInterviewerSlotsAndBookings(User user) {
+  private boolean hasActiveSlots(User user) {
     List<InterviewerTimeSlot> slots = interviewerTimeSlotRepository.findByInterviewer(user);
     for (InterviewerTimeSlot slot : slots) {
-      List<Booking> bookings = bookingRepository.findByInterviewerSlot(slot);
-      for (Booking booking : bookings) {
-        if (booking.getCandidateSlot().getDate().isAfter(WeekService.getCurrentDate())) {
-          throw new ApplicationErrorException(ErrorCode.REVOKE_USER_WITH_SLOT,
-              "Can not revoke user with slot for current or next week");
-        }
-        bookingRepository.delete(booking);
+      if (WeekService.getDateByWeekNumAndDayOfWeek(slot.getWeekNum(), slot.getDayOfWeek())
+          .atTime(slot.getFrom())
+          .isAfter(WeekService.getCurrentDateTime())) {
+        return true;
       }
-      interviewerTimeSlotRepository.delete(slot);
     }
+    return false;
   }
 }
