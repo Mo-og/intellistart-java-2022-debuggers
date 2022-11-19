@@ -25,7 +25,7 @@ public class ApplicationErrorException extends RuntimeException {
   public ApplicationErrorException(ErrorCode errorCode, String errorMessage) {
     super(errorCode.message + errorMessage);
     this.errorCode = errorCode;
-    this.errorMessage = errorMessage;
+    this.errorMessage = errorCode.message + errorMessage;
   }
 
   @JsonGetter
