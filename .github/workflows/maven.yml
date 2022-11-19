@@ -8,12 +8,13 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+    
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-    env:
+    environment: dev
+    env: 
       FACEBOOK_CLIENT_ID: ${{secrets.FACEBOOK_CLIENT_ID}}
       FACEBOOK_CLIENT_SECRET: ${{secrets.FACEBOOK_CLIENT_SECRET}}
       COORDINATOR_EMAIL: ${{secrets.COORDINATOR_EMAIL}}
