@@ -5,9 +5,9 @@ import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.services.CandidateService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
-import com.intellias.intellistart.interviewplanning.services.WeekService;
+import com.intellias.intellistart.interviewplanning.services.interfaces.WeekService;
 import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,16 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
  * Controller resolving slot-related requests.
  */
 @RestController
+@RequiredArgsConstructor
 public class SlotController {
 
   private final InterviewerService interviewerService;
   private final CandidateService candidateService;
+  private final WeekService weekService;
 
-  @Autowired
-  public SlotController(InterviewerService interviewerService, CandidateService candidateService) {
-    this.interviewerService = interviewerService;
-    this.candidateService = candidateService;
-  }
 
   @GetMapping("/interviewers/{interviewerId}/slots")
   public Set<InterviewerTimeSlot> getAllInterviewerSlots(@PathVariable Long interviewerId) {
@@ -55,11 +52,11 @@ public class SlotController {
 
   @GetMapping("/interviewers/{interviewerId}/slots/weeks/current")
   public Set<InterviewerSlotDto> getCurrentWeekInterviewerSlots(@PathVariable Long interviewerId) {
-    return interviewerService.getSlotsByWeekId(interviewerId, WeekService.getCurrentWeekNum());
+    return interviewerService.getSlotsByWeekId(interviewerId, weekService.getCurrentWeekNum());
   }
 
   @GetMapping("/interviewers/{interviewerId}/slots/weeks/next")
   public Set<InterviewerSlotDto> getNextWeekInterviewerSlots(@PathVariable Long interviewerId) {
-    return interviewerService.getSlotsByWeekId(interviewerId, WeekService.getNextWeekNum());
+    return interviewerService.getSlotsByWeekId(interviewerId, weekService.getNextWeekNum());
   }
 }

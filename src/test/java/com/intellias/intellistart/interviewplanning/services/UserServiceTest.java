@@ -11,12 +11,15 @@ import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
+import java.util.List;
+import java.util.Optional;
 import javax.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -119,5 +122,61 @@ class UserServiceTest {
   void testRemoveById() {
     doNothing().when(userRepository).deleteById(1L);
     assertDoesNotThrow(() -> service.removeById(1L));
+  }
+
+  @Test
+  void testGetByEmail() {
+    String existEmail = "test@test.ua";
+    when(userRepository.findByEmail(existEmail))
+        .thenReturn(Optional.of(interviewer));
+    var savedInterviewer = service.getByEmail(existEmail);
+    assertEquals(interviewer.getId(), savedInterviewer.getId());
+    assertEquals(interviewer.getRole(), savedInterviewer.getRole());
+    assertEquals(interviewer.getEmail(), savedInterviewer.getEmail());
+  }
+
+  @Test
+  void testThrowExceptionGetByEmail() {
+    String unExistEmail = "wrong@email.ua";
+    when(userRepository.findByEmail(unExistEmail))
+        .thenThrow(NotFoundException.user(unExistEmail));
+    assertThrows(NotFoundException.class, () -> service.getByEmail(unExistEmail));
+  }
+
+  @Test
+  void testLoadUserByUsername() {
+    when(userRepository.findByEmail(InterviewerServiceTest.INTERVIEWER_EMAIL))
+        .thenReturn(Optional.of(newInterviewer));
+    var savedInterviewer = service.loadUserByUsername(InterviewerServiceTest.INTERVIEWER_EMAIL);
+    assertEquals(InterviewerServiceTest.INTERVIEWER_EMAIL, savedInterviewer.getUsername());
+    assertEquals(newInterviewer.getRole(), ((User) savedInterviewer).getRole());
+    assertEquals(newInterviewer.getId(), ((User) savedInterviewer).getId());
+    assertEquals(newInterviewer.getEmail(), ((User) savedInterviewer).getEmail());
+  }
+
+  @Test
+  void testThrowExceptionLoadByUsername() {
+    when(userRepository.findByEmail(InterviewerServiceTest.INTERVIEWER_EMAIL))
+        .thenThrow(new UsernameNotFoundException(
+            "No user found with username " + InterviewerServiceTest.INTERVIEWER_EMAIL));
+    assertThrows(UsernameNotFoundException.class,
+        () -> service.loadUserByUsername(InterviewerServiceTest.INTERVIEWER_EMAIL));
+  }
+
+  @Test
+  void testGetAllUsers() {
+    when(userRepository.findAll())
+        .thenReturn(List.of(interviewer, coordinator, newInterviewer, newCoordinator));
+    var result = service.getAll();
+    assertEquals(List.of(interviewer, coordinator, newInterviewer, newCoordinator), result);
+  }
+
+  @Test
+  void testThrowExceptionLoadUserByUsername() {
+    when(userRepository.findByEmail(InterviewerServiceTest.INTERVIEWER_EMAIL))
+        .thenThrow(new UsernameNotFoundException(
+            "No user found with username " + InterviewerServiceTest.INTERVIEWER_EMAIL));
+    assertThrows(UsernameNotFoundException.class,
+        () -> service.loadUserByUsername(InterviewerServiceTest.INTERVIEWER_EMAIL));
   }
 }

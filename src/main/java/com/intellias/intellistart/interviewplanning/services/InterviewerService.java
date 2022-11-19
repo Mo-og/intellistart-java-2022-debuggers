@@ -1,8 +1,6 @@
 package com.intellias.intellistart.interviewplanning.services;
 
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
-import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
-import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException.ErrorCode;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.User;
@@ -10,6 +8,7 @@ import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
+import com.intellias.intellistart.interviewplanning.services.interfaces.WeekService;
 import com.intellias.intellistart.interviewplanning.utils.Utils;
 import com.intellias.intellistart.interviewplanning.utils.mappers.InterviewerSlotMapper;
 import com.intellias.intellistart.interviewplanning.validators.InterviewerSlotValidator;
@@ -19,34 +18,22 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
  * Interview service.
  */
 @Service
+@RequiredArgsConstructor
 public class InterviewerService {
 
   private final InterviewerTimeSlotRepository interviewerTimeSlotRepository;
   private final UserRepository userRepository;
   private final BookingRepository bookingRepository;
-
-  /**
-   * Constructor.
-   *
-   * @param interviewerTimeSlotRepository time slot repository bean
-   * @param userRepository                user repository bean
-   * @param bookingRepository             booking repository bean
-   */
-  @Autowired
-  public InterviewerService(InterviewerTimeSlotRepository interviewerTimeSlotRepository,
-      UserRepository userRepository, BookingRepository bookingRepository) {
-    this.interviewerTimeSlotRepository = interviewerTimeSlotRepository;
-    this.userRepository = userRepository;
-    this.bookingRepository = bookingRepository;
-  }
+  private final WeekService weekService;
+  private final InterviewerSlotValidator slotValidator;
 
   /**
    * Create slot for interview. Interviewer can create slot for current or next week.
@@ -57,7 +44,7 @@ public class InterviewerService {
    */
   public InterviewerTimeSlot createSlot(Long interviewerId,
       InterviewerTimeSlot interviewerTimeSlot) {
-    InterviewerSlotValidator.validate(interviewerTimeSlot);
+    slotValidator.validate(interviewerTimeSlot);
     User interviewer = userRepository.getReferenceById(interviewerId);
     interviewerTimeSlot.setInterviewer(interviewer);
     return interviewerTimeSlotRepository.saveAndFlush(interviewerTimeSlot);
@@ -85,7 +72,7 @@ public class InterviewerService {
     }
     return interviewerTimeSlotRepository
         .findByInterviewerIdAndWeekNumGreaterThanEqual(
-            interviewerId, WeekService.getCurrentWeekNum());
+            interviewerId, weekService.getCurrentWeekNum());
   }
 
   /**
@@ -132,12 +119,11 @@ public class InterviewerService {
    */
   public InterviewerTimeSlot updateSlot(Long interviewerId, Long slotId,
       InterviewerTimeSlot interviewerTimeSlot) {
-    InterviewerSlotValidator.validate(interviewerTimeSlot);
+    slotValidator.validate(interviewerTimeSlot);
     User interviewer = userRepository.getReferenceById(interviewerId);
     InterviewerTimeSlot slot = getSlotById(slotId);
     if (!slot.getInterviewer().equals(interviewer)) {
-      throw new ApplicationErrorException(ErrorCode.SLOT_NOT_FOUND,
-          "Slot of given id does not belong to specified interviewer");
+      throw NotFoundException.timeSlot(slotId, interviewerId);
     }
     slot.setFrom(interviewerTimeSlot.getFrom());
     slot.setTo(interviewerTimeSlot.getTo());

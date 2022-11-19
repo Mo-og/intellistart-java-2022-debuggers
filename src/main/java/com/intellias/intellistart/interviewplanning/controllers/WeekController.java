@@ -3,8 +3,8 @@ package com.intellias.intellistart.interviewplanning.controllers;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.intellias.intellistart.interviewplanning.controllers.dto.DashboardDto;
 import com.intellias.intellistart.interviewplanning.services.CoordinatorService;
-import com.intellias.intellistart.interviewplanning.services.WeekService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.intellias.intellistart.interviewplanning.services.interfaces.WeekService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,28 +13,20 @@ import org.springframework.web.bind.annotation.RestController;
  * Provides current and next week json responses.
  */
 @RestController
+@RequiredArgsConstructor
 public class WeekController {
 
   private final CoordinatorService coordinatorService;
-
-  /**
-   * Constructor.
-   *
-   * @param coordinatorService coordinator service
-   */
-  @Autowired
-  public WeekController(CoordinatorService coordinatorService) {
-    this.coordinatorService = coordinatorService;
-  }
+  private final WeekService weekService;
 
   @GetMapping("/weeks/current")
   public WeekNum getCurrentWeekNum() {
-    return new WeekNum(WeekService.getCurrentWeekNum());
+    return new WeekNum(weekService.getCurrentWeekNum());
   }
 
   @GetMapping("/weeks/next")
   public WeekNum getNextWeekNum() {
-    return new WeekNum(WeekService.getNextWeekNum());
+    return new WeekNum(weekService.getNextWeekNum());
   }
 
   @GetMapping("/weeks/{weekId}/dashboard")
