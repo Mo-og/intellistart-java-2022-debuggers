@@ -13,6 +13,7 @@ import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
@@ -50,9 +51,6 @@ public class AuthService {
     facebookTokenVerifyUri = env.getProperty("facebook.uri.token_verify");
     facebookUserDataUri = env.getProperty("facebook.uri.user_data");
 
-    log.debug("\n\n*******************************\nGET APP TOKEN URI:{}\n\n*********************",
-        env.getProperty("facebook.uri.get_app_token"));
-
     //needs to be updated every ~60 days
     appAccessToken = restTemplate.getForObject(
         Objects.requireNonNull(env.getProperty("facebook.uri.get_app_token")),
@@ -75,7 +73,7 @@ public class AuthService {
     if (token == null) {
       log.info("Acquiring user token by code failed");
       throw new ApplicationErrorException(ErrorCode.INVALID_USER_CREDENTIALS,
-          "Could not get user token for provided auth code");
+          ": could not get user token for provided auth code");
     } else {
       log.debug("Got facebook token of [{}] type", token.tokenType);
     }
@@ -89,11 +87,12 @@ public class AuthService {
    * @param token facebook token
    * @return json of jwt token of this app
    */
+  @SneakyThrows
   public ResponseEntity<?> generateTokenByFacebookToken(String token) {
     if (token == null || token.isBlank()) {
       log.info("Provided user token is empty");
       throw new ApplicationErrorException(ErrorCode.INVALID_USER_CREDENTIALS,
-          "Invalid facebook token");
+          ": invalid facebook token");
     } else {
       log.debug("Got facebook token from code: {}", token);
     }
@@ -105,8 +104,12 @@ public class AuthService {
     log.debug("Token data retrieved: {}", tokenData);
 
     if (tokenData == null || !tokenData.data.isValid()) {
+      if (tokenData != null) {
+        throw new ApplicationErrorException(ErrorCode.INVALID_USER_CREDENTIALS,
+            ": could not verify user token. " + tokenData.data.error.message);
+      }
       throw new ApplicationErrorException(ErrorCode.INVALID_USER_CREDENTIALS,
-          "Could not verify user token");
+          ": could not verify user token");
     }
 
     FacebookUserProfile userProfile = restTemplate.getForObject(
@@ -115,7 +118,7 @@ public class AuthService {
 
     if (userProfile == null || userProfile.getEmail() == null || userProfile.getEmail().isBlank()) {
       throw new ApplicationErrorException(ErrorCode.NO_USER_DATA,
-          "Unable to get email of user from provider");
+          ": unable to get email of user from provider");
     }
     //todo replace with OAuth2AccessToken
     JwtToken generatedJwtToken;
@@ -152,6 +155,7 @@ public class AuthService {
 
     @JsonAlias("token_type")
     private String tokenType;
+
   }
 
   @Data
@@ -172,7 +176,7 @@ public class AuthService {
     private FbData data;
 
     @Data
-    private static class FbData {
+    public static class FbData {
 
 
       @JsonAlias("app_id")
@@ -191,9 +195,16 @@ public class AuthService {
       private List<String> scopes;
       @JsonAlias("user_id")
       private String userId;
-      private String error;
+      private Error error;
     }
 
+    @Data
+    public static class Error {
+
+      int code;
+      String message;
+      int subcode;
+    }
   }
 
   @Data

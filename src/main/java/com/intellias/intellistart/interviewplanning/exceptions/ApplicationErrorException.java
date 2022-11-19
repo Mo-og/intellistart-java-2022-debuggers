@@ -55,7 +55,7 @@ public class ApplicationErrorException extends RuntimeException {
     BOOKING_LIMIT_NOT_FOUND(HttpStatus.NOT_FOUND, "No booking limit found"),
 
     //Conflict error code
-    SLOT_IS_OVERLAPPING(HttpStatus.CONFLICT, "slot_is_overlapping"),
+    SLOT_IS_OVERLAPPING(HttpStatus.CONFLICT, "Slot overlaps another one by time"),
     INVALID_BOOKING_LIMIT(HttpStatus.CONFLICT, "Invalid booking limit number"),
 
     //Bad request error codes
