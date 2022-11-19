@@ -9,12 +9,6 @@ on:
   pull_request:
     branches: [ "main" ]
     
-env:
-  
-  FACEBOOK_CLIENT_SECRET: ${{secrets.FACEBOOK_CLIENT_SECRET}}
-  COORDINATOR_EMAIL: ${{secrets.COORDINATOR_EMAIL}}
-  INTERVIEWER_EMAIL: ${{secrets.INTERVIEWER_EMAIL}}
-  JWT_SECRET: ${{secrets.JWT_SECRET}}
 
 jobs:
   build:
@@ -22,6 +16,10 @@ jobs:
     environment: dev
     env: 
       FACEBOOK_CLIENT_ID: ${{secrets.FACEBOOK_CLIENT_ID}}
+      FACEBOOK_CLIENT_SECRET: ${{secrets.FACEBOOK_CLIENT_SECRET}}
+      COORDINATOR_EMAIL: ${{secrets.COORDINATOR_EMAIL}}
+      INTERVIEWER_EMAIL: ${{secrets.INTERVIEWER_EMAIL}}
+      JWT_SECRET: ${{secrets.JWT_SECRET}}
 
     steps:
     - uses: actions/checkout@v3
