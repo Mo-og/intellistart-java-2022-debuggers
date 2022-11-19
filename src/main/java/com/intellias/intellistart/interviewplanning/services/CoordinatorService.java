@@ -244,8 +244,8 @@ public class CoordinatorService {
       List<Booking> bookings = bookingRepository.findByInterviewerSlot(slot);
       for (Booking booking : bookings) {
         if (booking.getCandidateSlot().getDate().isAfter(WeekService.getCurrentDate())) {
-          throw new ApplicationErrorException(ErrorCode.REVOKE_USER_WITH_BOOKINGS,
-              "Can not revoke interviewer with active bookings");
+          throw new ApplicationErrorException(ErrorCode.REVOKE_USER_WITH_SLOT,
+              "Can not revoke user with slot for current or next week");
         }
         bookingRepository.delete(booking);
       }
