@@ -28,6 +28,15 @@ public class ApplicationErrorException extends RuntimeException {
     this.errorMessage = errorMessage;
   }
 
+  /**
+   * Basic constructor.
+   *
+   * @param errorCode pre-defined API status
+   */
+  public ApplicationErrorException(ErrorCode errorCode) {
+    this(errorCode, errorCode.message);
+  }
+
   @JsonGetter
   public String getErrorCode() {
     return errorCode.code;
