@@ -2,6 +2,7 @@ package com.intellias.intellistart.interviewplanning.services;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.IsoFields;
@@ -12,6 +13,8 @@ import java.time.temporal.WeekFields;
  */
 public class WeekService {
 
+  public static final ZoneId ZONE_ID = ZoneId.of("Europe/Kiev");
+
   private WeekService() {
   }
 
@@ -21,7 +24,16 @@ public class WeekService {
    * @return LocalDate representation of zoned date
    */
   public static LocalDate getCurrentDate() {
-    return ZonedDateTime.now(ZoneId.of("Europe/Kiev")).toLocalDate();
+    return ZonedDateTime.now(ZONE_ID).toLocalDate();
+  }
+
+  /**
+   * Returns current zoned date and time.
+   *
+   * @return LocalDateTime representation of zoned date and time
+   */
+  public static LocalDateTime getCurrentDateTime() {
+    return ZonedDateTime.now(ZONE_ID).toLocalDateTime();
   }
 
   /**
