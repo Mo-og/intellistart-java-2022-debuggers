@@ -135,10 +135,4 @@ class UserControllerTest {
         status().is5xxServerError(), mockMvc);
   }
 
-  @Test
-  void testGetUser() {
-    when(userService.getById(1L)).thenReturn(testCoordinator);
-    checkResponseOk(get("/users/{id}", 1),
-        null, json(testCoordinator), mockMvc);
-  }
 }

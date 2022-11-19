@@ -1,5 +1,8 @@
 package com.intellias.intellistart.interviewplanning.security;
 
+import static com.intellias.intellistart.interviewplanning.models.User.UserRole.COORDINATOR;
+import static com.intellias.intellistart.interviewplanning.models.User.UserRole.INTERVIEWER;
+
 import com.intellias.intellistart.interviewplanning.security.jwt.JwtAuthenticationEntryPoint;
 import com.intellias.intellistart.interviewplanning.security.jwt.JwtRequestFilter;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +27,6 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 @Slf4j
 public class WebSecurityConfig {
-
   private final JwtRequestFilter jwtRequestFilter;
   private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
@@ -55,8 +57,10 @@ public class WebSecurityConfig {
 
     http.authorizeRequests(authorize -> authorize
         .antMatchers("/authenticate/**", "/auth-link", "/").permitAll()
-        .antMatchers("/interviewers/**").hasAnyAuthority("COORDINATOR", "INTERVIEWER")
-        .antMatchers("/users/**").hasAuthority("COORDINATOR")
+        .antMatchers("/bookings/**").hasAnyAuthority(COORDINATOR.name())
+        .antMatchers("/interviewers/**").hasAnyAuthority(COORDINATOR.name(), INTERVIEWER.name())
+        .antMatchers("/users/**").hasAuthority(COORDINATOR.name())
+        .antMatchers("/weeks/{weekId}/dashboard").hasAuthority(COORDINATOR.name())
         .anyRequest().authenticated()
     );
 

@@ -68,12 +68,6 @@ public class UserController {
   }
 
   //todo remove
-  @GetMapping("/users/{id}")
-  public User getUser(@PathVariable Long id) {
-    return userService.getById(id);
-  }
-
-  //todo remove
   @GetMapping("/users")
   public List<User> getUser() {
     return userService.getAll();

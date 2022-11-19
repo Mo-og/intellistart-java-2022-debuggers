@@ -1,6 +1,11 @@
 facebook:
-  client-id: 639777021199239
-  client-secret: 93d125256e4cbaa74630c32b87de2899
+  client-id: ${FACEBOOK_CLIENT_ID}
+  client-secret: ${FACEBOOK_CLIENT_SECRET}
+  native_user:
+    coordinator:
+      email: ${COORDINATOR_EMAIL}
+    interviewer:
+      email: ${INTERVIEWER_EMAIL}
 
 jwt:
-  secret: somesecretsomesecretsomesecretsomesecretsomesecretsomesecretsomesecretsomesecretsomesecretsomesecret
+  secret: ${JWT_SECRET}
