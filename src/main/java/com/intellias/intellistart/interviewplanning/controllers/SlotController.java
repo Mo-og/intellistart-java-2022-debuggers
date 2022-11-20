@@ -3,11 +3,14 @@ package com.intellias.intellistart.interviewplanning.controllers;
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
+import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.services.CandidateService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import com.intellias.intellistart.interviewplanning.services.WeekService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,6 +48,13 @@ public class SlotController {
   public InterviewerTimeSlot updateInterviewerTimeSlot(@PathVariable Long interviewerId,
       @PathVariable long slotId, @RequestBody InterviewerTimeSlot interviewerTimeSlot) {
     return interviewerService.updateSlot(interviewerId, slotId, interviewerTimeSlot);
+  }
+
+  @DeleteMapping("/interviewers/{interviewerId}/slots/{slotId}")
+  public InterviewerSlotDto deleteInterviewerTimeSlot(@PathVariable Long interviewerId,
+      @PathVariable long slotId, Authentication auth) {
+    User user = (User) auth.getPrincipal();
+    return interviewerService.deleteSlot(interviewerId, slotId, user);
   }
 
   @PostMapping("/candidates/current/slots/{slotId}")

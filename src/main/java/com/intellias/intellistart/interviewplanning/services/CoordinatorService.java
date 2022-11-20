@@ -172,7 +172,7 @@ public class CoordinatorService {
   public User grantCoordinatorRole(String email) {
     User user = userRepository.findByEmail(email)
         .orElseGet(() -> new User(email, UserRole.COORDINATOR));
-    if (user.getRole() == UserRole.INTERVIEWER && hasActiveSlots(user)) {
+    if (user.getRole() == UserRole.INTERVIEWER && hasActiveSlot(user)) {
       throw new ApplicationErrorException(ErrorCode.REVOKE_USER_WITH_SLOT);
     }
     user.setRole(UserRole.COORDINATOR);
@@ -192,7 +192,7 @@ public class CoordinatorService {
     if (user.getRole() != UserRole.INTERVIEWER) {
       throw NotFoundException.interviewer(id);
     }
-    if (hasActiveSlots(user)) {
+    if (hasActiveSlot(user)) {
       throw new ApplicationErrorException(ErrorCode.REVOKE_USER_WITH_SLOT);
     }
     user.setRole(UserRole.CANDIDATE);
@@ -236,7 +236,7 @@ public class CoordinatorService {
    * @param user interviewer
    * @return true if user has active slots, otherwise - false
    */
-  private boolean hasActiveSlots(User user) {
+  private boolean hasActiveSlot(User user) {
     List<InterviewerTimeSlot> slots = interviewerTimeSlotRepository.findByInterviewer(user);
     for (InterviewerTimeSlot slot : slots) {
       if (WeekService.getDateByWeekNumAndDayOfWeek(slot.getWeekNum(), slot.getDayOfWeek())

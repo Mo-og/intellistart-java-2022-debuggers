@@ -150,6 +150,40 @@ public class InterviewerService {
   }
 
   /**
+   * Deletes slot by interviewer time slot id.
+   *
+   * @param interviewerId id of interviewer
+   * @param slotId        id of interviewer time slot
+   * @param currentUser   current user
+   * @return deleted slot
+   */
+  public InterviewerSlotDto deleteSlot(Long interviewerId, Long slotId, User currentUser) {
+    InterviewerTimeSlot slot = getSlotById(slotId);
+    if (!slot.getInterviewer().getId().equals(interviewerId)) {
+      throw new ApplicationErrorException(ErrorCode.SLOT_NOT_FOUND,
+          "Slot of given id does not belong to specified interviewer");
+    }
+    if (currentUser.getRole() == UserRole.INTERVIEWER) {
+      InterviewerSlotValidator.validate(slot);
+    }
+    if (hasBooking(slot)) {
+      throw new ApplicationErrorException(ErrorCode.DELETE_SLOT_WITH_BOOKING);
+    }
+    interviewerTimeSlotRepository.delete(slot);
+    return InterviewerSlotMapper.mapToDto(slot);
+  }
+
+  /**
+   * Checks if the interviewer time slot has booking.
+   *
+   * @param slot interviewer time slot
+   * @return true if slot has booking, otherwise - false
+   */
+  private boolean hasBooking(InterviewerTimeSlot slot) {
+    return !bookingRepository.findByInterviewerSlot(slot).isEmpty();
+  }
+
+  /**
    * Gets interviewer from database by id and throws an exception if none found.
    *
    * @param id interviewer id to look for
