@@ -61,6 +61,7 @@ public class WebSecurityConfig {
         .antMatchers("/interviewers/**").hasAnyAuthority(COORDINATOR.name(), INTERVIEWER.name())
         .antMatchers("/users/**").hasAuthority(COORDINATOR.name())
         .antMatchers("/weeks/{weekId}/dashboard").hasAuthority(COORDINATOR.name())
+        .antMatchers("/weeks/*").permitAll()
         .anyRequest().authenticated()
     );
 

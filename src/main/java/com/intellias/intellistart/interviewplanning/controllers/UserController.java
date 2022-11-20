@@ -1,6 +1,7 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
-import com.fasterxml.jackson.databind.node.TextNode;
+import static com.intellias.intellistart.interviewplanning.validators.PermissionValidator.checkAuthorized;
+
 import com.intellias.intellistart.interviewplanning.controllers.dto.EmailDto;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
@@ -64,7 +65,8 @@ public class UserController {
 
 
   @GetMapping("/interviewers/{interviewerId}")
-  public User getInterviewerById(@PathVariable Long interviewerId) {
+  public User getInterviewerById(@PathVariable Long interviewerId, Authentication auth) {
+    checkAuthorized(auth, interviewerId);
     return interviewerService.getById(interviewerId);
   }
 
@@ -72,12 +74,6 @@ public class UserController {
   @GetMapping("/users")
   public List<User> getUser() {
     return userService.getAll();
-  }
-
-  //todo remove
-  @PostMapping("/interviewers")
-  public User postInterviewer(@RequestBody TextNode email) {
-    return userService.create(email.asText(), UserRole.INTERVIEWER);
   }
 
   @PostMapping("/users/interviewers")

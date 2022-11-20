@@ -79,8 +79,11 @@ public class ApplicationErrorException extends RuntimeException {
     DELETE_SLOT_WITH_BOOKING(HttpStatus.BAD_REQUEST,
         "Can not delete time slot that has booking"),
 
-    // Forbidden error code
+    //Forbidden error code
     SELF_ROLE_REVOKING(HttpStatus.FORBIDDEN, "Forbidden to revoke yourself"),
+    ATTEMPT_TO_EDIT_OTHER_USER_DATA(HttpStatus.FORBIDDEN, "You have no permission to edit this user data"),
+    NO_EMAIL_SPECIFIED(HttpStatus.BAD_REQUEST,
+        "As coordinator you need to specify candidate email as request param 'email' when adding candidate time slot"),
 
     //Authentication related
     INVALID_USER_CREDENTIALS(HttpStatus.BAD_REQUEST, "Invalid user credentials"),

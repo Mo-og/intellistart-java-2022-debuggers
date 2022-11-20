@@ -1,7 +1,8 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
-import static com.intellias.intellistart.interviewplanning.TestUtils.checkResponseOk;
-import static com.intellias.intellistart.interviewplanning.TestUtils.json;
+import static com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils.CANDIDATE_EMAIL;
+import static com.intellias.intellistart.interviewplanning.utils.TestUtils.checkResponseOk;
+import static com.intellias.intellistart.interviewplanning.utils.TestUtils.json;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -10,27 +11,28 @@ import com.intellias.intellistart.interviewplanning.controllers.dto.BookingDto;
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
-import com.intellias.intellistart.interviewplanning.security.jwt.JwtRequestFilter;
 import com.intellias.intellistart.interviewplanning.services.CandidateService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import com.intellias.intellistart.interviewplanning.services.WeekServiceImp;
 import com.intellias.intellistart.interviewplanning.services.interfaces.WeekService;
+import com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils;
+import com.intellias.intellistart.interviewplanning.utils.WithCustomUser;
 import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(SlotController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@SpringBootTest(classes = TestSecurityUtils.class)
+@AutoConfigureMockMvc
+@WithCustomUser
 class SlotControllerTest {
 
-  public static final String CANDIDATE_EMAIL = "test.candidate@test.com";
   private static final InterviewerTimeSlot interviewerSlot =
       new InterviewerTimeSlot("08:00", "10:00", "WEDNESDAY", 202240);
   private static final CandidateTimeSlot candidateSlot =
@@ -64,8 +66,6 @@ class SlotControllerTest {
 
   @MockBean
   private CommandLineRunner commandLineRunner;
-  @MockBean
-  private JwtRequestFilter jwtRequestFilter;
   @Autowired
   private MockMvc mockMvc;
   @MockBean
@@ -104,6 +104,7 @@ class SlotControllerTest {
   }
 
   @Test
+  @WithCustomUser(CANDIDATE_EMAIL)
   void testUpdateCandidateTimeSlot() {
     when(candidateService
         .updateSlot(1L, candidateSlot))

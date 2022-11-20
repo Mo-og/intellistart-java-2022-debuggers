@@ -1,9 +1,12 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
+import static com.intellias.intellistart.interviewplanning.validators.PermissionValidator.checkAuthorized;
+
 import com.intellias.intellistart.interviewplanning.controllers.dto.BookingLimitDto;
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
 import com.intellias.intellistart.interviewplanning.services.BookingLimitService;
 import java.util.List;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +28,8 @@ public class BookingLimitController {
 
   @PostMapping("/interviewers/{interviewerId}/bookingLimits")
   public BookingLimit setBookingLimit(@PathVariable Long interviewerId,
-      @RequestBody BookingLimitDto request) {
+      @RequestBody BookingLimitDto request, Authentication auth) {
+    checkAuthorized(auth, interviewerId);
     return bookingLimitService.saveBookingLimit(interviewerId, request);
   }
 
