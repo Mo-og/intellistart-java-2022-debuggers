@@ -84,7 +84,16 @@ public class BookingService {
     return bookingRepository.getReferenceById(id);
   }
 
-  public void removeBooking(Long id) {
-    bookingRepository.deleteById(id);
+  /**
+   * Removes booking by id.
+   *
+   * @param id booking id
+   * @return removed booking
+   */
+  public BookingDto removeBooking(Long id) {
+    Booking booking = bookingRepository.findById(id)
+        .orElseThrow(() -> NotFoundException.booking(id));
+    bookingRepository.delete(booking);
+    return BookingMapper.mapToDto(booking);
   }
 }

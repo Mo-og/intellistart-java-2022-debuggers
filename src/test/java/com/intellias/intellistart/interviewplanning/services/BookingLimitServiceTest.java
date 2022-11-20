@@ -22,7 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class BookingLimitServiceTest {
+class BookingLimitServiceTest {
 
   private BookingLimitService bookingLimitService;
   @Mock
@@ -33,7 +33,8 @@ public class BookingLimitServiceTest {
 
   @BeforeEach
   void setService() {
-    bookingLimitService = new BookingLimitService(bookingLimitRepository, userRepository, weekService);
+    bookingLimitService = new BookingLimitService(bookingLimitRepository, userRepository,
+        weekService);
   }
 
   private static final int limit = 5;
@@ -127,11 +128,12 @@ public class BookingLimitServiceTest {
     assertThrows(NotFoundException.class,
         () -> bookingLimitService.findBookingLimit(existingUserId, nextWeekNum));
   }
+
   @Test
-  void testThrowBookingLimitExceptionFindBookingLimit(){
+  void testThrowBookingLimitExceptionFindBookingLimit() {
     when(bookingLimitRepository.findByInterviewerIdAndWeekNum(existingUserId, nextWeekNum))
         .thenThrow(NotFoundException.bookingLimit(existingUserId, nextWeekNum));
     assertThrows(NotFoundException.class,
-        ()->bookingLimitRepository.findByInterviewerIdAndWeekNum(existingUserId, nextWeekNum));
+        () -> bookingLimitRepository.findByInterviewerIdAndWeekNum(existingUserId, nextWeekNum));
   }
 }

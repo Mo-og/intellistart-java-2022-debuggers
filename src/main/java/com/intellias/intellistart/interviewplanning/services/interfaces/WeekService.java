@@ -2,6 +2,7 @@ package com.intellias.intellistart.interviewplanning.services.interfaces;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * Week service.
@@ -9,6 +10,8 @@ import java.time.LocalDate;
 public interface WeekService {
 
   LocalDate getCurrentDate();
+
+  LocalDateTime getCurrentDateTime();
 
   /**
    * Defines the number of the current week.

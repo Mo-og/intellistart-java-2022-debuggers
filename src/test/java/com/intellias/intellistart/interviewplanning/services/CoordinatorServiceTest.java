@@ -9,6 +9,7 @@ import com.intellias.intellistart.interviewplanning.controllers.dto.CandidateSlo
 import com.intellias.intellistart.interviewplanning.controllers.dto.DashboardDto;
 import com.intellias.intellistart.interviewplanning.controllers.dto.DayDashboardDto;
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
+import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
@@ -37,13 +38,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class CoordinatorServiceTest {
 
+  public static final String COORDINATOR_EMAIL = "coordinator@gmail.com";
+  public static final String INTERVIEWER_EMAIL = "interviewer@gmail.com";
   private final WeekService weekService = new WeekServiceImp();
 
   public static final String CANDIDATE_EMAIL = "test.candidate@test.com";
-  private static final User coordinator = new User("coordinator@gmail.com",
-      UserRole.COORDINATOR);
-  private static final User interviewer = new User("interviewer@gmail.com",
-      UserRole.INTERVIEWER);
+  private static final User coordinator = new User(COORDINATOR_EMAIL, UserRole.COORDINATOR);
+  private static final User interviewer = new User(INTERVIEWER_EMAIL, UserRole.INTERVIEWER);
   private final CandidateTimeSlot candidateSlot = new CandidateTimeSlot(CANDIDATE_EMAIL,
       weekService.getCurrentDate().toString(), "08:00", "13:00");
   private final CandidateSlotDto candidateSlotDto =
@@ -109,16 +110,16 @@ class CoordinatorServiceTest {
   private static final Set<DayDashboardDto> days = new TreeSet<>(
       Comparator.comparing(DayDashboardDto::getDate));
   private static final DashboardDto weekDashboard = new DashboardDto();
-  private static final Set<InterviewerSlotDto> interviewerSlotDtoSet = new TreeSet<>(
-      Comparator.comparing(InterviewerSlotDto::getFrom));
-  private static final Set<CandidateSlotDto> candidateSlotDtoSet = new TreeSet<>(
-      Comparator.comparing(CandidateSlotDto::getFrom));
 
   {
     interviewer.setId(1L);
     interviewerSlot.setId(1L);
+    interviewerSlotDto.setId(1L);
     interviewerSlot.setInterviewer(interviewer);
+    interviewerSlotDto.setBookings(List.of(bookingDto));
     candidateSlot.setId(1L);
+    candidateSlotDto.setId(1L);
+    candidateSlotDto.setBookings(List.of(bookingDto));
     coordinator.setId(1L);
 
     booking.setCandidateSlot(candidateSlot);
@@ -128,11 +129,8 @@ class CoordinatorServiceTest {
     bookingDto.setCandidateSlotId(candidateSlot.getId());
     bookingDto.setInterviewerSlotId(interviewerSlot.getId());
 
-    interviewerSlotDtoSet.add(interviewerSlotDto);
-    candidateSlotDtoSet.add(candidateSlotDto);
-
-    mon.setInterviewerSlots(interviewerSlotDtoSet);
-    mon.setCandidateSlots(candidateSlotDtoSet);
+    mon.setInterviewerSlots(List.of(interviewerSlotDto));
+    mon.setCandidateSlots(List.of(candidateSlotDto));
     mon.setBookings(Map.of(bookingDto.getId(), bookingDto));
     days.add(mon);
     days.add(tue);
@@ -163,18 +161,18 @@ class CoordinatorServiceTest {
   void testGetWeekDashboard() {
     when(interviewerTimeSlotRepository
         .findByWeekNumAndDayOfWeek(weekService.getCurrentWeekNum(), DayOfWeek.MONDAY))
-        .thenReturn(Set.of(interviewerSlot));
+        .thenReturn(List.of(interviewerSlot));
     when(candidateTimeSlotRepository
         .findByDate(weekService
             .getDateByWeekNumAndDayOfWeek(weekService.getCurrentWeekNum(), DayOfWeek.MONDAY)))
-        .thenReturn(Set.of(candidateSlot));
+        .thenReturn(List.of(candidateSlot));
     when(bookingRepository
         .findByCandidateSlotDate(
             weekService
                 .getDateByWeekNumAndDayOfWeek(weekService.getCurrentWeekNum(), DayOfWeek.MONDAY)))
-        .thenReturn(Set.of(booking));
-    when(bookingRepository.findByInterviewerSlot(interviewerSlot)).thenReturn(Set.of(booking));
-    when(bookingRepository.findByCandidateSlot(candidateSlot)).thenReturn(Set.of(booking));
+        .thenReturn(List.of(booking));
+    when(bookingRepository.findByInterviewerSlot(interviewerSlot)).thenReturn(List.of(booking));
+    when(bookingRepository.findByCandidateSlot(candidateSlot)).thenReturn(List.of(booking));
     var dashboard = service.getWeekDashboard(weekService.getCurrentWeekNum());
     assertEquals(weekDashboard, dashboard);
   }
@@ -183,17 +181,17 @@ class CoordinatorServiceTest {
   void testGetDayDashboard() {
     when(interviewerTimeSlotRepository
         .findByWeekNumAndDayOfWeek(weekService.getCurrentWeekNum(), DayOfWeek.MONDAY))
-        .thenReturn(Set.of(interviewerSlot));
+        .thenReturn(List.of(interviewerSlot));
     when(candidateTimeSlotRepository
         .findByDate(weekService.getDateByWeekNumAndDayOfWeek(weekService.getCurrentWeekNum(),
             DayOfWeek.MONDAY)))
-        .thenReturn(Set.of(candidateSlot));
+        .thenReturn(List.of(candidateSlot));
     when(bookingRepository
         .findByCandidateSlotDate(weekService
             .getDateByWeekNumAndDayOfWeek(weekService.getCurrentWeekNum(), DayOfWeek.MONDAY)))
-        .thenReturn(Set.of(booking));
-    when(bookingRepository.findByInterviewerSlot(interviewerSlot)).thenReturn(Set.of(booking));
-    when(bookingRepository.findByCandidateSlot(candidateSlot)).thenReturn(Set.of(booking));
+        .thenReturn(List.of(booking));
+    when(bookingRepository.findByInterviewerSlot(interviewerSlot)).thenReturn(List.of(booking));
+    when(bookingRepository.findByCandidateSlot(candidateSlot)).thenReturn(List.of(booking));
     var dashboard =
         service.getDayDashboard(weekService.getCurrentWeekNum(), DayOfWeek.MONDAY);
     assertEquals(mon, dashboard);
@@ -201,56 +199,63 @@ class CoordinatorServiceTest {
 
   @Test
   void testInterviewerSlotsWithBookings() {
-    when(bookingRepository.findByInterviewerSlot(interviewerSlot)).thenReturn(Set.of(booking));
+    when(bookingRepository.findByInterviewerSlot(interviewerSlot)).thenReturn(List.of(booking));
     var result = service
-        .getInterviewerSlotsWithBookings(Set.of(interviewerSlot));
-    assertEquals(interviewerSlotDtoSet, result);
+        .getInterviewerSlotsWithBookings(List.of(interviewerSlot));
+    assertEquals(List.of(interviewerSlotDto), result);
   }
 
   @Test
   void testGetCandidateSlotsWithBookings() {
-    when(bookingRepository.findByCandidateSlot(candidateSlot)).thenReturn(Set.of(booking));
-    var result = service.getCandidateSlotsWithBookings(Set.of(candidateSlot));
-    assertEquals(candidateSlotDtoSet, result);
+    when(bookingRepository.findByCandidateSlot(candidateSlot)).thenReturn(List.of(booking));
+    var result = service.getCandidateSlotsWithBookings(List.of(candidateSlot));
+    assertEquals(List.of(candidateSlotDto), result);
   }
 
   @Test
   void testGetBookingMap() {
-    var result = service.getBookingMap(Set.of(booking));
+    var result = service.getBookingMap(List.of(booking));
     assertEquals(Map.of(bookingDto.getId(), bookingDto), result);
   }
 
   @Test
   void testGrantInterviewerRole() {
-    when(userRepository.findByEmail("interviewer@gmail.com"))
+    when(userRepository.findByEmail(INTERVIEWER_EMAIL))
         .thenReturn(Optional.of(interviewer));
     when(userRepository.save(interviewer))
         .thenReturn(interviewer);
-    var result = service.grantInterviewerRole("interviewer@gmail.com");
+    var result = service.grantInterviewerRole(INTERVIEWER_EMAIL, COORDINATOR_EMAIL);
     assertEquals(interviewer, result);
   }
 
   @Test
+  void testSelfGrantInterviewerRole() {
+    assertThrows(ApplicationErrorException.class,
+        () -> service.grantInterviewerRole(COORDINATOR_EMAIL, COORDINATOR_EMAIL));
+  }
+
+  @Test
   void testGrantCoordinatorRole() {
-    when(userRepository.findByEmail("coordinator@gmail.com"))
-        .thenReturn(Optional.of(interviewer));
-    when(userRepository.save(interviewer))
+    when(userRepository.findByEmail(COORDINATOR_EMAIL))
+        .thenReturn(Optional.of(coordinator));
+    when(userRepository.save(coordinator))
         .thenReturn(coordinator);
-    when(interviewerTimeSlotRepository.findByInterviewer(interviewer)).thenReturn(List.of(interviewerSlot));
-    var result = service.grantCoordinatorRole("coordinator@gmail.com");
+    var result = service.grantCoordinatorRole(COORDINATOR_EMAIL);
     assertEquals(coordinator, result);
   }
 
   @Test
   void testRevokeInterviewerRole() {
-    when(userRepository.findByIdAndRole(1L, UserRole.INTERVIEWER))
+    when(userRepository.findById(1L))
         .thenReturn(Optional.of(interviewer));
-    assertEquals(UserRole.INTERVIEWER, service.revokeInterviewerRole(1L).getRole());
+    when(userRepository.save(interviewer))
+        .thenReturn(interviewer);
+    assertEquals(UserRole.CANDIDATE, service.revokeInterviewerRole(1L).getRole());
   }
 
   @Test
   void testRevokeInterviewerRoleWrongId() {
-    when(userRepository.findByIdAndRole(-1L, UserRole.INTERVIEWER))
+    when(userRepository.findById(-1L))
         .thenReturn(Optional.empty());
     assertThrows(NotFoundException.class,
         () -> service.revokeInterviewerRole(-1L));
@@ -258,23 +263,30 @@ class CoordinatorServiceTest {
 
   @Test
   void testRevokeCoordinatorRole() {
-    when(userRepository.findByIdAndRole(1L, UserRole.COORDINATOR))
+    when(userRepository.findById(1L))
         .thenReturn(Optional.of(coordinator));
-    assertEquals(UserRole.COORDINATOR, service.revokeCoordinatorRole(1L).getRole());
+    when(userRepository.save(coordinator))
+        .thenReturn(coordinator);
+    assertEquals(UserRole.CANDIDATE, service.revokeCoordinatorRole(1L, 2L).getRole());
+  }
+
+  @Test
+  void testSelfRevokeCoordinatorRole() {
+    assertThrows(ApplicationErrorException.class,
+        () -> service.revokeCoordinatorRole(1L, 1L));
   }
 
   @Test
   void testRevokeCoordinatorRoleWrongId() {
-    when(userRepository.findByIdAndRole(-1L, UserRole.COORDINATOR))
+    when(userRepository.findById(-1L))
         .thenReturn(Optional.empty());
     assertThrows(NotFoundException.class,
-        () -> service.revokeCoordinatorRole(-1L));
+        () -> service.revokeCoordinatorRole(-1L, 1L));
   }
 
   @Test
   void testGetUsersWithRole() {
-    Set<User> set = Set.of(interviewer);
-    when(userRepository.findByRole(UserRole.INTERVIEWER)).thenReturn(set);
-    assertEquals(set, service.getUsersWithRole(UserRole.INTERVIEWER));
+    when(userRepository.findByRole(UserRole.INTERVIEWER)).thenReturn(List.of(interviewer));
+    assertEquals(List.of(interviewer), service.getUsersWithRole(UserRole.INTERVIEWER));
   }
 }

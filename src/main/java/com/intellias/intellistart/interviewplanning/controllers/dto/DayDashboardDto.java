@@ -1,8 +1,8 @@
 package com.intellias.intellistart.interviewplanning.controllers.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +19,7 @@ public class DayDashboardDto {
 
   private LocalDate date;
   private String dayOfWeek;
-  private Set<InterviewerSlotDto> interviewerSlots;
-  private Set<CandidateSlotDto> candidateSlots;
+  private List<InterviewerSlotDto> interviewerSlots;
+  private List<CandidateSlotDto> candidateSlots;
   private Map<Long, BookingDto> bookings;
 }

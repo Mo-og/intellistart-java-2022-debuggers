@@ -1,6 +1,8 @@
 package com.intellias.intellistart.interviewplanning.services;
 
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
+import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
+import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException.ErrorCode;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.User;
@@ -14,8 +16,7 @@ import com.intellias.intellistart.interviewplanning.utils.mappers.InterviewerSlo
 import com.intellias.intellistart.interviewplanning.validators.InterviewerSlotValidator;
 import java.time.DayOfWeek;
 import java.util.Comparator;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -66,7 +67,7 @@ public class InterviewerService {
    * @param interviewerId id of interviewer to get slots from
    * @return time slots of requested interviewer for current week and future weeks
    */
-  public Set<InterviewerTimeSlot> getRelevantInterviewerSlots(Long interviewerId) {
+  public List<InterviewerTimeSlot> getRelevantInterviewerSlots(Long interviewerId) {
     if (!userRepository.existsById(interviewerId)) {
       throw NotFoundException.interviewer(interviewerId);
     }
@@ -80,15 +81,18 @@ public class InterviewerService {
    *
    * @param interviewerId id of interviewer
    * @param weekId        id of week
-   * @return a set of interviewer time slots
+   * @return a list of interviewer time slots
    * @throws NotFoundException if no interviewer is found
    */
-  public Set<InterviewerSlotDto> getSlotsByWeekId(Long interviewerId, int weekId) {
-    if (!userRepository.existsByIdAndRole(interviewerId, UserRole.INTERVIEWER)) {
+  public List<InterviewerSlotDto> getSlotsByWeekId(Long interviewerId, int weekId) {
+    User user = userRepository.findById(interviewerId)
+        .orElseThrow(() -> NotFoundException.user(interviewerId));
+
+    if (user.getRole() != UserRole.INTERVIEWER) {
       throw NotFoundException.interviewer(interviewerId);
     }
 
-    Set<InterviewerTimeSlot> slots = interviewerTimeSlotRepository
+    List<InterviewerTimeSlot> slots = interviewerTimeSlotRepository
         .findByInterviewerIdAndWeekNum(interviewerId, weekId);
 
     return getInterviewerSlotsWithBookings(slots);
@@ -98,16 +102,16 @@ public class InterviewerService {
    * Returns interviewer slots with bookings.
    *
    * @param slots interviewer time slots
-   * @return a set of interviewer time slots with bookings
+   * @return a list of interviewer time slots with bookings
    */
-  public Set<InterviewerSlotDto> getInterviewerSlotsWithBookings(Set<InterviewerTimeSlot> slots) {
+  public List<InterviewerSlotDto> getInterviewerSlotsWithBookings(List<InterviewerTimeSlot> slots) {
     return slots.stream()
         .map(slot -> InterviewerSlotMapper.mapToDtoWithBookings(slot,
             bookingRepository.findByInterviewerSlot(slot)))
-        .collect(Collectors.toCollection(
-            () -> new TreeSet<>(Comparator.comparing((InterviewerSlotDto dto) ->
-                    DayOfWeek.from(Utils.DAY_OF_WEEK_FORMATTER.parse(dto.getDayOfWeek())))
-                .thenComparing(InterviewerSlotDto::getFrom))));
+        .sorted(Comparator.comparing((InterviewerSlotDto dto) ->
+                DayOfWeek.from(Utils.DAY_OF_WEEK_FORMATTER.parse(dto.getDayOfWeek())))
+            .thenComparing(InterviewerSlotDto::getFrom))
+        .collect(Collectors.toList());
   }
 
   /**
@@ -131,6 +135,40 @@ public class InterviewerService {
     slot.setWeekNum(interviewerTimeSlot.getWeekNum());
     slot.setInterviewer(interviewer);
     return interviewerTimeSlotRepository.save(slot);
+  }
+
+  /**
+   * Deletes slot by interviewer time slot id.
+   *
+   * @param interviewerId id of interviewer
+   * @param slotId        id of interviewer time slot
+   * @param currentUser   current user
+   * @return deleted slot
+   */
+  public InterviewerSlotDto deleteSlot(Long interviewerId, Long slotId, User currentUser) {
+    InterviewerTimeSlot slot = getSlotById(slotId);
+    if (!slot.getInterviewer().getId().equals(interviewerId)) {
+      throw new ApplicationErrorException(ErrorCode.SLOT_NOT_FOUND,
+          "Slot of given id does not belong to specified interviewer");
+    }
+    if (currentUser.getRole() == UserRole.INTERVIEWER) {
+      slotValidator.validate(slot);
+    }
+    if (hasBooking(slot)) {
+      throw new ApplicationErrorException(ErrorCode.DELETE_SLOT_WITH_BOOKING);
+    }
+    interviewerTimeSlotRepository.delete(slot);
+    return InterviewerSlotMapper.mapToDto(slot);
+  }
+
+  /**
+   * Checks if the interviewer time slot has booking.
+   *
+   * @param slot interviewer time slot
+   * @return true if slot has booking, otherwise - false
+   */
+  private boolean hasBooking(InterviewerTimeSlot slot) {
+    return !bookingRepository.findByInterviewerSlot(slot).isEmpty();
   }
 
   /**

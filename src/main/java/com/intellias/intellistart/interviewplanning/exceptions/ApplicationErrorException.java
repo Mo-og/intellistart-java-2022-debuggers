@@ -28,6 +28,17 @@ public class ApplicationErrorException extends RuntimeException {
     this.errorMessage = errorCode.message + errorMessage;
   }
 
+  /**
+   * Basic constructor.
+   *
+   * @param errorCode pre-defined API status
+   */
+  public ApplicationErrorException(ErrorCode errorCode) {
+    super(errorCode.message);
+    this.errorCode = errorCode;
+    this.errorMessage = errorCode.message;
+  }
+
   @JsonGetter
   public String getErrorCode() {
     return errorCode.code;
@@ -52,6 +63,7 @@ public class ApplicationErrorException extends RuntimeException {
     INTERVIEWER_NOT_FOUND(HttpStatus.NOT_FOUND, "No interviewer found"),
     COORDINATOR_NOT_FOUND(HttpStatus.NOT_FOUND, "No coordinator found"),
     SLOT_NOT_FOUND(HttpStatus.NOT_FOUND, "No slot found"),
+    BOOKING_NOT_FOUND(HttpStatus.NOT_FOUND, "No booking found"),
     BOOKING_LIMIT_NOT_FOUND(HttpStatus.NOT_FOUND, "No booking limit found"),
 
     //Conflict error code
@@ -62,6 +74,13 @@ public class ApplicationErrorException extends RuntimeException {
     INVALID_BOUNDARIES(HttpStatus.BAD_REQUEST, "Invalid time boundaries"),
     INVALID_DAY_OF_WEEK(HttpStatus.BAD_REQUEST, "Invalid day of week"),
     INVALID_WEEK_NUM(HttpStatus.BAD_REQUEST, "Invalid week number"),
+    REVOKE_USER_WITH_SLOT(HttpStatus.BAD_REQUEST,
+        "Can not revoke user who has time slot in the future"),
+    DELETE_SLOT_WITH_BOOKING(HttpStatus.BAD_REQUEST,
+        "Can not delete time slot that has booking"),
+
+    // Forbidden error code
+    SELF_ROLE_REVOKING(HttpStatus.FORBIDDEN, "Forbidden to revoke yourself"),
 
     //Authentication related
     INVALID_USER_CREDENTIALS(HttpStatus.BAD_REQUEST, "Invalid user credentials"),
@@ -77,5 +96,4 @@ public class ApplicationErrorException extends RuntimeException {
       this.message = errorMessage;
     }
   }
-
 }

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.intellias.intellistart.interviewplanning.utils.Utils;
 import java.time.LocalTime;
-import java.util.Set;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,7 +29,7 @@ public class InterviewerSlotDto {
   @JsonFormat(pattern = "HH:mm")
   private LocalTime to;
   @JsonInclude(Include.NON_EMPTY)
-  private Set<BookingDto> bookings;
+  private List<BookingDto> bookings;
 
   @JsonGetter("from")
   public String getFromAsString() {

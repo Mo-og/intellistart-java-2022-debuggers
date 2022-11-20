@@ -3,6 +3,7 @@ package com.intellias.intellistart.interviewplanning.services;
 import com.intellias.intellistart.interviewplanning.services.interfaces.WeekService;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.IsoFields;
@@ -17,13 +18,24 @@ import org.springframework.stereotype.Service;
 @Qualifier("WeekService")
 public class WeekServiceImp implements WeekService {
 
+  public static final ZoneId ZONE_ID = ZoneId.of("Europe/Kiev");
+
   /**
    * Returns current zoned date.
    *
    * @return LocalDate representation of zoned date
    */
   public LocalDate getCurrentDate() {
-    return ZonedDateTime.now(ZoneId.of("Europe/Kiev")).toLocalDate();
+    return ZonedDateTime.now(ZONE_ID).toLocalDate();
+  }
+
+  /**
+   * Returns current zoned date and time.
+   *
+   * @return LocalDateTime representation of zoned date and time
+   */
+  public LocalDateTime getCurrentDateTime() {
+    return ZonedDateTime.now(ZONE_ID).toLocalDateTime();
   }
 
   /**

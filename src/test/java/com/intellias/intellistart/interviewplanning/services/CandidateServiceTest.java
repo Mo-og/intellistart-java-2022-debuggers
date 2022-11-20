@@ -14,7 +14,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import javax.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +44,7 @@ class CandidateServiceTest {
     candidateSlot.setId(1L);
     candidateSlotDto.setId(1L);
     candidateSlotDtoWithBookings.setId(1L);
-    candidateSlotDtoWithBookings.setBookings(Collections.emptySet());
+    candidateSlotDtoWithBookings.setBookings(Collections.emptyList());
   }
 
   @Mock
@@ -83,14 +82,14 @@ class CandidateServiceTest {
   @Test
   void testAllCandidateSlots() {
     when(candidateSlotRepository.findByEmail(CANDIDATE_EMAIL)).thenReturn(List.of(candidateSlot));
-    assertEquals(Set.of(candidateSlotDtoWithBookings),
+    assertEquals(List.of(candidateSlotDtoWithBookings),
         service.getAllCandidateSlots(CANDIDATE_EMAIL));
   }
 
   @Test
   void testGetCandidateSlotsWithBookings() {
     var result = service.getCandidateSlotsWithBookings(List.of(candidateSlot));
-    assertEquals(Set.of(candidateSlotDtoWithBookings), result);
+    assertEquals(List.of(candidateSlotDtoWithBookings), result);
   }
 
   @Test

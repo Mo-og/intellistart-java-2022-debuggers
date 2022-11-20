@@ -16,7 +16,7 @@ import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import com.intellias.intellistart.interviewplanning.services.WeekServiceImp;
 import com.intellias.intellistart.interviewplanning.services.interfaces.WeekService;
 import java.time.LocalTime;
-import java.util.Set;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -51,11 +51,11 @@ class SlotControllerTest {
   private final InterviewerSlotDto interviewerSlotDto1 =
       new InterviewerSlotDto(interviewerId, actualWeekService.getCurrentWeekNum(),
           "friday", LocalTime.parse("08:00"),
-          LocalTime.parse("10:00"), Set.of(bookingDto));
+          LocalTime.parse("10:00"), List.of(bookingDto));
   private final InterviewerSlotDto interviewerSlotDto2 =
       new InterviewerSlotDto(interviewerId, actualWeekService.getNextWeekNum(),
           "friday", LocalTime.parse("08:00"),
-          LocalTime.parse("10:00"), Set.of(bookingDto));
+          LocalTime.parse("10:00"), List.of(bookingDto));
 
   static {
     interviewerSlot.setId(1L);
@@ -77,10 +77,10 @@ class SlotControllerTest {
   void testGetAllInterviewerSlots() {
     when(interviewerService
         .getRelevantInterviewerSlots(1L))
-        .thenReturn(Set.of(interviewerSlot));
+        .thenReturn(List.of(interviewerSlot));
     checkResponseOk(
         get("/interviewers/{interviewerId}/slots", 1L),
-        null, json(Set.of(interviewerSlot)), mockMvc);
+        null, json(List.of(interviewerSlot)), mockMvc);
   }
 
   @Test
@@ -117,20 +117,20 @@ class SlotControllerTest {
   void testGetCurrentWeekInterviewerSlots() {
     when(interviewerService.getSlotsByWeekId(interviewerId,
         actualWeekService.getCurrentWeekNum()))
-        .thenReturn(Set.of(interviewerSlotDto1));
+        .thenReturn(List.of(interviewerSlotDto1));
     checkResponseOk(
         get("/interviewers/{interviewerId}/slots/weeks/current", interviewerId),
-        null, json(Set.of(interviewerSlotDto1)), mockMvc);
+        null, json(List.of(interviewerSlotDto1)), mockMvc);
   }
 
   @Test
   void testGetNextWeekInterviewerSlots() {
     when(interviewerService.getSlotsByWeekId(interviewerId,
         actualWeekService.getNextWeekNum()))
-        .thenReturn(Set.of(interviewerSlotDto2));
+        .thenReturn(List.of(interviewerSlotDto2));
     System.out.println(interviewerSlotDto2);
     checkResponseOk(
         get("/interviewers/{interviewerId}/slots/weeks/next", interviewerId),
-        null, json(Set.of(interviewerSlotDto2)), mockMvc);
+        null, json(List.of(interviewerSlotDto2)), mockMvc);
   }
 }

@@ -20,8 +20,8 @@ import com.intellias.intellistart.interviewplanning.services.interfaces.WeekServ
 import com.intellias.intellistart.interviewplanning.validators.InterviewerSlotValidator;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
+import java.util.Optional;
 import javax.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -73,14 +73,14 @@ class InterviewerServiceTest {
           .to(LocalTime.of(11, 30))
           .subject("some subject")
           .description("some desc")
-          .interviewerSlotId(timeSlot.getId())
-          .candidateSlotId(candidateSlot.getId())
+          .interviewerSlotId(1L)
+          .candidateSlotId(2L)
           .build();
 
   {
     timeSlot.setId(1L);
     interviewerSlotDto.setId(1L);
-    interviewerSlotDto.setBookings(Set.of(bookingDto));
+    interviewerSlotDto.setBookings(List.of(bookingDto));
     interviewer.setId(1L);
     timeSlotWithUser.setId(1L);
     timeSlotWithUser.setInterviewer(interviewer);
@@ -125,18 +125,16 @@ class InterviewerServiceTest {
 
   @Test
   void testGetRelevantInterviewerSlots() {
-    Set<InterviewerTimeSlot> set = new HashSet<>();
-    set.add(timeSlotWithUser);
     when(userRepository
         .existsById(1L))
         .thenReturn(true);
     when(interviewerTimeSlotRepository
         .findByInterviewerIdAndWeekNumGreaterThanEqual(1L,
             actualWeekService.getCurrentWeekNum()))
-        .thenReturn(set);
+        .thenReturn(List.of(timeSlotWithUser));
     var retrievedSet = interviewerService
         .getRelevantInterviewerSlots(1L);
-    assertEquals(set, retrievedSet);
+    assertEquals(List.of(timeSlotWithUser), retrievedSet);
   }
 
   @Test
@@ -151,24 +149,24 @@ class InterviewerServiceTest {
   @Test
   void testGetSlotsByWeekId() {
     when(userRepository
-        .existsByIdAndRole(1L, UserRole.INTERVIEWER))
-        .thenReturn(true);
+        .findById(1L))
+        .thenReturn(Optional.of(interviewer));
     when(interviewerTimeSlotRepository
         .findByInterviewerIdAndWeekNum(1L, actualWeekService.getNextWeekNum()))
-        .thenReturn(Set.of(timeSlot));
+        .thenReturn(List.of(timeSlot));
     when(bookingRepository
         .findByInterviewerSlot(timeSlot))
-        .thenReturn(Set.of(booking));
+        .thenReturn(List.of(booking));
     var result = interviewerService
         .getSlotsByWeekId(1L, actualWeekService.getNextWeekNum());
-    assertEquals(Set.of(interviewerSlotDto), result);
+    assertEquals(List.of(interviewerSlotDto), result);
   }
 
   @Test
   void testGetSlotsByWeekIdWithWrongInterviewerId() {
     when(userRepository
-        .existsByIdAndRole(-1L, UserRole.INTERVIEWER))
-        .thenThrow(NotFoundException.interviewer(-1L));
+        .findById(-1L))
+        .thenThrow(NotFoundException.user(-1L));
     int weekNum = actualWeekService.getNextWeekNum();
     assertThrows(NotFoundException.class,
         () -> interviewerService.getSlotsByWeekId(-1L, weekNum));
@@ -177,7 +175,7 @@ class InterviewerServiceTest {
   @Test
   void testGetSlotsByWeekIdWithWrongInterviewerRole() {
     when(userRepository
-        .existsByIdAndRole(2L, UserRole.INTERVIEWER))
+        .findById(2L))
         .thenThrow(NotFoundException.interviewer(2L));
     int weekNum = actualWeekService.getNextWeekNum();
     assertThrows(NotFoundException.class,
@@ -186,10 +184,10 @@ class InterviewerServiceTest {
 
   @Test
   void testGetInterviewerSlotsWithBookings() {
-    when(bookingRepository.findByInterviewerSlot(timeSlot)).thenReturn(Set.of(booking));
+    when(bookingRepository.findByInterviewerSlot(timeSlot)).thenReturn(List.of(booking));
     var result = interviewerService
-        .getInterviewerSlotsWithBookings(Set.of(timeSlot));
-    assertEquals(Set.of(interviewerSlotDto), result);
+        .getInterviewerSlotsWithBookings(List.of(timeSlot));
+    assertEquals(List.of(interviewerSlotDto), result);
   }
 
   @Test
@@ -232,10 +230,11 @@ class InterviewerServiceTest {
   @Test
   void testThrowExceptionGetSlotsByWeekId() {
     when(userRepository
-        .existsByIdAndRole(1L, UserRole.INTERVIEWER))
-        .thenReturn(false);
+        .findById(2L))
+        .thenThrow(NotFoundException.interviewer(2L));
+    int weekNum = weekService.getNextWeekNum();
     assertThrows(NotFoundException.class,
-        () -> interviewerService.getSlotsByWeekId(1L, actualWeekService.getCurrentWeekNum()));
+        () -> interviewerService.getSlotsByWeekId(2L, weekNum));
   }
 
   @Test

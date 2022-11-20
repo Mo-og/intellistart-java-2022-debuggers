@@ -36,6 +36,10 @@ public class NotFoundException extends ApplicationErrorException {
         String.format(" with id: %d, belonging to interviewer with id: %d", id, interviewerId));
   }
 
+  public static NotFoundException booking(Long id) {
+    return new NotFoundException(ErrorCode.BOOKING_NOT_FOUND, " with id: " + id);
+  }
+
   /**
    * Booking limit not found exception.
    *

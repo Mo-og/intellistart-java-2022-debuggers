@@ -5,6 +5,8 @@ import com.intellias.intellistart.interviewplanning.controllers.dto.CandidateSlo
 import com.intellias.intellistart.interviewplanning.controllers.dto.DashboardDto;
 import com.intellias.intellistart.interviewplanning.controllers.dto.DayDashboardDto;
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
+import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
+import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException.ErrorCode;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
@@ -73,10 +75,10 @@ public class CoordinatorService {
   public DayDashboardDto getDayDashboard(int weekNum, DayOfWeek day) {
     LocalDate date = weekService.getDateByWeekNumAndDayOfWeek(weekNum, day);
 
-    Set<InterviewerTimeSlot> interviewerSlots = interviewerTimeSlotRepository
+    List<InterviewerTimeSlot> interviewerSlots = interviewerTimeSlotRepository
         .findByWeekNumAndDayOfWeek(weekNum, day);
-    Set<CandidateTimeSlot> candidateSlots = candidateTimeSlotRepository.findByDate(date);
-    Set<Booking> bookings = bookingRepository.findByCandidateSlotDate(date);
+    List<CandidateTimeSlot> candidateSlots = candidateTimeSlotRepository.findByDate(date);
+    List<Booking> bookings = bookingRepository.findByCandidateSlotDate(date);
 
     return DayDashboardDto.builder()
         .date(date)
@@ -91,37 +93,37 @@ public class CoordinatorService {
    * Returns interviewer slots with bookings.
    *
    * @param slots interviewer time slots
-   * @return a set of interviewer time slots with bookings
+   * @return a list of interviewer time slots with bookings
    */
-  public Set<InterviewerSlotDto> getInterviewerSlotsWithBookings(Set<InterviewerTimeSlot> slots) {
+  public List<InterviewerSlotDto> getInterviewerSlotsWithBookings(List<InterviewerTimeSlot> slots) {
     return slots.stream()
         .map(slot -> InterviewerSlotMapper.mapToDtoWithBookings(slot,
             bookingRepository.findByInterviewerSlot(slot)))
-        .collect(Collectors.toCollection(
-            () -> new TreeSet<>(Comparator.comparing(InterviewerSlotDto::getFrom))));
+        .sorted(Comparator.comparing(InterviewerSlotDto::getFrom))
+        .collect(Collectors.toList());
   }
 
   /**
    * Returns candidate slots with bookings.
    *
    * @param slots candidate time slots
-   * @return a set of candidate time slots with bookings
+   * @return a list of candidate time slots with bookings
    */
-  public Set<CandidateSlotDto> getCandidateSlotsWithBookings(Set<CandidateTimeSlot> slots) {
+  public List<CandidateSlotDto> getCandidateSlotsWithBookings(List<CandidateTimeSlot> slots) {
     return slots.stream()
         .map(slot -> CandidateSlotMapper.mapToDtoWithBookings(slot,
             bookingRepository.findByCandidateSlot(slot)))
-        .collect(Collectors.toCollection(
-            () -> new TreeSet<>(Comparator.comparing(CandidateSlotDto::getFrom))));
+        .sorted(Comparator.comparing(CandidateSlotDto::getFrom))
+        .collect(Collectors.toList());
   }
 
   /**
    * Grouping the bookings into a map.
    *
-   * @param bookings set of bookings
+   * @param bookings list of bookings
    * @return map of bookings as map bookingId bookingData
    */
-  public Map<Long, BookingDto> getBookingMap(Set<Booking> bookings) {
+  public Map<Long, BookingDto> getBookingMap(List<Booking> bookings) {
     return bookings.stream()
         .map(BookingMapper::mapToDto)
         .collect(Collectors.toMap(BookingDto::getId, Function.identity()));
@@ -130,12 +132,17 @@ public class CoordinatorService {
   /**
    * Grant user the interviewer role by email.
    *
-   * @param email user email
+   * @param email                   email of the user
+   * @param currentCoordinatorEmail email of the current coordinator
    * @return user with the granted interviewer role
+   * @throws ApplicationErrorException if coordinator grant himself
    */
-  public User grantInterviewerRole(String email) {
+  public User grantInterviewerRole(String email, String currentCoordinatorEmail) {
+    if (email.equals(currentCoordinatorEmail)) {
+      throw new ApplicationErrorException(ErrorCode.SELF_ROLE_REVOKING);
+    }
     User user = userRepository.findByEmail(email)
-        .orElseGet(() -> new User(email, null));
+        .orElseGet(() -> new User(email, UserRole.INTERVIEWER));
     user.setRole(UserRole.INTERVIEWER);
     return userRepository.save(user);
   }
@@ -145,66 +152,84 @@ public class CoordinatorService {
    *
    * @param email user email
    * @return user with the granted coordinator role
+   * @throws ApplicationErrorException if user is interviewer and has active slots
    */
   public User grantCoordinatorRole(String email) {
     User user = userRepository.findByEmail(email)
-        .orElseGet(() -> new User(email, null));
-    if (user.getRole() == UserRole.INTERVIEWER) {
-      removeInterviewerSlotsAndBookings(user);
+        .orElseGet(() -> new User(email, UserRole.COORDINATOR));
+    if (user.getRole() == UserRole.INTERVIEWER && hasActiveSlot(user)) {
+      throw new ApplicationErrorException(ErrorCode.REVOKE_USER_WITH_SLOT);
     }
     user.setRole(UserRole.COORDINATOR);
     return userRepository.save(user);
   }
 
   /**
-   * Removes all interviewer slots and bookings.
+   * Revoke the interviewer role by user id.
    *
-   * @param user interviewer
-   */
-  private void removeInterviewerSlotsAndBookings(User user) {
-    List<InterviewerTimeSlot> slots = interviewerTimeSlotRepository.findByInterviewer(user);
-    for (InterviewerTimeSlot slot : slots) {
-      Set<Booking> bookings = bookingRepository.findByInterviewerSlot(slot);
-      bookingRepository.deleteAll(bookings);
-      interviewerTimeSlotRepository.delete(slot);
-    }
-  }
-
-  /**
-   * Revoke the interviewer role by id.
-   *
-   * @param id user id
-   * @return user whose role has been revoked
+   * @param id id of the user whose role will be revoked
+   * @return user with revoked interviewer role
+   * @throws NotFoundException         if interviewer with the specified id is not found
+   * @throws ApplicationErrorException if interviewer has active slots
    */
   public User revokeInterviewerRole(Long id) {
-    User user = userRepository.findByIdAndRole(id, UserRole.INTERVIEWER)
-        .orElseThrow(() -> NotFoundException.interviewer(id));
-    removeInterviewerSlotsAndBookings(user);
-    userRepository.delete(user);
-    return user;
+    User user = userRepository.findById(id).orElseThrow(() -> NotFoundException.user(id));
+    if (user.getRole() != UserRole.INTERVIEWER) {
+      throw NotFoundException.interviewer(id);
+    }
+    if (hasActiveSlot(user)) {
+      throw new ApplicationErrorException(ErrorCode.REVOKE_USER_WITH_SLOT);
+    }
+    user.setRole(UserRole.CANDIDATE);
+    return userRepository.save(user);
   }
 
   /**
-   * Revoke the coordinator role by id.
+   * Revoke the coordinator role by user id.
    *
-   * @param id user id
-   * @return user whose role has been revoked
+   * @param id                   id of the user whose role will be revoked
+   * @param currentCoordinatorId id of the current coordinator
+   * @return user with revoked coordinator role
+   * @throws NotFoundException         if coordinator with the specified id is not found
+   * @throws ApplicationErrorException if coordinator revoke himself
    */
-  public User revokeCoordinatorRole(Long id) {
-    User user = userRepository.findByIdAndRole(id, UserRole.COORDINATOR)
-        .orElseThrow(() -> NotFoundException.coordinator(id));
-    // Todo Coordinator cannot revoke himself
-    userRepository.delete(user);
-    return user;
+  public User revokeCoordinatorRole(Long id, Long currentCoordinatorId) {
+    if (id.equals(currentCoordinatorId)) {
+      throw new ApplicationErrorException(ErrorCode.SELF_ROLE_REVOKING);
+    }
+    User user = userRepository.findById(id).orElseThrow(() -> NotFoundException.user(id));
+    if (user.getRole() != UserRole.COORDINATOR) {
+      throw NotFoundException.coordinator(id);
+    }
+    user.setRole(UserRole.CANDIDATE);
+    return userRepository.save(user);
   }
 
   /**
    * Provides all users with the specified role.
    *
    * @param role user role
-   * @return set of users with specified role
+   * @return a list of users with the specified role
    */
-  public Set<User> getUsersWithRole(UserRole role) {
+  public List<User> getUsersWithRole(UserRole role) {
     return userRepository.findByRole(role);
+  }
+
+  /**
+   * Checks if the user has slots in the future.
+   *
+   * @param user interviewer
+   * @return true if user has active slots, otherwise - false
+   */
+  private boolean hasActiveSlot(User user) {
+    List<InterviewerTimeSlot> slots = interviewerTimeSlotRepository.findByInterviewer(user);
+    for (InterviewerTimeSlot slot : slots) {
+      if (weekService.getDateByWeekNumAndDayOfWeek(slot.getWeekNum(), slot.getDayOfWeek())
+          .atTime(slot.getFrom())
+          .isAfter(weekService.getCurrentDateTime())) {
+        return true;
+      }
+    }
+    return false;
   }
 }

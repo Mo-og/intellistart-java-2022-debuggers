@@ -5,8 +5,7 @@ import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import java.util.Comparator;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.List;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 
@@ -63,12 +62,12 @@ public class BookingMapper {
    * entity to BookingDto.
    *
    * @param bookings entities
-   * @return Set of BookingDto
+   * @return list of BookingDto
    */
-  public Set<BookingDto> mapSetToDto(Set<Booking> bookings) {
+  public List<BookingDto> mapSetToDto(List<Booking> bookings) {
     return bookings.stream()
         .map(BookingMapper::mapToDto)
-        .collect(Collectors.toCollection(
-            () -> new TreeSet<>(Comparator.comparing(BookingDto::getFrom))));
+        .sorted(Comparator.comparing(BookingDto::getFrom))
+        .collect(Collectors.toList());
   }
 }
