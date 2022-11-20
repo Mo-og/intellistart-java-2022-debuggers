@@ -25,7 +25,7 @@ public class ApplicationErrorException extends RuntimeException {
   public ApplicationErrorException(ErrorCode errorCode, String errorMessage) {
     super(errorCode.message + errorMessage);
     this.errorCode = errorCode;
-    this.errorMessage = errorMessage;
+    this.errorMessage = errorCode.message + errorMessage;
   }
 
   /**
@@ -61,6 +61,7 @@ public class ApplicationErrorException extends RuntimeException {
     INTERVIEWER_NOT_FOUND(HttpStatus.NOT_FOUND, "No interviewer found"),
     COORDINATOR_NOT_FOUND(HttpStatus.NOT_FOUND, "No coordinator found"),
     SLOT_NOT_FOUND(HttpStatus.NOT_FOUND, "No slot found"),
+    BOOKING_LIMIT_NOT_FOUND(HttpStatus.NOT_FOUND, "No booking limit found"),
 
     //Conflict error code
     SLOT_IS_OVERLAPPING(HttpStatus.CONFLICT, "slot_is_overlapping"),

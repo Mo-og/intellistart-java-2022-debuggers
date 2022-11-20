@@ -17,6 +17,7 @@ import com.intellias.intellistart.interviewplanning.repositories.BookingReposito
 import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
+import com.intellias.intellistart.interviewplanning.services.interfaces.WeekService;
 import com.intellias.intellistart.interviewplanning.utils.mappers.BookingMapper;
 import com.intellias.intellistart.interviewplanning.utils.mappers.CandidateSlotMapper;
 import com.intellias.intellistart.interviewplanning.utils.mappers.InterviewerSlotMapper;
@@ -31,37 +32,21 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**
  * Coordinator service.
  */
 @Service
+@RequiredArgsConstructor
 public class CoordinatorService {
 
+  private final WeekService weekService;
   private final InterviewerTimeSlotRepository interviewerTimeSlotRepository;
   private final CandidateTimeSlotRepository candidateTimeSlotRepository;
   private final BookingRepository bookingRepository;
   private final UserRepository userRepository;
-
-  /**
-   * Constructor.
-   *
-   * @param interviewerTimeSlotRepository interviewer time slot repository
-   * @param candidateTimeSlotRepository   candidate time slot repository
-   * @param bookingRepository             booking repository
-   * @param userRepository                user repository
-   */
-  @Autowired
-  public CoordinatorService(InterviewerTimeSlotRepository interviewerTimeSlotRepository,
-      CandidateTimeSlotRepository candidateTimeSlotRepository,
-      BookingRepository bookingRepository, UserRepository userRepository) {
-    this.interviewerTimeSlotRepository = interviewerTimeSlotRepository;
-    this.candidateTimeSlotRepository = candidateTimeSlotRepository;
-    this.bookingRepository = bookingRepository;
-    this.userRepository = userRepository;
-  }
 
   /**
    * Returns week dashboard with time slots and bookings by a specified number of week.
@@ -88,7 +73,7 @@ public class CoordinatorService {
    * @return dashboard with time slots and bookings for the day
    */
   public DayDashboardDto getDayDashboard(int weekNum, DayOfWeek day) {
-    LocalDate date = WeekService.getDateByWeekNumAndDayOfWeek(weekNum, day);
+    LocalDate date = weekService.getDateByWeekNumAndDayOfWeek(weekNum, day);
 
     List<InterviewerTimeSlot> interviewerSlots = interviewerTimeSlotRepository
         .findByWeekNumAndDayOfWeek(weekNum, day);
@@ -239,9 +224,9 @@ public class CoordinatorService {
   private boolean hasActiveSlot(User user) {
     List<InterviewerTimeSlot> slots = interviewerTimeSlotRepository.findByInterviewer(user);
     for (InterviewerTimeSlot slot : slots) {
-      if (WeekService.getDateByWeekNumAndDayOfWeek(slot.getWeekNum(), slot.getDayOfWeek())
+      if (weekService.getDateByWeekNumAndDayOfWeek(slot.getWeekNum(), slot.getDayOfWeek())
           .atTime(slot.getFrom())
-          .isAfter(WeekService.getCurrentDateTime())) {
+          .isAfter(weekService.getCurrentDateTime())) {
         return true;
       }
     }

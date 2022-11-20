@@ -54,7 +54,7 @@ public class UserService implements UserDetailsService {
     try {
       return (User) Hibernate.unproxy(userRepository.getReferenceById(id));
     } catch (EntityNotFoundException e) {
-      throw NotFoundException.coordinator(id);
+      throw NotFoundException.user(id);
     }
   }
 

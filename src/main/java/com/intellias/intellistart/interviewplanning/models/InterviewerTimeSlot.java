@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ToString
 @RequiredArgsConstructor
 public class InterviewerTimeSlot {
+
   @ManyToOne
   @JsonIgnore
   User interviewer;

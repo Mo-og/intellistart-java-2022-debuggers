@@ -1,6 +1,8 @@
 package com.intellias.intellistart.interviewplanning.controllers.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.intellias.intellistart.interviewplanning.utils.Utils;
 import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,8 +14,8 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class BookingDto {
 
   private Long id;
@@ -25,4 +27,14 @@ public class BookingDto {
   private String description;
   private Long interviewerSlotId;
   private Long candidateSlotId;
+
+  @JsonGetter("from")
+  public String getFromAsString() {
+    return Utils.timeAsString(from);
+  }
+
+  @JsonGetter("to")
+  public String getToAsString() {
+    return Utils.timeAsString(to);
+  }
 }

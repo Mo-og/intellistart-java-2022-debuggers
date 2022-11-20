@@ -15,7 +15,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.Hibernate;
 
 /**
@@ -24,8 +23,8 @@ import org.hibernate.Hibernate;
 @Entity
 @Getter
 @Setter
-@ToString
 public class Booking {
+
   @Id
   @SequenceGenerator(name = "booking_seq", sequenceName = "booking_sequence", allocationSize = 5)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "booking_seq")

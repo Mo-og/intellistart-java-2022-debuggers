@@ -26,13 +26,17 @@ public class BookingLimit {
   /**
    * Constructor.
    *
-   * @param weekNum          week number
-   * @param limit            limit of bookings
+   * @param weekNum week number
+   * @param limit   limit of bookings
    */
   public BookingLimit(Long interviewerId, int weekNum, int limit) {
     this.interviewerId = interviewerId;
     this.weekNum = weekNum;
     this.bookingLimit = limit;
+  }
+
+  public BookingLimit(Long interviewerId) {
+    this.interviewerId = interviewerId;
   }
 
   public BookingLimit() {

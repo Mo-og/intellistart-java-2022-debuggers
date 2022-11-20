@@ -194,4 +194,14 @@ class UserControllerTest {
     checkResponseOk(get("/users/{id}", 1),
         null, json(testCoordinator), mockMvc);
   }
+
+  @Test
+  void testGetAllUsers() {
+    when(userService.getAll())
+        .thenReturn(List.of(testCandidate, testCoordinator, testInterviewer));
+    checkResponseOk(
+        get("/users"),
+        null, json(List.of(testCandidate, testCoordinator, testInterviewer)),
+        mockMvc);
+  }
 }

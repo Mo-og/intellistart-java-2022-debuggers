@@ -12,7 +12,9 @@ import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
 import com.intellias.intellistart.interviewplanning.repositories.BookingLimitRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
+import com.intellias.intellistart.interviewplanning.services.interfaces.WeekService;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,33 +22,35 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class BookingLimitServiceTest {
+class BookingLimitServiceTest {
 
   private BookingLimitService bookingLimitService;
   @Mock
   private BookingLimitRepository bookingLimitRepository;
   @Mock
   private UserRepository userRepository;
+  private final WeekService weekService = new WeekServiceImp();
 
   @BeforeEach
   void setService() {
-    bookingLimitService = new BookingLimitService(bookingLimitRepository, userRepository);
+    bookingLimitService = new BookingLimitService(bookingLimitRepository, userRepository,
+        weekService);
   }
 
   private static final int limit = 5;
-  private static final int nextWeekNum = WeekService.getNextWeekNum();
+  private final int nextWeekNum = weekService.getNextWeekNum();
   private static final Long existingUserId = 1L;
   private static final Long notExistingUserId = 2L;
 
-  private static final BookingLimit bookingLimit = new BookingLimit(
+  private final BookingLimit bookingLimit = new BookingLimit(
       existingUserId,
       nextWeekNum,
       limit);
-  private static final BookingLimit bookingLimit2 = new BookingLimit(
+  private final BookingLimit bookingLimit2 = new BookingLimit(
       notExistingUserId,
       nextWeekNum,
       limit + 2);
-  private static final BookingLimitDto bookingLimitRequest = new BookingLimitDto(limit,
+  private final BookingLimitDto bookingLimitRequest = new BookingLimitDto(limit,
       nextWeekNum);
   private static final BookingLimitDto badBookingLimitRequest = new BookingLimitDto(limit,
       0);
@@ -54,7 +58,7 @@ public class BookingLimitServiceTest {
   @Test
   void testSetBooking() {
     when(bookingLimitRepository.findByInterviewerIdAndWeekNum(existingUserId, nextWeekNum))
-        .thenReturn(bookingLimit);
+        .thenReturn(Optional.of(bookingLimit));
     when(userRepository.existsById(existingUserId))
         .thenReturn(true);
     when(bookingLimitRepository.save(bookingLimit))
@@ -86,7 +90,7 @@ public class BookingLimitServiceTest {
   @Test
   void testSetBookingNewBooking() {
     when(bookingLimitRepository.findByInterviewerIdAndWeekNum(existingUserId, nextWeekNum))
-        .thenReturn(null);
+        .thenReturn(Optional.of(bookingLimit));
     when(userRepository.existsById(existingUserId))
         .thenReturn(true);
     when(bookingLimitRepository.save(any()))
@@ -112,7 +116,7 @@ public class BookingLimitServiceTest {
     lenient().when(userRepository.existsById(existingUserId))
         .thenReturn(true);
     when(bookingLimitRepository.findByInterviewerIdAndWeekNum(existingUserId, nextWeekNum))
-        .thenReturn(bookingLimit);
+        .thenReturn(Optional.of(bookingLimit));
     assertEquals(bookingLimitService.findBookingLimit(existingUserId, nextWeekNum),
         bookingLimit);
   }
@@ -123,5 +127,13 @@ public class BookingLimitServiceTest {
         .thenReturn(false);
     assertThrows(NotFoundException.class,
         () -> bookingLimitService.findBookingLimit(existingUserId, nextWeekNum));
+  }
+
+  @Test
+  void testThrowBookingLimitExceptionFindBookingLimit() {
+    when(bookingLimitRepository.findByInterviewerIdAndWeekNum(existingUserId, nextWeekNum))
+        .thenThrow(NotFoundException.bookingLimit(existingUserId, nextWeekNum));
+    assertThrows(NotFoundException.class,
+        () -> bookingLimitRepository.findByInterviewerIdAndWeekNum(existingUserId, nextWeekNum));
   }
 }
