@@ -245,7 +245,9 @@ class CoordinatorServiceTest {
   void testRevokeInterviewerRole() {
     when(userRepository.findById(1L))
         .thenReturn(Optional.of(interviewer));
-    assertEquals(UserRole.INTERVIEWER, service.revokeInterviewerRole(1L).getRole());
+    when(userRepository.save(interviewer))
+        .thenReturn(interviewer);
+    assertEquals(UserRole.CANDIDATE, service.revokeInterviewerRole(1L).getRole());
   }
 
   @Test
@@ -260,7 +262,9 @@ class CoordinatorServiceTest {
   void testRevokeCoordinatorRole() {
     when(userRepository.findById(1L))
         .thenReturn(Optional.of(coordinator));
-    assertEquals(UserRole.COORDINATOR, service.revokeCoordinatorRole(1L, 2L).getRole());
+    when(userRepository.save(coordinator))
+        .thenReturn(coordinator);
+    assertEquals(UserRole.CANDIDATE, service.revokeCoordinatorRole(1L, 2L).getRole());
   }
 
   @Test
