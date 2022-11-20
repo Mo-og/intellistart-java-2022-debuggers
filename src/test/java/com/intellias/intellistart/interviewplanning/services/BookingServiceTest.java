@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import com.intellias.intellistart.interviewplanning.controllers.dto.BookingDto;
+import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
@@ -17,7 +17,6 @@ import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSl
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import java.time.LocalTime;
 import java.util.Optional;
-import javax.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -120,13 +119,14 @@ class BookingServiceTest {
 
   @Test
   void testRemoveBooking() {
-    doNothing().when(bookingRepository).deleteById(1L);
+    when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
+    doNothing().when(bookingRepository).delete(booking);
     assertDoesNotThrow(() -> service.removeBooking(1L));
   }
 
   @Test
   void testRemoveBookingNotFound() {
-    doThrow(EntityNotFoundException.class).when(bookingRepository).deleteById(1L);
-    assertThrows(EntityNotFoundException.class, () -> service.removeBooking(1L));
+    when(bookingRepository.findById(2L)).thenThrow(NotFoundException.booking(2L));
+    assertThrows(NotFoundException.class, () -> service.removeBooking(2L));
   }
 }

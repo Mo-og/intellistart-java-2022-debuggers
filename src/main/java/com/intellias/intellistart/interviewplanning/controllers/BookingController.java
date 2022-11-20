@@ -45,9 +45,7 @@ public class BookingController {
   }
 
   @DeleteMapping("/bookings/{bookingId}")
-  public boolean deleteBooking(@PathVariable long bookingId) {
-    bookingService.removeBooking(bookingId);
-    return true;
+  public BookingDto deleteBooking(@PathVariable long bookingId) {
+    return bookingService.removeBooking(bookingId);
   }
-
 }

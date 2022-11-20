@@ -34,7 +34,9 @@ public class ApplicationErrorException extends RuntimeException {
    * @param errorCode pre-defined API status
    */
   public ApplicationErrorException(ErrorCode errorCode) {
-    this(errorCode, errorCode.message);
+    super(errorCode.message);
+    this.errorCode = errorCode;
+    this.errorMessage = errorCode.message;
   }
 
   @JsonGetter
@@ -61,6 +63,7 @@ public class ApplicationErrorException extends RuntimeException {
     INTERVIEWER_NOT_FOUND(HttpStatus.NOT_FOUND, "No interviewer found"),
     COORDINATOR_NOT_FOUND(HttpStatus.NOT_FOUND, "No coordinator found"),
     SLOT_NOT_FOUND(HttpStatus.NOT_FOUND, "No slot found"),
+    BOOKING_NOT_FOUND(HttpStatus.NOT_FOUND, "No booking found"),
     BOOKING_LIMIT_NOT_FOUND(HttpStatus.NOT_FOUND, "No booking limit found"),
 
     //Conflict error code
