@@ -85,19 +85,21 @@ public class CandidateService {
   /**
    * Update slot by id.
    *
-   * @param slotId slot id
-   * @param slot   candidate time slot
+   * @param email            candidate email
+   * @param slotId           slot id
+   * @param candidateSlotDto candidate time slot dto
    */
-  public CandidateTimeSlot updateSlot(Long slotId, CandidateTimeSlot slot) {
+  public CandidateSlotDto updateSlot(String email, Long slotId, CandidateSlotDto candidateSlotDto) {
     // validate from, to, date
     // check if current time is by end of Friday (00:00) of current week
+    CandidateTimeSlot candidateSlot = CandidateSlotMapper.mapToEntity(email, candidateSlotDto);
     if (!candidateTimeSlotRepository.existsById(slotId)) {
       throw NotFoundException.timeSlot(slotId);
     }
     CandidateTimeSlot timeSlot = candidateTimeSlotRepository.getReferenceById(slotId);
-    timeSlot.setFrom(slot.getFrom());
-    timeSlot.setTo(slot.getTo());
-    timeSlot.setDate(slot.getDate());
-    return candidateTimeSlotRepository.save(slot);
+    timeSlot.setFrom(candidateSlot.getFrom());
+    timeSlot.setTo(candidateSlot.getTo());
+    timeSlot.setDate(candidateSlot.getDate());
+    return CandidateSlotMapper.mapToDto(candidateTimeSlotRepository.save(timeSlot));
   }
 }
