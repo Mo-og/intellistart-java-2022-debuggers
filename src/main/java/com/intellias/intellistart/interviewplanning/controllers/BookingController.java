@@ -3,6 +3,7 @@ package com.intellias.intellistart.interviewplanning.controllers;
 import com.intellias.intellistart.interviewplanning.controllers.dto.BookingDto;
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.services.BookingService;
+import com.intellias.intellistart.interviewplanning.utils.mappers.BookingMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,8 +41,8 @@ public class BookingController {
    * @return booking
    */
   @PostMapping("/bookings/{bookingId}")
-  public Booking updateBooking(@PathVariable long bookingId, @RequestBody Booking booking) {
-    return bookingService.updateBooking(bookingId, booking);
+  public BookingDto updateBooking(@PathVariable long bookingId, @RequestBody Booking booking) {
+    return BookingMapper.mapToDto(bookingService.updateBooking(bookingId, booking));
   }
 
   @DeleteMapping("/bookings/{bookingId}")
