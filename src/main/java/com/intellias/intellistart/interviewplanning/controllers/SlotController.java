@@ -1,5 +1,6 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
+import com.intellias.intellistart.interviewplanning.controllers.dto.CandidateSlotDto;
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
@@ -30,21 +31,28 @@ public class SlotController {
 
 
   @GetMapping("/interviewers/{interviewerId}/slots")
-  public List<InterviewerTimeSlot> getAllInterviewerSlots(@PathVariable Long interviewerId) {
+  public List<InterviewerSlotDto> getAllInterviewerSlots(@PathVariable Long interviewerId) {
     return interviewerService.getRelevantInterviewerSlots(interviewerId);
   }
 
   @PostMapping("/interviewers/{interviewerId}/slots")
-  public InterviewerTimeSlot addSlotToInterviewer(
-      @RequestBody InterviewerTimeSlot interviewerTimeSlot,
+  public InterviewerSlotDto addSlotToInterviewer(
+      @RequestBody InterviewerSlotDto interviewerSlotDto,
       @PathVariable Long interviewerId) {
-    return interviewerService.createSlot(interviewerId, interviewerTimeSlot);
+    return interviewerService.createSlot(interviewerId, interviewerSlotDto);
+  }
+
+  @PostMapping("/candidates/current/slots")
+  public CandidateSlotDto addSlotToCandidate(
+      Authentication authentication, @RequestBody CandidateSlotDto candidateSlotDto) {
+    return candidateService.createSlot(((User) authentication.getPrincipal()).getEmail(),
+        candidateSlotDto);
   }
 
   @PostMapping("/interviewers/{interviewerId}/slots/{slotId}")
-  public InterviewerTimeSlot updateInterviewerTimeSlot(@PathVariable Long interviewerId,
-      @PathVariable long slotId, @RequestBody InterviewerTimeSlot interviewerTimeSlot) {
-    return interviewerService.updateSlot(interviewerId, slotId, interviewerTimeSlot);
+  public InterviewerSlotDto updateInterviewerTimeSlot(@PathVariable Long interviewerId,
+      @PathVariable long slotId, @RequestBody InterviewerSlotDto interviewerSlotDto) {
+    return interviewerService.updateSlot(interviewerId, slotId, interviewerSlotDto);
   }
 
   @DeleteMapping("/interviewers/{interviewerId}/slots/{slotId}")
@@ -55,9 +63,17 @@ public class SlotController {
   }
 
   @PostMapping("/candidates/current/slots/{slotId}")
-  public CandidateTimeSlot updateCandidateTimeSlot(@PathVariable Long slotId,
-      @RequestBody CandidateTimeSlot candidateTimeSlot) {
-    return candidateService.updateSlot(slotId, candidateTimeSlot);
+  public CandidateSlotDto updateCandidateTimeSlot(Authentication authentication,
+      @PathVariable Long slotId,
+      @RequestBody CandidateSlotDto candidateSlotDto) {
+    return candidateService.updateSlot(((User) authentication.getPrincipal()).getEmail(),
+        slotId, candidateSlotDto);
+  }
+
+  @GetMapping("/candidates/current/slots")
+  public List<CandidateSlotDto> checkAllCandidateSlots(
+      Authentication authentication) {
+    return candidateService.getAllCandidateSlots(((User) authentication.getPrincipal()).getEmail());
   }
 
   @GetMapping("/interviewers/{interviewerId}/slots/weeks/current")
