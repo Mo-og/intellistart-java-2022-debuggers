@@ -31,8 +31,9 @@ spring:
     active: dev
 
 facebook:
-  client-id: ${facebook.client-id}
-  client-secret: ${facebook.client-secret}
+  client-id: ${FACEBOOK_CLIENT_ID}
+  client-secret: ${FACEBOOK_CLIENT_SECRET}
+  app-token: ${FACEBOOK_APP_TOKEN} # leave blank to get new (if left blank will fail app and tests when no internet)
   uri:
     auth: 'https://www.facebook.com/v15.0/dialog/oauth'
     redirect: 'http://localhost:8080/authenticate/redirect'
@@ -42,12 +43,12 @@ facebook:
     user_data: 'https://graph.facebook.com/{0}?fields=email&access_token={1}'
   native_user:
     coordinator:
-      email: ${coordinator_email}
+      email: ${COORDINATOR_EMAIL}
     interviewer:
-      email: ${interviewer_email}
+      email: ${INTERVIEWER_EMAIL}
 
 jwt:
-  secret: ${jwt.secret}
+  secret: ${JWT_SECRET}
 
 
 logging:

@@ -32,7 +32,7 @@ public class AuthService {
   private final String facebookTokenVerifyUri;
   private final String facebookUserDataUri;
   private final RestTemplate restTemplate;
-  private final FacebookAppAccessToken appAccessToken;
+  private FacebookAppAccessToken appAccessToken;
   private final UserService userService;
   private final JwtTokenUtil jwtTokenUtil;
 
@@ -52,9 +52,13 @@ public class AuthService {
     facebookUserDataUri = env.getProperty("facebook.uri.user_data");
 
     //needs to be updated every ~60 days
-    appAccessToken = restTemplate.getForObject(
-        Objects.requireNonNull(env.getProperty("facebook.uri.get_app_token")),
-        FacebookAppAccessToken.class);
+    appAccessToken = new FacebookAppAccessToken(env.getProperty("facebook.app-token"), "bearer");
+    if (appAccessToken.accessToken.isBlank()) {
+      log.debug("Getting new app token from Facebook");
+      appAccessToken = restTemplate.getForObject(
+          Objects.requireNonNull(env.getProperty("facebook.uri.get_app_token")),
+          FacebookAppAccessToken.class);
+    }
 
   }
 
@@ -148,6 +152,8 @@ public class AuthService {
 
 
   @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
   static class FacebookAppAccessToken {
 
     @JsonAlias("access_token")
