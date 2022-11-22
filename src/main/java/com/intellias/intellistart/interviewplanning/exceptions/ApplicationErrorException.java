@@ -67,7 +67,7 @@ public class ApplicationErrorException extends RuntimeException {
     BOOKING_LIMIT_NOT_FOUND(HttpStatus.NOT_FOUND, "No booking limit found"),
 
     //Conflict error code
-    SLOT_IS_OVERLAPPING(HttpStatus.CONFLICT, "slot_is_overlapping"),
+    SLOT_IS_OVERLAPPING(HttpStatus.CONFLICT, "Slot overlaps another one by time"),
     INVALID_BOOKING_LIMIT(HttpStatus.CONFLICT, "Invalid booking limit number"),
 
     //Bad request error codes
@@ -79,8 +79,11 @@ public class ApplicationErrorException extends RuntimeException {
     DELETE_SLOT_WITH_BOOKING(HttpStatus.BAD_REQUEST,
         "Can not delete time slot that has booking"),
 
-    // Forbidden error code
+    //Forbidden error code
     SELF_ROLE_REVOKING(HttpStatus.FORBIDDEN, "Forbidden to revoke yourself"),
+    ATTEMPT_TO_EDIT_OTHER_USER_DATA(HttpStatus.FORBIDDEN, "You have no permission to edit this user data"),
+    NO_EMAIL_SPECIFIED(HttpStatus.BAD_REQUEST,
+        "As coordinator you need to specify candidate email as request param 'email' when adding candidate time slot"),
 
     //Authentication related
     INVALID_USER_CREDENTIALS(HttpStatus.BAD_REQUEST, "Invalid user credentials"),

@@ -1,11 +1,8 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
-import static com.intellias.intellistart.interviewplanning.TestUtils.checkResponseBad;
-import static com.intellias.intellistart.interviewplanning.TestUtils.checkResponseOk;
-import static com.intellias.intellistart.interviewplanning.TestUtils.json;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
+import static com.intellias.intellistart.interviewplanning.utils.TestUtils.checkResponseBad;
+import static com.intellias.intellistart.interviewplanning.utils.TestUtils.checkResponseOk;
+import static com.intellias.intellistart.interviewplanning.utils.TestUtils.json;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -13,19 +10,18 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.intellias.intellistart.interviewplanning.SpringSecurityTestUtils;
 import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
 import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException.ErrorCode;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
-import com.intellias.intellistart.interviewplanning.security.jwt.JwtRequestFilter;
 import com.intellias.intellistart.interviewplanning.services.CoordinatorService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import com.intellias.intellistart.interviewplanning.services.UserService;
+import com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils;
+import com.intellias.intellistart.interviewplanning.utils.WithCustomUser;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -35,10 +31,9 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest(
-    classes = SpringSecurityTestUtils.class
-)
-@AutoConfigureMockMvc(addFilters = false)
+@SpringBootTest(classes = TestSecurityUtils.class)
+@AutoConfigureMockMvc
+@WithCustomUser
 class UserControllerTest {
 
   private static final String coordinatorEmail = "coordinator@test.com";
@@ -56,8 +51,8 @@ class UserControllerTest {
 
   @MockBean
   private CommandLineRunner commandLineRunner;
-  @MockBean
-  private JwtRequestFilter jwtRequestFilter;
+  //  @MockBean
+//  private JwtRequestFilter jwtRequestFilter;
   @Autowired
   private MockMvc mockMvc;
   @MockBean
@@ -66,17 +61,6 @@ class UserControllerTest {
   private CoordinatorService coordinatorService;
   @MockBean
   private UserService userService;
-
-  @Test
-  void testCreateInterviewer() {
-    when(userService.create(email, UserRole.INTERVIEWER)).thenReturn(testInterviewer);
-    checkResponseOk(post("/interviewers"), json(email), json(testInterviewer),
-        mockMvc);
-
-    ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
-    verify(userService).create(captor.capture(), eq(UserRole.INTERVIEWER));
-    assertThat(captor.getValue()).isEqualTo(email);
-  }
 
   @Test
   void testGetInterviewer() {
@@ -179,20 +163,6 @@ class UserControllerTest {
     checkResponseBad(get("/interviewers/{id}", -1L),
         null, json(NotFoundException.interviewer(-1L)),
         status().is4xxClientError(), mockMvc);
-  }
-
-  @Test
-  void testUnexpectedExceptionHandledByGlobalExceptionHandler() {
-    checkResponseBad(post("/interviewers"),
-        null, null,
-        status().is5xxServerError(), mockMvc);
-  }
-
-  @Test
-  void testGetUser() {
-    when(userService.getById(1L)).thenReturn(testCoordinator);
-    checkResponseOk(get("/users/{id}", 1),
-        null, json(testCoordinator), mockMvc);
   }
 
   @Test

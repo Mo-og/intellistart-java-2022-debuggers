@@ -1,7 +1,7 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
-import static com.intellias.intellistart.interviewplanning.TestUtils.checkResponseOk;
-import static com.intellias.intellistart.interviewplanning.TestUtils.json;
+import static com.intellias.intellistart.interviewplanning.utils.TestUtils.checkResponseOk;
+import static com.intellias.intellistart.interviewplanning.utils.TestUtils.json;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import com.intellias.intellistart.interviewplanning.security.jwt.JwtRequestFilter;

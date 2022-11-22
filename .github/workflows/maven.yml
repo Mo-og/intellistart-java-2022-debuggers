@@ -8,11 +8,19 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+    
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    environment: dev
+    env:
+      FACEBOOK_CLIENT_ID: ${{secrets.FACEBOOK_CLIENT_ID}}
+      FACEBOOK_CLIENT_SECRET: ${{secrets.FACEBOOK_CLIENT_SECRET}}
+      FACEBOOK_APP_TOKEN: '' #Get new from Facebook since GitHub has internet
+      COORDINATOR_EMAIL: ${{secrets.COORDINATOR_EMAIL}}
+      INTERVIEWER_EMAIL: ${{secrets.INTERVIEWER_EMAIL}}
+      JWT_SECRET: ${{secrets.JWT_SECRET}}
 
     steps:
     - uses: actions/checkout@v3

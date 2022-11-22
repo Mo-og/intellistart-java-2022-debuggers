@@ -1,7 +1,7 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
-import static com.intellias.intellistart.interviewplanning.TestUtils.checkResponseOk;
-import static com.intellias.intellistart.interviewplanning.TestUtils.json;
+import static com.intellias.intellistart.interviewplanning.utils.TestUtils.checkResponseOk;
+import static com.intellias.intellistart.interviewplanning.utils.TestUtils.json;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -12,21 +12,22 @@ import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorE
 import com.intellias.intellistart.interviewplanning.exceptions.InvalidInputException;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
-import com.intellias.intellistart.interviewplanning.security.jwt.JwtRequestFilter;
 import com.intellias.intellistart.interviewplanning.services.BookingLimitService;
 import com.intellias.intellistart.interviewplanning.services.WeekServiceImp;
 import com.intellias.intellistart.interviewplanning.services.interfaces.WeekService;
+import com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils;
+import com.intellias.intellistart.interviewplanning.utils.WithCustomUser;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(BookingLimitController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@SpringBootTest(classes = TestSecurityUtils.class)
+@AutoConfigureMockMvc
 class BookingLimitControllerTest {
 
   private static final int limit = 5;
@@ -50,10 +51,9 @@ class BookingLimitControllerTest {
   private BookingLimitService bookingLimitService;
   @MockBean
   private CommandLineRunner commandLineRunner;
-  @MockBean
-  private JwtRequestFilter jwtRequestFilter;
 
   @Test
+  @WithCustomUser
   void testSetBookingLimit() {
     when(bookingLimitService.saveBookingLimit(existingUserId, bookingLimitRequest))
         .thenReturn(bookingLimit);
@@ -82,6 +82,7 @@ class BookingLimitControllerTest {
   }
 
   @Test
+  @WithCustomUser
   void testGetWeekBookingLimits() {
     when(bookingLimitService.getBookingLimitsByWeekNum(nextWeekNum))
         .thenReturn(List.of(bookingLimit, bookingLimit2));
@@ -93,6 +94,7 @@ class BookingLimitControllerTest {
   }
 
   @Test
+  @WithCustomUser
   void testGetBookingLimit() {
     when(bookingLimitService.findBookingLimit(existingUserId, nextWeekNum))
         .thenReturn(bookingLimit);

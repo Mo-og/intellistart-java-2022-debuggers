@@ -18,7 +18,7 @@ class WeekServiceTest {
   @Test
   void testGetCurrentSameAsGetFromDateToday() {
     var a = weekService.getCurrentWeekNum();
-    var b = weekService.getWeekNumByDate(LocalDate.now());
+    var b = weekService.getWeekNumByDate(weekService.getCurrentDate());
     log.debug(a + " == " + b);
     assertThat(a).isEqualTo(b);
   }
@@ -35,7 +35,7 @@ class WeekServiceTest {
   @Test
   void testGetNextSameAsGetFromDateWeekLater() {
     var a = weekService.getNextWeekNum();
-    var b = weekService.getWeekNumByDate(LocalDate.now().plusWeeks(1));
+    var b = weekService.getWeekNumByDate(weekService.getCurrentDate().plusWeeks(1));
     log.debug(a + " == " + b);
     assertThat(a).isEqualTo(b);
   }

@@ -31,8 +31,9 @@ spring:
     active: dev
 
 facebook:
-  client-id: ${facebook.client-id}
-  client-secret: ${facebook.client-secret}
+  client-id: ${FACEBOOK_CLIENT_ID}
+  client-secret: ${FACEBOOK_CLIENT_SECRET}
+  app-token: ${FACEBOOK_APP_TOKEN} # leave blank to get new (if left blank will fail app and tests when no internet)
   uri:
     auth: 'https://www.facebook.com/v15.0/dialog/oauth'
     redirect: 'http://localhost:8080/authenticate/redirect'
@@ -40,9 +41,14 @@ facebook:
     token_verify: 'https://graph.facebook.com/v15.0/debug_token?input_token={0}&access_token={1}'
     get_app_token: 'https://graph.facebook.com/v15.0/oauth/access_token?client_id=${facebook.client-id}&client_secret=${facebook.client-secret}&grant_type=client_credentials'
     user_data: 'https://graph.facebook.com/{0}?fields=email&access_token={1}'
+  native_user:
+    coordinator:
+      email: ${COORDINATOR_EMAIL}
+    interviewer:
+      email: ${INTERVIEWER_EMAIL}
 
 jwt:
-  secret: ${jwt.secret}
+  secret: ${JWT_SECRET}
 
 
 logging:
@@ -55,5 +61,7 @@ logging:
           interviewplanning:
             configs: debug
             controllers: debug
+            services: debug
+            InterviewPlanningApplication: debug
   pattern:
     console: "%clr(%d{dd.MM.yyyy HH:mm:ss}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%5.5t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"
