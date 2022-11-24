@@ -65,6 +65,7 @@ class BookingServiceTest {
     BOOKING_DTO.setInterviewerSlotId(1L);
     BOOKING_DTO.setCandidateSlotId(1L);
     BOOKING_DTO_WITH_WRONG_SLOT.setInterviewerSlotId(-1L);
+    BOOKING_DTO_WITH_WRONG_SLOT.setCandidateSlotId(-1L);
   }
 
   @Mock
@@ -95,8 +96,17 @@ class BookingServiceTest {
   }
 
   @Test
-  void testCreateBookingSlotNotFound() {
+  void testCreateBookingInterviewerSlotNotFound() {
     when(interviewerTimeSlotRepository.findById(-1L))
+        .thenThrow(NotFoundException.timeSlot(-1L));
+    assertThrows(NotFoundException.class, () -> service.createBooking(BOOKING_DTO_WITH_WRONG_SLOT));
+  }
+
+  @Test
+  void testCreateBookingCandidateSlotNotFound() {
+    when(interviewerTimeSlotRepository.findById(any()))
+        .thenReturn(Optional.of(INTERVIEWER_SLOT));
+    when(candidateTimeSlotRepository.findById(-1L))
         .thenThrow(NotFoundException.timeSlot(-1L));
     assertThrows(NotFoundException.class, () -> service.createBooking(BOOKING_DTO_WITH_WRONG_SLOT));
   }
