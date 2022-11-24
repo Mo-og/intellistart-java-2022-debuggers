@@ -1,10 +1,10 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
 import com.intellias.intellistart.interviewplanning.services.AuthService;
-import com.intellias.intellistart.interviewplanning.services.AuthService.JwtToken;
 import java.util.Collections;
 import java.util.Map;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +27,7 @@ public class AuthController {
   private final Map<String, String> authLink;
 
   private final AuthService authService;
+
 
   /**
    * Initiates authorization link for fast token acquisition.
@@ -65,11 +66,25 @@ public class AuthController {
     return authService.generateTokenByFacebookToken(jwtToken.getToken());
   }
 
+  /**
+   * Simple facebook code DTO.
+   */
   @AllArgsConstructor
   @NoArgsConstructor
   static class JwtCode {
 
     private String code;
+  }
+
+  /**
+   * Simple jwt token DTO.
+   */
+  @Data
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class JwtToken {
+
+    private String token;
   }
 }
 

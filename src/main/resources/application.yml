@@ -28,6 +28,7 @@ spring:
             token-uri: https://graph.facebook.com/v15.0/oauth/access_token
             user-info-uri: https://graph.facebook.com/v3.0/me?fields=id,first_name,middle_name,last_name,name,email
   profiles:
+#    active: dev, offline
     active: dev
 
 facebook:
@@ -40,12 +41,14 @@ facebook:
     get_token_by_code: 'https://graph.facebook.com/v15.0/oauth/access_token?client_id=${facebook.client-id}&redirect_uri=${facebook.uri.redirect}&client_secret=${facebook.client-secret}&code={0}'
     token_verify: 'https://graph.facebook.com/v15.0/debug_token?input_token={0}&access_token={1}'
     get_app_token: 'https://graph.facebook.com/v15.0/oauth/access_token?client_id=${facebook.client-id}&client_secret=${facebook.client-secret}&grant_type=client_credentials'
-    user_data: 'https://graph.facebook.com/{0}?fields=email&access_token={1}'
+    user_data: 'https://graph.facebook.com/{0}?fields=id,email,first_name,last_name,middle_name&access_token={1}'
   native_user:
     coordinator:
       email: ${COORDINATOR_EMAIL}
     interviewer:
       email: ${INTERVIEWER_EMAIL}
+    offline:
+      email: ${facebook.native_user.coordinator.email}
 
 jwt:
   secret: ${JWT_SECRET}

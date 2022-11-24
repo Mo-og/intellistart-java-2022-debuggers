@@ -8,6 +8,7 @@ import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorE
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.security.jwt.JwtTokenUtil;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
@@ -17,17 +18,19 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 /**
- * Service for managing authentication. Involves jwt token generation, and authentication on
- * facebook servers.
+ * Service for managing authentication. Involves jwt token generation, and authentication on facebook servers.
  */
 @Service
 @Slf4j
 public class AuthService {
 
+  private final boolean isOffline;
+  private final String offlineUserEmail;
   private final String facebookGetTokenByCodeUri;
   private final String facebookTokenVerifyUri;
   private final String facebookUserDataUri;
@@ -47,9 +50,15 @@ public class AuthService {
     this.userService = userService;
     this.jwtTokenUtil = jwtTokenUtil;
 
+    isOffline = Arrays.stream(env.getActiveProfiles()).anyMatch(s -> s.equalsIgnoreCase("offline"));
+    if (isOffline) {
+      log.error("AUTH SERVICE IS OFFLINE!");
+    }
+
     facebookGetTokenByCodeUri = env.getProperty("facebook.uri.get_token_by_code");
     facebookTokenVerifyUri = env.getProperty("facebook.uri.token_verify");
     facebookUserDataUri = env.getProperty("facebook.uri.user_data");
+    offlineUserEmail = env.getProperty("facebook.native_user.offline.email");
 
     //needs to be updated every ~60 days
     appAccessToken = new FacebookAppAccessToken(env.getProperty("facebook.app-token"), "bearer");
@@ -93,17 +102,19 @@ public class AuthService {
    */
   @SneakyThrows
   public ResponseEntity<?> generateTokenByFacebookToken(String token) {
+    if (isOffline) {
+      return ResponseEntity.ok(jwtTokenUtil.generateToken(userService.getByEmail(offlineUserEmail)));
+    }
+
     if (token == null || token.isBlank()) {
       log.info("Provided user token is empty");
-      throw new ApplicationErrorException(ErrorCode.INVALID_USER_CREDENTIALS,
-          ": invalid facebook token");
+      throw new ApplicationErrorException(ErrorCode.INVALID_USER_CREDENTIALS, ": invalid facebook token");
     } else {
       log.debug("Got facebook token from code: {}", token);
     }
 
     FacebookTokenData tokenData = restTemplate.getForObject(
-        format(facebookTokenVerifyUri, token, appAccessToken.getAccessToken()),
-        FacebookTokenData.class);
+        format(facebookTokenVerifyUri, token, appAccessToken.getAccessToken()), FacebookTokenData.class);
 
     log.debug("Token data retrieved: {}", tokenData);
 
@@ -116,40 +127,36 @@ public class AuthService {
           ": could not verify user token");
     }
 
-    FacebookUserProfile userProfile = restTemplate.getForObject(
-        format(facebookUserDataUri, tokenData.data.userId, token),
-        FacebookUserProfile.class);
+    FacebookUserProfile fbProfile = restTemplate.getForObject(
+        format(facebookUserDataUri, tokenData.data.userId, token), FacebookUserProfile.class);
 
-    if (userProfile == null || userProfile.getEmail() == null || userProfile.getEmail().isBlank()) {
-      throw new ApplicationErrorException(ErrorCode.NO_USER_DATA,
-          ": unable to get email of user from provider");
+    if (fbProfile == null || fbProfile.getEmail() == null || fbProfile.getEmail().isBlank()) {
+      throw new ApplicationErrorException(ErrorCode.NO_USER_DATA, ": unable to get email of user from provider");
     }
-    //todo replace with OAuth2AccessToken
-    JwtToken generatedJwtToken;
-    if (userService.existsWithEmail(userProfile.getEmail())) {
-      User user = userService.getByEmail(userProfile.getEmail());
-      generatedJwtToken = new JwtToken(jwtTokenUtil.generateToken(user));
+
+    OAuth2AccessToken generatedJwtToken;
+    if (userService.existsWithEmail(fbProfile.getEmail())) {
+      User user = userService.getByEmail(fbProfile.getEmail());
+      if (user.getFacebookId() == null) {
+        user
+            .setFacebookId(fbProfile.getId())
+            .setFirstName(fbProfile.getFirstName())
+            .setMiddleName(fbProfile.getMiddleName())
+            .setLastName(fbProfile.getLastName());
+        user = userService.save(user);
+      }
+      generatedJwtToken = jwtTokenUtil.generateToken(user);
     } else {
-      generatedJwtToken = new JwtToken(
-          jwtTokenUtil.generateToken(
-              new User(userProfile.getEmail(), UserRole.CANDIDATE)
-          )
+      generatedJwtToken = jwtTokenUtil.generateToken(
+          new User(fbProfile.getEmail(), UserRole.CANDIDATE)
+              .setFacebookId(fbProfile.getId())
+              .setFirstName(fbProfile.getFirstName())
+              .setMiddleName(fbProfile.getMiddleName())
+              .setLastName(fbProfile.getLastName())
       );
     }
     return ResponseEntity.ok(generatedJwtToken);
   }
-
-  /**
-   * Simple jwt token DTO.
-   */
-  @Data
-  @AllArgsConstructor
-  @NoArgsConstructor
-  public static class JwtToken {
-
-    private String token;
-  }
-
 
   @Data
   @NoArgsConstructor
@@ -216,6 +223,13 @@ public class AuthService {
   @Data
   static class FacebookUserProfile {
 
+    Long id;
+    @JsonAlias("first_name")
+    String firstName;
+    @JsonAlias("last_name")
+    String lastName;
+    @JsonAlias("middle_name")
+    String middleName;
     String email;
   }
 
