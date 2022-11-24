@@ -1,6 +1,5 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
-import static com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils.CANDIDATE_EMAIL;
 import static com.intellias.intellistart.interviewplanning.utils.TestUtils.checkResponseOk;
 import static com.intellias.intellistart.interviewplanning.utils.TestUtils.json;
 import static org.mockito.Mockito.when;
@@ -8,12 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import com.intellias.intellistart.interviewplanning.controllers.dto.BookingDto;
-import com.intellias.intellistart.interviewplanning.models.Booking;
-import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
-import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.services.BookingService;
-import com.intellias.intellistart.interviewplanning.services.CandidateService;
-import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils;
 import com.intellias.intellistart.interviewplanning.utils.WithCustomUser;
 import java.time.LocalTime;
@@ -30,34 +24,17 @@ import org.springframework.test.web.servlet.MockMvc;
 @WithCustomUser
 class BookingControllerTest {
 
-  private static final InterviewerTimeSlot interviewerSlot =
-      new InterviewerTimeSlot("08:00", "18:00", "WEDNESDAY", 202240);
-  private static final CandidateTimeSlot candidateSlot =
-      new CandidateTimeSlot(CANDIDATE_EMAIL, "2022-11-03", "08:00", "13:00");
-  private static final Booking booking =
-      new Booking(
-          LocalTime.of(8, 0),
-          LocalTime.of(10, 0),
-          candidateSlot,
-          interviewerSlot,
-          "some subject",
-          "some desc"
-      );
-
   private static final BookingDto bookingDto =
       BookingDto.builder()
           .from(LocalTime.of(8, 0))
           .to(LocalTime.of(10, 0))
           .subject("some subject")
           .description("some desc")
-          .interviewerSlotId(interviewerSlot.getId())
-          .candidateSlotId(candidateSlot.getId())
+          .interviewerSlotId(1L)
+          .candidateSlotId(1L)
           .build();
 
   static {
-    interviewerSlot.setId(1L);
-    candidateSlot.setId(1L);
-    booking.setId(1L);
     bookingDto.setId(1L);
   }
 
@@ -67,10 +44,6 @@ class BookingControllerTest {
   private MockMvc mockMvc;
   @MockBean
   private BookingService bookingService;
-  @MockBean
-  private InterviewerService interviewerService;
-  @MockBean
-  private CandidateService candidateService;
 
   @Test
   void testCreateBooking() {
@@ -79,17 +52,17 @@ class BookingControllerTest {
         .thenReturn(bookingDto);
     checkResponseOk(
         post("/bookings"),
-        json(booking), json(booking), mockMvc);
+        json(bookingDto), json(bookingDto), mockMvc);
   }
 
   @Test
   void testUpdateBooking() {
     when(bookingService
-        .updateBooking(1L, booking))
-        .thenReturn(booking);
+        .updateBooking(1L, bookingDto))
+        .thenReturn(bookingDto);
     checkResponseOk(
         post("/bookings/{bookingId}", 1L),
-        json(booking), json(booking), mockMvc);
+        json(bookingDto), json(bookingDto), mockMvc);
   }
 
   @Test
