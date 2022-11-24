@@ -84,9 +84,9 @@ public class JwtTokenUtil implements Serializable {
         .setExpiration(expiresAt)
         .signWith(getKey())
         .compact();
-    class OAuth2AccessTokenFormatted extends OAuth2AccessToken {
+    class Oauth2AccessTokenFormatted extends OAuth2AccessToken {
 
-      public OAuth2AccessTokenFormatted(TokenType tokenType, String tokenValue, Instant issuedAt, Instant expiresAt) {
+      public Oauth2AccessTokenFormatted(TokenType tokenType, String tokenValue, Instant issuedAt, Instant expiresAt) {
         super(tokenType, tokenValue, issuedAt, expiresAt);
       }
 
@@ -96,7 +96,8 @@ public class JwtTokenUtil implements Serializable {
         return super.getTokenValue();
       }
     }
-    return new OAuth2AccessTokenFormatted(TokenType.BEARER, tokenValue, issuedAt.toInstant(), expiresAt.toInstant());
+
+    return new Oauth2AccessTokenFormatted(TokenType.BEARER, tokenValue, issuedAt.toInstant(), expiresAt.toInstant());
   }
 
   public boolean isTokenValid(String token, UserDetails userDetails) {
