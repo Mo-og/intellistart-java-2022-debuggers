@@ -28,7 +28,7 @@ public class UserController {
   /**
    * Endpoint to provide current user info.
    *
-   * @param auth object from spring security containing the principle presented by our user
+   * @param auth object from spring security containing the principle presented by user
    * @return current user info as json object containing full name, email and role
    */
   @GetMapping("/me")
@@ -40,7 +40,7 @@ public class UserController {
    * Endpoint to grant user the interviewer role.
    *
    * @param emailDto user email
-   * @param auth     object from spring security containing the principle presented by our user
+   * @param auth     object from spring security containing the principle presented by user
    * @return user with the granted interviewer role
    */
   @PostMapping("/users/interviewers")
