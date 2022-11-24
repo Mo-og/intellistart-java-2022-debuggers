@@ -1,18 +1,13 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
-import static com.intellias.intellistart.interviewplanning.validators.PermissionValidator.checkAuthorized;
-
 import com.intellias.intellistart.interviewplanning.controllers.dto.EmailDto;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.services.CoordinatorService;
-import com.intellias.intellistart.interviewplanning.services.InterviewerService;
-import com.intellias.intellistart.interviewplanning.services.UserService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,95 +16,90 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Controller involved in login and user CRUD operations.
+ * Controller for managing users.
  */
 @RestController
 @RequiredArgsConstructor
 @Slf4j
 public class UserController {
 
-  private final InterviewerService interviewerService;
   private final CoordinatorService coordinatorService;
-  private final UserService userService;
-
 
   /**
-   * Test method to see what token contains.
+   * Endpoint to provide current user info.
    *
-   * @param authentication Object from spring security containing the principle presented by our
-   *                       user.
-   * @return toString() of received authentication object
-   */
-  @GetMapping("/")
-  //todo remove
-  public String test(Authentication authentication) {
-    if (authentication != null) {
-      log.debug("Authentication class: " + authentication.getClass());
-      log.debug("Authentication authorities: " + authentication.getAuthorities());
-      log.debug("Authentication principal class: {}", authentication.getPrincipal().getClass());
-    } else {
-      log.debug("Not authenticated");
-    }
-    return String.valueOf(authentication);
-  }
-
-  /**
-   * Me endpoint. Provides current user info
-   *
-   * @return current user info as json object containing email and role
+   * @param auth object from spring security containing the principle presented by our user
+   * @return current user info as json object containing full name, email and role
    */
   @GetMapping("/me")
-  public User getUserInfo(Authentication authentication) {
-    return (User) authentication.getPrincipal();
+  public User getUserInfo(Authentication auth) {
+    return (User) auth.getPrincipal();
   }
 
-
-  @GetMapping("/interviewers/{interviewerId}")
-  public User getInterviewerById(@PathVariable Long interviewerId, Authentication auth) {
-    checkAuthorized(auth, interviewerId);
-    return interviewerService.getById(interviewerId);
-  }
-
-  //todo remove
-  @GetMapping("/users")
-  public List<User> getUser() {
-    return userService.getAll();
-  }
-
+  /**
+   * Endpoint to grant user the interviewer role.
+   *
+   * @param emailDto user email
+   * @param auth     object from spring security containing the principle presented by our user
+   * @return user with the granted interviewer role
+   */
   @PostMapping("/users/interviewers")
-  public User grantInterviewerRole(@RequestBody EmailDto emailDto) {
-    String coordinatorEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-    return coordinatorService.grantInterviewerRole(emailDto.getEmail(), coordinatorEmail);
+  public User grantInterviewerRole(@RequestBody EmailDto emailDto, Authentication auth) {
+    User authenticatedUser = (User) auth.getPrincipal();
+    return coordinatorService
+        .grantInterviewerRole(emailDto.getEmail(), authenticatedUser.getEmail());
   }
 
+  /**
+   * Endpoint to revoke user the interviewer role.
+   *
+   * @param interviewerId id of the interviewer
+   * @return user with revoked interviewer role
+   */
   @DeleteMapping("/users/interviewers/{interviewerId}")
   public User revokeInterviewerRole(@PathVariable Long interviewerId) {
     return coordinatorService.revokeInterviewerRole(interviewerId);
   }
 
+  /**
+   * Endpoint to get users with the interviewer role.
+   *
+   * @return users with the interviewer role
+   */
   @GetMapping("/users/interviewers")
   public List<User> getInterviewers() {
     return coordinatorService.getUsersWithRole(UserRole.INTERVIEWER);
   }
 
+  /**
+   * Endpoint to grant user the coordinator role.
+   *
+   * @param emailDto user email
+   * @return user with the granted coordinator role
+   */
   @PostMapping("/users/coordinators")
   public User grantCoordinatorRole(@RequestBody EmailDto emailDto) {
     return coordinatorService.grantCoordinatorRole(emailDto.getEmail());
   }
 
   /**
-   * Revoke the coordinator role by user id.
+   * Endpoint to revoke user the coordinator role.
    *
-   * @param coordinatorId id of the current coordinator
-   * @return user whose coordinator role has been revoked
+   * @param coordinatorId id of the coordinator
+   * @param auth          object from spring security containing the principle presented by user
+   * @return user with revoked coordinator role
    */
   @DeleteMapping("/users/coordinators/{coordinatorId}")
-  public User revokeCoordinatorRole(@PathVariable Long coordinatorId) {
-    String coordinatorEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-    User coordinator = (User) userService.loadUserByUsername(coordinatorEmail);
-    return coordinatorService.revokeCoordinatorRole(coordinatorId, coordinator.getId());
+  public User revokeCoordinatorRole(@PathVariable Long coordinatorId, Authentication auth) {
+    User authenticatedUser = (User) auth.getPrincipal();
+    return coordinatorService.revokeCoordinatorRole(coordinatorId, authenticatedUser.getId());
   }
 
+  /**
+   * Endpoint to get users with the coordinator role.
+   *
+   * @return users with the coordinator role
+   */
   @GetMapping("/users/coordinators")
   public List<User> getCoordinators() {
     return coordinatorService.getUsersWithRole(UserRole.COORDINATOR);

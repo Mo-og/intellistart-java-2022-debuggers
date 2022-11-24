@@ -18,9 +18,7 @@ import java.time.DayOfWeek;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 /**
@@ -169,19 +167,5 @@ public class InterviewerService {
    */
   private boolean hasBooking(InterviewerTimeSlot slot) {
     return !bookingRepository.findByInterviewerSlot(slot).isEmpty();
-  }
-
-  /**
-   * Gets interviewer from database by id and throws an exception if none found.
-   *
-   * @param id interviewer id to look for
-   * @return interviewer stored by given id
-   */
-  public User getById(Long id) {
-    try {
-      return (User) Hibernate.unproxy(userRepository.getReferenceById(id));
-    } catch (EntityNotFoundException e) {
-      throw NotFoundException.interviewer(id);
-    }
   }
 }
