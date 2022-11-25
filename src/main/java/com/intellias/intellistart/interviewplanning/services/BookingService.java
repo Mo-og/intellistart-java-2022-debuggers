@@ -9,13 +9,14 @@ import com.intellias.intellistart.interviewplanning.repositories.BookingReposito
 import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.utils.mappers.BookingMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**
  * Booking service.
  */
 @Service
+@RequiredArgsConstructor
 public class BookingService {
 
   private final BookingRepository bookingRepository;
@@ -23,30 +24,15 @@ public class BookingService {
   private final CandidateTimeSlotRepository candidateTimeSlotRepository;
 
   /**
-   * Constructor.
-   *
-   * @param bookingRepository             booking repository
-   * @param interviewerTimeSlotRepository interviewer time slot repository
-   * @param candidateTimeSlotRepository   candidate time slot repository
-   */
-  @Autowired
-  public BookingService(BookingRepository bookingRepository,
-      InterviewerTimeSlotRepository interviewerTimeSlotRepository,
-      CandidateTimeSlotRepository candidateTimeSlotRepository) {
-    this.bookingRepository = bookingRepository;
-    this.interviewerTimeSlotRepository = interviewerTimeSlotRepository;
-    this.candidateTimeSlotRepository = candidateTimeSlotRepository;
-  }
-
-  /**
-   * Create new booking.
+   * Creates new booking.
    *
    * @param bookingDto object with data to create
-   * @return created booking
+   * @return object with created booking data
+   * @throws NotFoundException if slot with the specified id is not found
    */
   public BookingDto createBooking(BookingDto bookingDto) {
     //Todo calculate possible time
-
+    //Todo check booking limit
     Long interviewerSlotId = bookingDto.getInterviewerSlotId();
     InterviewerTimeSlot interviewerSlot = interviewerTimeSlotRepository.findById(interviewerSlotId)
         .orElseThrow(() -> NotFoundException.timeSlot(interviewerSlotId));
@@ -61,36 +47,32 @@ public class BookingService {
   }
 
   /**
-   * Update existing booking.
+   * Updates existing booking.
    *
    * @param id         booking id
-   * @param newBooking object with data to update
+   * @param bookingDto object with data to update
    * @return booking with new parameters
+   * @throws NotFoundException if booking with the specified id is not found
    */
-  public Booking updateBooking(Long id, Booking newBooking) {
-    Booking booking = bookingRepository.getReferenceById(id);
-    booking.setFrom(newBooking.getFrom());
-    booking.setTo(newBooking.getTo());
-    booking.setSubject(newBooking.getSubject());
-    booking.setDescription(newBooking.getDescription());
-    return booking;
-  }
-
-  public Booking saveBooking(Booking booking) {
-    return bookingRepository.save(booking);
-  }
-
-  public Booking getBooking(Long id) {
-    return bookingRepository.getReferenceById(id);
+  public BookingDto updateBooking(Long id, BookingDto bookingDto) {
+    //Todo validate new booking info
+    Booking booking = bookingRepository.findById(id)
+        .orElseThrow(() -> NotFoundException.booking(id));
+    booking.setFrom(bookingDto.getFrom());
+    booking.setTo(bookingDto.getTo());
+    booking.setSubject(bookingDto.getSubject());
+    booking.setDescription(bookingDto.getDescription());
+    return BookingMapper.mapToDto(bookingRepository.save(booking));
   }
 
   /**
-   * Removes booking by id.
+   * Deletes booking by id.
    *
    * @param id booking id
-   * @return removed booking
+   * @return deleted booking
+   * @throws NotFoundException if booking with the specified id is not found
    */
-  public BookingDto removeBooking(Long id) {
+  public BookingDto deleteBooking(Long id) {
     Booking booking = bookingRepository.findById(id)
         .orElseThrow(() -> NotFoundException.booking(id));
     bookingRepository.delete(booking);
