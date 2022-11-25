@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,18 +53,18 @@ public class AuthController {
   }
 
   @GetMapping({"/authenticate/redirect"})
-  public ResponseEntity<?> retrieveToken(@RequestParam String code) {
-    return authService.generateTokenByFacebookCode(code);
+  public ResponseEntity<OAuth2AccessToken> retrieveToken(@RequestParam String code) {
+    return ResponseEntity.ok(authService.generateJwtByFacebookCode(code));
   }
 
   @RequestMapping(value = "/authenticate/code", method = {RequestMethod.POST, RequestMethod.GET})
-  public ResponseEntity<?> retrieveTokenByCodeJson(@RequestBody JwtCode jwtCode) {
+  public ResponseEntity<OAuth2AccessToken> retrieveTokenByCodeJson(@RequestBody JwtCode jwtCode) {
     return retrieveToken(jwtCode.code);
   }
 
   @RequestMapping(value = "/authenticate/token", method = {RequestMethod.POST, RequestMethod.GET})
-  public ResponseEntity<?> retrieveTokenByFbTokenJson(@RequestBody JwtToken jwtToken) {
-    return authService.generateTokenByFacebookToken(jwtToken.getToken());
+  public ResponseEntity<OAuth2AccessToken> retrieveTokenByFbTokenJson(@RequestBody JwtToken jwtToken) {
+    return ResponseEntity.ok(authService.generateJwtByFacebookToken(jwtToken.getToken()));
   }
 
   /**

@@ -17,7 +17,6 @@ import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -33,8 +32,8 @@ public class AuthService {
   private final String offlineUserEmail;
   private final String facebookGetTokenByCodeUri;
   private final String facebookTokenVerifyUri;
-  private final String facebookUserDataUri;
-  private final RestTemplate restTemplate;
+  private final String facebookUserProfileUri;
+  private final RestTemplate rest;
   private FacebookAppAccessToken appAccessToken;
   private final UserService userService;
   private final JwtTokenUtil jwtTokenUtil;
@@ -44,9 +43,8 @@ public class AuthService {
    *
    * @param env object to retrieve project environment variables
    */
-  public AuthService(Environment env, RestTemplate restTemplate, UserService userService,
-      JwtTokenUtil jwtTokenUtil) {
-    this.restTemplate = restTemplate;
+  public AuthService(Environment env, RestTemplate rest, UserService userService, JwtTokenUtil jwtTokenUtil) {
+    this.rest = rest;
     this.userService = userService;
     this.jwtTokenUtil = jwtTokenUtil;
 
@@ -57,53 +55,51 @@ public class AuthService {
 
     facebookGetTokenByCodeUri = env.getProperty("facebook.uri.get_token_by_code");
     facebookTokenVerifyUri = env.getProperty("facebook.uri.token_verify");
-    facebookUserDataUri = env.getProperty("facebook.uri.user_data");
+    facebookUserProfileUri = env.getProperty("facebook.uri.user_data");
     offlineUserEmail = env.getProperty("facebook.native_user.offline.email");
 
     //needs to be updated every ~60 days
     appAccessToken = new FacebookAppAccessToken(env.getProperty("facebook.app-token"), "bearer");
-    if (appAccessToken.accessToken.isBlank()) {
+    if (appAccessToken.accessToken == null || appAccessToken.accessToken.isBlank()) {
       log.debug("Getting new app token from Facebook");
-      appAccessToken = restTemplate.getForObject(
-          Objects.requireNonNull(env.getProperty("facebook.uri.get_app_token")),
+      appAccessToken = rest.getForObject(Objects.requireNonNull(env.getProperty("facebook.uri.get_app_token"),
+              "Facebook app access token property is not set. Check 'facebook.uri.get_app_token' in application.yml"),
           FacebookAppAccessToken.class);
     }
 
   }
 
   /**
-   * Verifies facebook code and exchanges it for facebook token. Then makes needed requests to
-   * Facebook servers for user data retrieval, finds user in app's database and generates jwt token
-   * with their username and authorities.
+   * Verifies facebook code and exchanges it for facebook token. Then makes needed requests to Facebook servers for user
+   * data retrieval, finds user in app's database and generates jwt token with their username and authorities.
    *
    * @param code facebook auth code
    * @return json of jwt token of this app
    */
-  public ResponseEntity<?> generateTokenByFacebookCode(String code) {
-    FacebookTokenResponse token = restTemplate.getForObject(
-        format(facebookGetTokenByCodeUri, code),
+  public OAuth2AccessToken generateJwtByFacebookCode(String code) {
+    FacebookTokenResponse token = rest.getForObject(format(facebookGetTokenByCodeUri, code),
         FacebookTokenResponse.class);
     if (token == null) {
       log.info("Acquiring user token by code failed");
-      throw new ApplicationErrorException(ErrorCode.INVALID_USER_CREDENTIALS,
-          ": could not get user token for provided auth code");
+      throw new ApplicationErrorException(
+          ErrorCode.INVALID_USER_CREDENTIALS, ": could not get user token for provided auth code");
     } else {
       log.debug("Got facebook token of [{}] type", token.tokenType);
     }
-    return generateTokenByFacebookToken(token.accessToken);
+    return generateJwtByFacebookToken(token.accessToken);
   }
 
   /**
-   * Makes needed requests to Facebook servers for user data retrieval, finds user in app's database
-   * and generates jwt token with their username and authorities.
+   * Makes needed requests to Facebook servers for user data retrieval, finds user in app's database and generates jwt
+   * token with their username and authorities.
    *
    * @param token facebook token
    * @return json of jwt token of this app
    */
   @SneakyThrows
-  public ResponseEntity<?> generateTokenByFacebookToken(String token) {
+  public OAuth2AccessToken generateJwtByFacebookToken(String token) {
     if (isOffline) {
-      return ResponseEntity.ok(jwtTokenUtil.generateToken(userService.getByEmail(offlineUserEmail)));
+      return jwtTokenUtil.generateToken(userService.getByEmail(offlineUserEmail));
     }
 
     if (token == null || token.isBlank()) {
@@ -113,27 +109,16 @@ public class AuthService {
       log.debug("Got facebook token from code: {}", token);
     }
 
-    FacebookTokenData tokenData = restTemplate.getForObject(
-        format(facebookTokenVerifyUri, token, appAccessToken.getAccessToken()), FacebookTokenData.class);
-
-    log.debug("Token data retrieved: {}", tokenData);
-
-    if (tokenData == null || !tokenData.data.isValid()) {
-      if (tokenData != null) {
-        throw new ApplicationErrorException(ErrorCode.INVALID_USER_CREDENTIALS,
-            ": could not verify user token. " + tokenData.data.error.message);
-      }
-      throw new ApplicationErrorException(ErrorCode.INVALID_USER_CREDENTIALS,
-          ": could not verify user token");
-    }
-
-    FacebookUserProfile fbProfile = restTemplate.getForObject(
-        format(facebookUserDataUri, tokenData.data.userId, token), FacebookUserProfile.class);
+    FacebookUserProfile fbProfile = getFacebookUserProfile(token);
 
     if (fbProfile == null || fbProfile.getEmail() == null || fbProfile.getEmail().isBlank()) {
       throw new ApplicationErrorException(ErrorCode.NO_USER_DATA, ": unable to get email of user from provider");
     }
 
+    return makeJwtFromProfile(fbProfile);
+  }
+
+  private OAuth2AccessToken makeJwtFromProfile(FacebookUserProfile fbProfile) {
     OAuth2AccessToken generatedJwtToken;
     if (userService.existsWithEmail(fbProfile.getEmail())) {
       User user = userService.getByEmail(fbProfile.getEmail());
@@ -152,10 +137,26 @@ public class AuthService {
               .setFacebookId(fbProfile.getId())
               .setFirstName(fbProfile.getFirstName())
               .setMiddleName(fbProfile.getMiddleName())
-              .setLastName(fbProfile.getLastName())
-      );
+              .setLastName(fbProfile.getLastName()));
     }
-    return ResponseEntity.ok(generatedJwtToken);
+    return generatedJwtToken;
+  }
+
+  private FacebookUserProfile getFacebookUserProfile(String token) {
+    FacebookTokenData tokenData = rest.getForObject(
+        format(facebookTokenVerifyUri, token, appAccessToken.getAccessToken()), FacebookTokenData.class);
+
+    log.debug("Token data retrieved: {}", tokenData);
+
+    if (tokenData == null || !tokenData.data.isValid()) {
+      if (tokenData != null) {
+        throw new ApplicationErrorException(ErrorCode.INVALID_USER_CREDENTIALS,
+            ": could not verify user token. " + tokenData.data.error.message);
+      }
+      throw new ApplicationErrorException(ErrorCode.INVALID_USER_CREDENTIALS, ": could not verify user token");
+    }
+
+    return rest.getForObject(format(facebookUserProfileUri, tokenData.data.userId, token), FacebookUserProfile.class);
   }
 
   @Data

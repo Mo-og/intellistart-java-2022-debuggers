@@ -84,6 +84,7 @@ public class JwtTokenUtil implements Serializable {
         .setExpiration(expiresAt)
         .signWith(getKey())
         .compact();
+    //to keep api same as it was before: "tokenValue" -> "token"
     class Oauth2AccessTokenFormatted extends OAuth2AccessToken {
 
       public Oauth2AccessTokenFormatted(TokenType tokenType, String tokenValue, Instant issuedAt, Instant expiresAt) {
