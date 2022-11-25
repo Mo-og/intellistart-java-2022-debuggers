@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Controller for managing users.
+ * Rest controller for managing users.
  */
 @RestController
 @RequiredArgsConstructor

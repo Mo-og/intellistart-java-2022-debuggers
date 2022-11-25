@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Controller for managing bookings.
+ * Rest controller for managing bookings.
  */
 @RestController
 @RequiredArgsConstructor
