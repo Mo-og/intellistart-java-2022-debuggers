@@ -3,7 +3,7 @@ package com.intellias.intellistart.interviewplanning.exceptions;
 /**
  * Not found exception class.
  */
-public class NotFoundException extends ApplicationErrorException {
+public class NotFoundException extends TemplateMessageException {
 
   public NotFoundException(ErrorCode errorCode, String errorMessage) {
     super(errorCode, errorMessage);

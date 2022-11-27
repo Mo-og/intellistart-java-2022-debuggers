@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 @JsonIgnoreProperties({"cause", "stackTrace", "message", "suppressed", "localizedMessage"})
 public class ApplicationErrorException extends RuntimeException {
 
-
   private final ErrorCode errorCode;
 
   private final String errorMessage;
@@ -23,9 +22,9 @@ public class ApplicationErrorException extends RuntimeException {
    * @param errorMessage user-friendly error message
    */
   public ApplicationErrorException(ErrorCode errorCode, String errorMessage) {
-    super(errorCode.message + errorMessage);
+    super(errorMessage);
     this.errorCode = errorCode;
-    this.errorMessage = errorCode.message + errorMessage;
+    this.errorMessage = errorMessage;
   }
 
   /**

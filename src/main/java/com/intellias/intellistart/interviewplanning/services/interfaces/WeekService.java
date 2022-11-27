@@ -3,11 +3,14 @@ package com.intellias.intellistart.interviewplanning.services.interfaces;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 /**
  * Week service.
  */
 public interface WeekService {
+
+  ZoneId ZONE_ID = ZoneId.of("Europe/Kiev");
 
   LocalDate getCurrentDate();
 

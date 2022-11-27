@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.intellias.intellistart.interviewplanning.utils.Utils;
 import com.intellias.intellistart.interviewplanning.validators.PeriodValidator;
 import java.time.LocalTime;
-import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,9 +12,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.Hibernate;
 
 /**
  * Booking.
@@ -23,6 +22,7 @@ import org.hibernate.Hibernate;
 @Entity
 @Getter
 @Setter
+@EqualsAndHashCode
 public class Booking {
 
   @Id
@@ -78,26 +78,4 @@ public class Booking {
     return Utils.timeAsString(to);
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
-      return false;
-    }
-    Booking booking = (Booking) o;
-    if (id != null) {
-      return Objects.equals(id, booking.id);
-    }
-    return Objects.equals(from, booking.from)
-        && Objects.equals(to, booking.to)
-        && Objects.equals(subject, booking.subject)
-        && Objects.equals(description, booking.description);
-  }
-
-  @Override
-  public int hashCode() {
-    return getClass().hashCode();
-  }
 }

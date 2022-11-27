@@ -41,8 +41,7 @@ public class InterviewerService {
    * @param interviewerTimeSlot slot to validate and save
    * @return slot
    */
-  public InterviewerTimeSlot createSlot(Long interviewerId,
-      InterviewerTimeSlot interviewerTimeSlot) {
+  public InterviewerTimeSlot createSlot(Long interviewerId, InterviewerTimeSlot interviewerTimeSlot) {
     slotValidator.validate(interviewerTimeSlot);
     User interviewer = userRepository.getReferenceById(interviewerId);
     interviewerTimeSlot.setInterviewer(interviewer);

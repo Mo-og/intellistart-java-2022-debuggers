@@ -5,7 +5,7 @@ import java.time.DayOfWeek;
 /**
  * InvalidInputException class.
  */
-public class InvalidInputException extends ApplicationErrorException {
+public class InvalidInputException extends TemplateMessageException {
 
   /**
    * constructor.

@@ -5,6 +5,7 @@ import static java.text.MessageFormat.format;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
 import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException.ErrorCode;
+import com.intellias.intellistart.interviewplanning.exceptions.TemplateMessageException;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.security.jwt.JwtTokenUtil;
@@ -13,8 +14,9 @@ import java.util.List;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 import lombok.SneakyThrows;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
@@ -28,12 +30,12 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class AuthService {
 
-  private final boolean isOffline;
-  private final String offlineUserEmail;
-  private final String facebookGetTokenByCodeUri;
-  private final String facebookTokenVerifyUri;
-  private final String facebookUserProfileUri;
-  private final RestTemplate rest;
+  public final boolean isOffline;
+  public final String offlineUserEmail;
+  public final String facebookGetTokenByCodeUri;
+  public final String facebookTokenVerifyUri;
+  public final String facebookUserProfileUri;
+  public final RestTemplate rest;
   private FacebookAppAccessToken appAccessToken;
   private final UserService userService;
   private final JwtTokenUtil jwtTokenUtil;
@@ -79,14 +81,16 @@ public class AuthService {
   public OAuth2AccessToken generateJwtByFacebookCode(String code) {
     FacebookTokenResponse token = rest.getForObject(format(facebookGetTokenByCodeUri, code),
         FacebookTokenResponse.class);
-    if (token == null) {
+    if (token == null || token.hasErrors()) {
       log.info("Acquiring user token by code failed");
-      throw new ApplicationErrorException(
-          ErrorCode.INVALID_USER_CREDENTIALS, ": could not get user token for provided auth code");
+      throw new TemplateMessageException(ErrorCode.INVALID_USER_CREDENTIALS,
+          ": could not get user token for provided auth code. " + ((token == null || token.getError() == null) ? ""
+              : format("{0}, error type: {1}, error code: {2}, fb trace id: {3}", token.getError().getMessage(),
+                  token.getError().getType(), token.getError().getCode(), token.getError().getFbTraceId())));
     } else {
-      log.debug("Got facebook token of [{}] type", token.tokenType);
+      log.debug("Got facebook token of [{}] type", token.getTokenType());
     }
-    return generateJwtByFacebookToken(token.accessToken);
+    return generateJwtByFacebookToken(token.getAccessToken());
   }
 
   /**
@@ -104,7 +108,7 @@ public class AuthService {
 
     if (token == null || token.isBlank()) {
       log.info("Provided user token is empty");
-      throw new ApplicationErrorException(ErrorCode.INVALID_USER_CREDENTIALS, ": invalid facebook token");
+      throw new ApplicationErrorException(ErrorCode.INVALID_USER_CREDENTIALS, "Invalid facebook token");
     } else {
       log.debug("Got facebook token from code: {}", token);
     }
@@ -112,7 +116,7 @@ public class AuthService {
     FacebookUserProfile fbProfile = getFacebookUserProfile(token);
 
     if (fbProfile == null || fbProfile.getEmail() == null || fbProfile.getEmail().isBlank()) {
-      throw new ApplicationErrorException(ErrorCode.NO_USER_DATA, ": unable to get email of user from provider");
+      throw new ApplicationErrorException(ErrorCode.NO_USER_DATA, "Unable to get email of user from provider");
     }
 
     return makeJwtFromProfile(fbProfile);
@@ -143,27 +147,29 @@ public class AuthService {
   }
 
   private FacebookUserProfile getFacebookUserProfile(String token) {
-    FacebookTokenData tokenData = rest.getForObject(
-        format(facebookTokenVerifyUri, token, appAccessToken.getAccessToken()), FacebookTokenData.class);
+    FacebookTokenInfo tokenData = rest.getForObject(
+        format(facebookTokenVerifyUri, token, appAccessToken.getAccessToken()), FacebookTokenInfo.class);
 
     log.debug("Token data retrieved: {}", tokenData);
 
     if (tokenData == null || !tokenData.data.isValid()) {
       if (tokenData != null) {
         throw new ApplicationErrorException(ErrorCode.INVALID_USER_CREDENTIALS,
-            ": could not verify user token. " + tokenData.data.error.message);
+            "Cannot verify user token. " + tokenData.data.error.message);
       }
-      throw new ApplicationErrorException(ErrorCode.INVALID_USER_CREDENTIALS, ": could not verify user token");
+      throw new ApplicationErrorException(ErrorCode.INVALID_USER_CREDENTIALS, "Cannot verify user token");
     }
 
     return rest.getForObject(format(facebookUserProfileUri, tokenData.data.userId, token), FacebookUserProfile.class);
   }
 
-  @Data
-  @NoArgsConstructor
+  /**
+   * FacebookAppAccessToken DTO class for getting app access token.
+   */
   @AllArgsConstructor
-  static class FacebookAppAccessToken {
+  public static class FacebookAppAccessToken {
 
+    @Getter
     @JsonAlias("access_token")
     private String accessToken;
 
@@ -172,23 +178,50 @@ public class AuthService {
 
   }
 
+  /**
+   * Facebook token response DTO.
+   */
   @Data
-  static class FacebookTokenResponse {
+  @Accessors(chain = true)
+  public static class FacebookTokenResponse {
 
     @JsonAlias("access_token")
-    String accessToken;
+    private String accessToken;
 
     @JsonAlias("token_type")
-    String tokenType;
-    @JsonAlias("expires_in")
-    String expiresIn;
+    private String tokenType;
+    private Error error;
+
+    public boolean hasErrors() {
+      return error != null;
+    }
+
+    /**
+     * Facebook token response errors DTO.
+     */
+    @Data
+    public static class Error {
+
+      private int code;
+      private String message;
+      private String type;
+      @JsonAlias("fbtrace_id")
+      private String fbTraceId;
+    }
   }
 
+  /**
+   * Facebook token data wrapper DTO.
+   */
   @Data
-  static class FacebookTokenData {
+  @Accessors(chain = true)
+  public static class FacebookTokenInfo {
 
     private FbData data;
 
+    /**
+     * Facebook token data DTO.
+     */
     @Data
     public static class FbData {
 
@@ -212,17 +245,24 @@ public class AuthService {
       private Error error;
     }
 
+    /**
+     * Facebook token data errors DTO.
+     */
     @Data
     public static class Error {
 
-      int code;
-      String message;
-      int subcode;
+      private int code;
+      private String message;
+      private int subcode;
     }
   }
 
+  /**
+   * FacebookUserProfile DTO. Retrieved from Facebook
+   */
   @Data
-  static class FacebookUserProfile {
+  @Accessors(chain = true)
+  public static class FacebookUserProfile {
 
     Long id;
     @JsonAlias("first_name")

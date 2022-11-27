@@ -32,14 +32,10 @@ public class InterviewPlanningApplication {
       if (!userService.existsWithEmail(coordinatorEmail)) {
         userService.create(coordinatorEmail, UserRole.COORDINATOR);
         log.info("Initial coordinator user was created");
-      } else {
-        log.info("Coordinator is already present in database");
       }
       if (!userService.existsWithEmail(interviewerEmail)) {
         userService.create(interviewerEmail, UserRole.INTERVIEWER);
         log.info("Initial interviewer user was created");
-      } else {
-        log.info("Interviewer is already present in database");
       }
       if (Arrays.stream(env.getActiveProfiles()).anyMatch(s -> s.equalsIgnoreCase("dev"))) {
         log.debug("Users: {}", userService.getAll());

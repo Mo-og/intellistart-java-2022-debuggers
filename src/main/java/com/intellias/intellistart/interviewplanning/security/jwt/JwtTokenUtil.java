@@ -110,15 +110,9 @@ public class JwtTokenUtil implements Serializable {
     if (key != null) {
       return key;
     }
-    if (secret == null) {
-      log.error("JWT secret is null");
+    if (secret == null || secret.isBlank()) {
+      log.error("JWT secret is not set");
       throw new NullPointerException("Secret for jwt token was not retrieved");
-    } else {
-      if (secret.isBlank()) {
-        log.error("Secret is not set");
-      } else {
-        log.debug("Secret is set successfully");
-      }
     }
     key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     return key;

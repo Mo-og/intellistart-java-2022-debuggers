@@ -6,7 +6,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,6 +30,7 @@ import lombok.experimental.Accessors;
 import org.hibernate.Hibernate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 /**
  * User.
@@ -42,7 +45,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
-public class User implements UserDetails {
+public class User implements UserDetails, OAuth2User {
 
   @Id
   @SequenceGenerator(name = "user_seq", sequenceName = "USER_SEQUENCE", allocationSize = 5)
@@ -75,6 +78,19 @@ public class User implements UserDetails {
     this.email = email;
     this.role = role;
     authorities = List.of(role);
+  }
+
+  @Override
+  public Map<String, Object> getAttributes() {
+    Map<String, Object> map = new HashMap<>();
+    map.put("id", id);
+    map.put("email", email);
+    map.put("role", role);
+    map.put("facebookId", facebookId);
+    map.put("firstName", firstName);
+    map.put("middleName", middleName);
+    map.put("lastName", lastName);
+    return map;
   }
 
   /**
@@ -143,6 +159,11 @@ public class User implements UserDetails {
   @Override
   public int hashCode() {
     return getClass().hashCode();
+  }
+
+  @Override
+  public String getName() {
+    return getUsername();
   }
 
   /**

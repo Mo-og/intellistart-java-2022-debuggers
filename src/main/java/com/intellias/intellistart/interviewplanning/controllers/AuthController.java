@@ -70,9 +70,10 @@ public class AuthController {
   /**
    * Simple facebook code DTO.
    */
+  @Data
   @AllArgsConstructor
   @NoArgsConstructor
-  static class JwtCode {
+  public static class JwtCode {
 
     private String code;
   }

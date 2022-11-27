@@ -31,14 +31,13 @@ public abstract class TestUtils {
   }
 
   @SneakyThrows
-  public static void checkResponseOk(MockHttpServletRequestBuilder methodAndUrl, String requestBody,
+  public static String checkResponseOk(MockHttpServletRequestBuilder methodAndUrl, String requestBody,
       String responseBody, MockMvc mock) {
-    checkResponseBad(methodAndUrl, requestBody, responseBody, status().isOk(), mock);
+    return checkResponseBad(methodAndUrl, requestBody, responseBody, status().isOk(), mock);
   }
 
   @SneakyThrows
-  public static void checkResponseBad(MockHttpServletRequestBuilder methodAndUrl,
-      String requestBody,
+  public static String checkResponseBad(MockHttpServletRequestBuilder methodAndUrl, String requestBody,
       String responseBody, ResultMatcher resultMatcher, MockMvc mock) {
     methodAndUrl
         .contentType(MediaType.APPLICATION_JSON)
@@ -52,5 +51,6 @@ public abstract class TestUtils {
     if (responseBody != null) {
       result.andExpect(content().json(responseBody));
     }
+    return result.andReturn().getResponse().getContentAsString();
   }
 }

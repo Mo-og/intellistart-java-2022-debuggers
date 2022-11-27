@@ -1,5 +1,9 @@
 package com.intellias.intellistart.interviewplanning.services;
 
+import static com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils.COORDINATOR_EMAIL;
+import static com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils.INTERVIEWER_EMAIL;
+import static com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils.coordinator;
+import static com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils.interviewer;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -24,20 +28,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-  public static final String COORDINATOR_EMAIL = "test.coordinator@test.com";
-  private static final User newInterviewer = new User(
-      InterviewerServiceTest.INTERVIEWER_EMAIL, UserRole.INTERVIEWER);
-  private static final User interviewer = new User(
-      InterviewerServiceTest.INTERVIEWER_EMAIL, UserRole.INTERVIEWER);
-  private static final User newCoordinator = new User(COORDINATOR_EMAIL,
-      UserRole.COORDINATOR);
-  private static final User coordinator = new User(COORDINATOR_EMAIL,
-      UserRole.COORDINATOR);
-
-  static {
-    interviewer.setId(1L);
-    coordinator.setId(1L);
-  }
+  private static final User newInterviewer = new User(INTERVIEWER_EMAIL, UserRole.INTERVIEWER);
+  private static final User newCoordinator = new User(COORDINATOR_EMAIL, UserRole.COORDINATOR);
 
   @Mock
   UserRepository userRepository;
@@ -53,7 +45,7 @@ class UserServiceTest {
     when(userRepository
         .save(newInterviewer))
         .thenReturn(interviewer);
-    var savedInterviewer = service.create(InterviewerServiceTest.INTERVIEWER_EMAIL,
+    var savedInterviewer = service.create(INTERVIEWER_EMAIL,
         UserRole.INTERVIEWER);
     assertEquals(interviewer.getId(), savedInterviewer.getId());
     assertEquals(interviewer.getRole(), savedInterviewer.getRole());
@@ -145,10 +137,10 @@ class UserServiceTest {
 
   @Test
   void testLoadUserByUsername() {
-    when(userRepository.findByEmail(InterviewerServiceTest.INTERVIEWER_EMAIL))
+    when(userRepository.findByEmail(INTERVIEWER_EMAIL))
         .thenReturn(Optional.of(newInterviewer));
-    var savedInterviewer = service.loadUserByUsername(InterviewerServiceTest.INTERVIEWER_EMAIL);
-    assertEquals(InterviewerServiceTest.INTERVIEWER_EMAIL, savedInterviewer.getUsername());
+    var savedInterviewer = service.loadUserByUsername(INTERVIEWER_EMAIL);
+    assertEquals(INTERVIEWER_EMAIL, savedInterviewer.getUsername());
     assertEquals(newInterviewer.getRole(), ((User) savedInterviewer).getRole());
     assertEquals(newInterviewer.getId(), ((User) savedInterviewer).getId());
     assertEquals(newInterviewer.getEmail(), ((User) savedInterviewer).getEmail());
@@ -156,11 +148,11 @@ class UserServiceTest {
 
   @Test
   void testThrowExceptionLoadByUsername() {
-    when(userRepository.findByEmail(InterviewerServiceTest.INTERVIEWER_EMAIL))
+    when(userRepository.findByEmail(INTERVIEWER_EMAIL))
         .thenThrow(new UsernameNotFoundException(
-            "No user found with username " + InterviewerServiceTest.INTERVIEWER_EMAIL));
+            "No user found with username " + INTERVIEWER_EMAIL));
     assertThrows(UsernameNotFoundException.class,
-        () -> service.loadUserByUsername(InterviewerServiceTest.INTERVIEWER_EMAIL));
+        () -> service.loadUserByUsername(INTERVIEWER_EMAIL));
   }
 
   @Test
@@ -173,10 +165,10 @@ class UserServiceTest {
 
   @Test
   void testThrowExceptionLoadUserByUsername() {
-    when(userRepository.findByEmail(InterviewerServiceTest.INTERVIEWER_EMAIL))
+    when(userRepository.findByEmail(INTERVIEWER_EMAIL))
         .thenThrow(new UsernameNotFoundException(
-            "No user found with username " + InterviewerServiceTest.INTERVIEWER_EMAIL));
+            "No user found with username " + INTERVIEWER_EMAIL));
     assertThrows(UsernameNotFoundException.class,
-        () -> service.loadUserByUsername(InterviewerServiceTest.INTERVIEWER_EMAIL));
+        () -> service.loadUserByUsername(INTERVIEWER_EMAIL));
   }
 }

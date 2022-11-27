@@ -8,7 +8,7 @@ spring:
           import_files: schema-h2.sql, data.sql
     hibernate:
       ddl-auto: create
-    show-sql: true
+    show-sql: false
   datasource:
     driverClassName: org.h2.Driver
     username: sa
