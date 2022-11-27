@@ -15,6 +15,7 @@ import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -167,6 +168,7 @@ public class AuthService {
    * FacebookAppAccessToken DTO class for getting app access token.
    */
   @AllArgsConstructor
+  @NoArgsConstructor
   public static class FacebookAppAccessToken {
 
     @Getter
