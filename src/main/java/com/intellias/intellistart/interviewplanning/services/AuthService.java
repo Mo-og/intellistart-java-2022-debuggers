@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -169,6 +170,8 @@ public class AuthService {
    */
   @AllArgsConstructor
   @NoArgsConstructor
+  @RequiredArgsConstructor
+  @Data
   public static class FacebookAppAccessToken {
 
     @Getter
