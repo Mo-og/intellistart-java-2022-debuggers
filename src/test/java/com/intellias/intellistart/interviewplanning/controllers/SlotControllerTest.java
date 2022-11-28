@@ -75,8 +75,6 @@ class SlotControllerTest {
 
   @MockBean
   private CommandLineRunner commandLineRunner;
-  @MockBean
-  private JwtRequestFilter jwtRequestFilter;
   @Autowired
   private MockMvc mockMvc;
   @MockBean

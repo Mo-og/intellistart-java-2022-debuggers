@@ -42,7 +42,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class User implements UserDetails {
 
   @Id
-  @SequenceGenerator(name = "user_seq", sequenceName = "USER_SEQUENCE", allocationSize = 5)
+  @SequenceGenerator(name = "user_seq", sequenceName = "USER_SEQUENCE", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
   @Column(nullable = false)
   private Long id;
