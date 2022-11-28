@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 public abstract class TestUtils {
 
   private static final ObjectWriter jsonWriter;
+  public static boolean debug = false;
 
   static {
     jsonWriter = new ObjectMapper()
@@ -45,9 +46,11 @@ public abstract class TestUtils {
     if (requestBody != null) {
       methodAndUrl = methodAndUrl.content(requestBody);
     }
-    var result = mock.perform(methodAndUrl)
-        .andDo(print())
-        .andExpect(resultMatcher);
+    var result = mock.perform(methodAndUrl);
+    if (debug) {
+      result.andDo(print());
+    }
+    result.andExpect(resultMatcher);
     if (responseBody != null) {
       result.andExpect(content().json(responseBody));
     }

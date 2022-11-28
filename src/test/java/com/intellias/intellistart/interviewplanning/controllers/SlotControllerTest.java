@@ -21,9 +21,11 @@ import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import com.intellias.intellistart.interviewplanning.services.WeekServiceImp;
 import com.intellias.intellistart.interviewplanning.services.interfaces.WeekService;
 import com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils;
+import com.intellias.intellistart.interviewplanning.utils.TestUtils;
 import com.intellias.intellistart.interviewplanning.utils.WithCustomUser;
 import java.time.LocalTime;
 import java.util.List;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -37,28 +39,26 @@ import org.springframework.test.web.servlet.MockMvc;
 @WithCustomUser
 class SlotControllerTest {
 
-  private static final InterviewerTimeSlot interviewerSlot =
-      new InterviewerTimeSlot("08:00", "10:00", "WEDNESDAY", 202240);
-  private static final CandidateTimeSlot candidateSlot =
-      new CandidateTimeSlot(CANDIDATE_EMAIL, "2022-11-03", "08:00", "10:00");
+  private static final InterviewerTimeSlot interviewerSlot = new InterviewerTimeSlot("08:00", "10:00", "WEDNESDAY",
+      202240);
+  private static final CandidateTimeSlot candidateSlot = new CandidateTimeSlot(CANDIDATE_EMAIL, "2022-11-03", "08:00",
+      "10:00");
+  private static final BookingDto bookingDto = BookingDto.builder().from(LocalTime.of(8, 0)).to(LocalTime.of(10, 0))
+      .subject("some subject").description("some desc")
+      .interviewerSlotId(interviewerSlot.getId())
+      .candidateSlotId(candidateSlot.getId())
+      .build();
+  private final WeekService actualWeekService = new WeekServiceImp();
   @SpyBean
   private WeekServiceImp weekService;
-  private final WeekService actualWeekService = new WeekServiceImp();
-  private static final BookingDto bookingDto =
-      BookingDto.builder()
-          .from(LocalTime.of(8, 0))
-          .to(LocalTime.of(10, 0))
-          .subject("some subject")
-          .description("some desc")
-          .interviewerSlotId(interviewerSlot.getId())
-          .candidateSlotId(candidateSlot.getId())
-          .build();
 
-  static {
+  @BeforeAll
+  static void setupSlots() {
     interviewerSlot.setId(1L);
     interviewerSlot.setInterviewer(TestSecurityUtils.interviewer);
     candidateSlot.setId(1L);
   }
+
 
   private final InterviewerSlotDto interviewerSlotDto1 =
       new InterviewerSlotDto(INTERVIEWER_ID, actualWeekService.getCurrentWeekNum(),
@@ -125,7 +125,7 @@ class SlotControllerTest {
     when(interviewerService.getSlotsByWeekId(INTERVIEWER_ID,
         actualWeekService.getNextWeekNum()))
         .thenReturn(List.of(interviewerSlotDto2));
-    System.out.println(interviewerSlotDto2);
+
     checkResponseOk(
         get("/interviewers/{INTERVIEWER_ID}/slots/weeks/next", INTERVIEWER_ID),
         null, json(List.of(interviewerSlotDto2)), mockMvc);
@@ -133,13 +133,15 @@ class SlotControllerTest {
 
   @Test
   void testDeleteSlots() {
+    TestUtils.debug = true;
     when(interviewerService.getSlotById(interviewerSlot.getId()))
         .thenReturn(interviewerSlot);
-    System.out.println(interviewerSlot);
+    System.err.println(interviewerSlot);
 
     checkResponseOk(
         delete("/interviewers/{INTERVIEWER_ID}/slots/{slotId}", INTERVIEWER_ID, interviewerSlot.getId()),
         null, null, mockMvc);
+    TestUtils.debug = false;
   }
 
   @Test
@@ -147,7 +149,6 @@ class SlotControllerTest {
   void testDeleteSlotsOfAnotherUserNoPermission() {
     when(interviewerService.getSlotById(interviewerSlot.getId()))
         .thenReturn(interviewerSlot);
-    System.out.println(interviewerSlot);
 
     checkResponseBad(
         delete("/interviewers/{INTERVIEWER_ID}/slots/{slotId}", INTERVIEWER_ID + 2, interviewerSlot.getId()),
@@ -159,7 +160,6 @@ class SlotControllerTest {
   void testDeleteSlotsSlotBoundedToAnotherUser() {
     when(interviewerService.getSlotById(interviewerSlot.getId()))
         .thenReturn(interviewerSlot);
-    System.out.println(interviewerSlot);
 
     checkResponseBad(
         delete("/interviewers/{INTERVIEWER_ID}/slots/{slotId}", INTERVIEWER_ID + 2, interviewerSlot.getId()),

@@ -23,15 +23,9 @@ public class TestSecurityUtils {
   public static final Long INTERVIEWER_ID = 2L;
   public static final String CANDIDATE_EMAIL = "candidate@test.com";
   public static final Long CANDIDATE_ID = 3L;
-  public static final User candidate = new User(CANDIDATE_EMAIL, UserRole.CANDIDATE);
-  public static final User coordinator = new User(COORDINATOR_EMAIL, UserRole.COORDINATOR);
-  public static final User interviewer = new User(INTERVIEWER_EMAIL, UserRole.INTERVIEWER);
-
-  static {
-    candidate.setId(CANDIDATE_ID);
-    coordinator.setId(COORDINATOR_ID);
-    interviewer.setId(INTERVIEWER_ID);
-  }
+  public static final User candidate = new User(CANDIDATE_EMAIL, UserRole.CANDIDATE).setId(CANDIDATE_ID);
+  public static final User coordinator = new User(COORDINATOR_EMAIL, UserRole.COORDINATOR).setId(COORDINATOR_ID);
+  public static final User interviewer = new User(INTERVIEWER_EMAIL, UserRole.INTERVIEWER).setId(INTERVIEWER_ID);
 
   @Bean
   @Primary
