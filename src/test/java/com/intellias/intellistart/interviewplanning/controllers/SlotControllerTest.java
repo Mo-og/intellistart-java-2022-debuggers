@@ -2,6 +2,7 @@ package com.intellias.intellistart.interviewplanning.controllers;
 
 import static com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils.CANDIDATE_EMAIL;
 import static com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils.INTERVIEWER_ID;
+import static com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils.interviewer;
 import static com.intellias.intellistart.interviewplanning.utils.TestUtils.checkResponseBad;
 import static com.intellias.intellistart.interviewplanning.utils.TestUtils.checkResponseOk;
 import static com.intellias.intellistart.interviewplanning.utils.TestUtils.json;
@@ -32,6 +33,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.core.annotation.Order;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest(classes = TestSecurityUtils.class)
@@ -132,10 +134,12 @@ class SlotControllerTest {
   }
 
   @Test
+  @Order
   void testDeleteSlots() {
     TestUtils.debug = true;
     when(interviewerService.getSlotById(interviewerSlot.getId()))
         .thenReturn(interviewerSlot);
+    interviewer.setId(INTERVIEWER_ID);
     System.err.println(interviewerSlot);
 
     checkResponseOk(
