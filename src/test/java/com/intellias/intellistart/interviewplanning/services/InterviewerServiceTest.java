@@ -23,7 +23,6 @@ import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
-import javax.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -211,22 +210,6 @@ class InterviewerServiceTest {
     assertEquals(timeSlot.getTo(), slot.getTo());
     assertEquals(timeSlot.getDayOfWeek(), slot.getDayOfWeek());
     assertEquals(timeSlot.getWeekNum(), slot.getWeekNum());
-  }
-
-  @Test
-  void testGetById() {
-    when(userRepository
-        .getReferenceById(1L))
-        .thenReturn(interviewer);
-    assertEquals(interviewer, interviewerService.getById(1L));
-  }
-
-  @Test
-  void testGetByWrongId() {
-    when(userRepository
-        .getReferenceById(-1L))
-        .thenThrow(new EntityNotFoundException());
-    assertThrows(NotFoundException.class, () -> interviewerService.getById(-1L));
   }
 
   @Test

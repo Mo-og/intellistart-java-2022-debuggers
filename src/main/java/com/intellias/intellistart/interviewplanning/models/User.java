@@ -1,5 +1,6 @@
 package com.intellias.intellistart.interviewplanning.models;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -23,6 +24,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import org.hibernate.Hibernate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,6 +35,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Entity
 @Getter
 @Setter
+@Accessors(chain = true)
 @ToString
 @RequiredArgsConstructor
 @Table(name = "USERS")
@@ -49,6 +52,15 @@ public class User implements UserDetails {
   private String email;
   @Enumerated(EnumType.STRING)
   private UserRole role;
+
+  @JsonAlias("facebook_id")
+  private Long facebookId;
+  @JsonAlias("first_name")
+  private String firstName;
+  @JsonAlias("middle_name")
+  private String middleName;
+  @JsonAlias("last_name")
+  private String lastName;
   @JsonIgnore
   @Transient
   private Collection<GrantedAuthority> authorities;

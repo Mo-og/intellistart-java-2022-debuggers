@@ -1,11 +1,14 @@
 package com.intellias.intellistart.interviewplanning.security.jwt;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.intellias.intellistart.interviewplanning.models.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +16,8 @@ import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType;
 import org.springframework.stereotype.Component;
 
 /**
@@ -56,21 +61,43 @@ public class JwtTokenUtil implements Serializable {
    * @param userDetails user data object to get username and authorities from
    * @return token String
    */
-  public String generateToken(UserDetails userDetails) {
+  public OAuth2AccessToken generateToken(UserDetails userDetails) {
     Map<String, Object> claims = new HashMap<>();
     claims.put("authorities", userDetails.getAuthorities());
+    if (userDetails instanceof User) {
+      User user = (User) userDetails;
+      claims.put("fb_id", user.getFacebookId());
+      claims.put("first_name", user.getFirstName());
+      claims.put("middle_name", user.getMiddleName());
+      claims.put("last_name", user.getLastName());
+    }
     return doGenerateToken(claims, userDetails.getUsername());
   }
 
-  private String doGenerateToken(Map<String, Object> claims, String subject) {
-
-    return Jwts.builder()
+  private OAuth2AccessToken doGenerateToken(Map<String, Object> claims, String subject) {
+    Date issuedAt = new Date(System.currentTimeMillis());
+    Date expiresAt = new Date(issuedAt.getTime() + JWT_TOKEN_VALIDITY_SECONDS * 1000);
+    String tokenValue = Jwts.builder()
         .setClaims(claims)
         .setSubject(subject)
-        .setIssuedAt(new Date(System.currentTimeMillis()))
-        .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY_SECONDS * 1000))
+        .setIssuedAt(issuedAt)
+        .setExpiration(expiresAt)
         .signWith(getKey())
         .compact();
+    class Oauth2AccessTokenFormatted extends OAuth2AccessToken {
+
+      public Oauth2AccessTokenFormatted(TokenType tokenType, String tokenValue, Instant issuedAt, Instant expiresAt) {
+        super(tokenType, tokenValue, issuedAt, expiresAt);
+      }
+
+      @Override
+      @JsonGetter("token")
+      public String getTokenValue() {
+        return super.getTokenValue();
+      }
+    }
+
+    return new Oauth2AccessTokenFormatted(TokenType.BEARER, tokenValue, issuedAt.toInstant(), expiresAt.toInstant());
   }
 
   public boolean isTokenValid(String token, UserDetails userDetails) {
