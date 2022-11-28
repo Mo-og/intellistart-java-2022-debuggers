@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 public abstract class TestUtils {
 
   private static final ObjectWriter jsonWriter;
-  public static boolean debug = false;
+  public static boolean debug = true;
 
   static {
     jsonWriter = new ObjectMapper()

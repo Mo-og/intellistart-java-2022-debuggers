@@ -22,7 +22,6 @@ import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import com.intellias.intellistart.interviewplanning.services.WeekServiceImp;
 import com.intellias.intellistart.interviewplanning.services.interfaces.WeekService;
 import com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils;
-import com.intellias.intellistart.interviewplanning.utils.TestUtils;
 import com.intellias.intellistart.interviewplanning.utils.WithCustomUser;
 import java.time.LocalTime;
 import java.util.List;
@@ -33,7 +32,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.core.annotation.Order;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest(classes = TestSecurityUtils.class)
@@ -134,18 +132,14 @@ class SlotControllerTest {
   }
 
   @Test
-  @Order
   void testDeleteSlots() {
-    TestUtils.debug = true;
     when(interviewerService.getSlotById(interviewerSlot.getId()))
         .thenReturn(interviewerSlot);
-    interviewer.setId(INTERVIEWER_ID);
-    System.err.println(interviewerSlot);
+    interviewer.setId(INTERVIEWER_ID); //git actions somehow reset id to 1 and break test
 
     checkResponseOk(
         delete("/interviewers/{INTERVIEWER_ID}/slots/{slotId}", INTERVIEWER_ID, interviewerSlot.getId()),
         null, null, mockMvc);
-    TestUtils.debug = false;
   }
 
   @Test
