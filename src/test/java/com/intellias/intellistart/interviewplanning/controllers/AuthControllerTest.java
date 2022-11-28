@@ -114,6 +114,7 @@ class AuthControllerTest {
     assertTrue(responseJson.contains("\"role\":\"" + UserRole.COORDINATOR.name() + "\""));
   }
 
+
   @Test
     //integration
   void getAuthByTokenUserNotFoundGivesCandidateRole() {

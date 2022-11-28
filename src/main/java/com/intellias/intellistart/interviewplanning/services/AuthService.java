@@ -14,7 +14,9 @@ import java.util.List;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -71,6 +73,8 @@ public class AuthService {
         appAccessToken = rest.getForObject(Objects.requireNonNull(env.getProperty("facebook.uri.get_app_token"),
                 "Facebook app access token property is not set. Check 'facebook.uri.get_app_token' in application.yml"),
             FacebookAppAccessToken.class);
+        log.debug("Acquired new FB app token [{}]:{}", Objects.requireNonNull(appAccessToken).getTokenType(),
+            appAccessToken.getAccessToken());
       }
     }
   }
@@ -170,7 +174,8 @@ public class AuthService {
   /**
    * FacebookAppAccessToken DTO class for getting app access token.
    */
-  @Data
+  @Getter
+  @Setter
   @AllArgsConstructor
   @NoArgsConstructor
   public static class FacebookAppAccessToken {
