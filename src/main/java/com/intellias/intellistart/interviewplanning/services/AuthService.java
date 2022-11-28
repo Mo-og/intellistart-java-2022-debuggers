@@ -14,9 +14,7 @@ import java.util.List;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -52,11 +50,6 @@ public class AuthService {
     this.userService = userService;
     this.jwtTokenUtil = jwtTokenUtil;
 
-    isOffline = Arrays.stream(env.getActiveProfiles()).anyMatch(s -> s.equalsIgnoreCase("offline"));
-    if (isOffline) {
-      log.error("AUTH SERVICE IS OFFLINE!");
-    }
-
     facebookGetTokenByCodeUri = env.getProperty("facebook.uri.get_token_by_code");
     facebookTokenVerifyUri = env.getProperty("facebook.uri.token_verify");
     facebookUserProfileUri = env.getProperty("facebook.uri.user_data");
@@ -64,13 +57,22 @@ public class AuthService {
 
     //needs to be updated every ~60 days
     appAccessToken = new FacebookAppAccessToken(env.getProperty("facebook.app-token"), "bearer");
-    if (appAccessToken.accessToken == null || appAccessToken.accessToken.isBlank()) {
-      log.debug("Getting new app token from Facebook");
-      appAccessToken = rest.getForObject(Objects.requireNonNull(env.getProperty("facebook.uri.get_app_token"),
-              "Facebook app access token property is not set. Check 'facebook.uri.get_app_token' in application.yml"),
-          FacebookAppAccessToken.class);
+
+    isOffline = Arrays.stream(env.getActiveProfiles()).anyMatch(s -> s.equalsIgnoreCase("offline"));
+    if (isOffline) {
+      log.error("AUTH SERVICE IS OFFLINE!");
     }
 
+    if (appAccessToken.accessToken == null || appAccessToken.accessToken.isBlank()) {
+      log.info("Getting new app token from Facebook");
+      if (isOffline) {
+        appAccessToken = new FacebookAppAccessToken("offline_fb_app_token_placeholder", "bearer");
+      } else {
+        appAccessToken = rest.getForObject(Objects.requireNonNull(env.getProperty("facebook.uri.get_app_token"),
+                "Facebook app access token property is not set. Check 'facebook.uri.get_app_token' in application.yml"),
+            FacebookAppAccessToken.class);
+      }
+    }
   }
 
   /**
@@ -168,13 +170,11 @@ public class AuthService {
   /**
    * FacebookAppAccessToken DTO class for getting app access token.
    */
+  @Data
   @AllArgsConstructor
   @NoArgsConstructor
-  @RequiredArgsConstructor
-  @Data
   public static class FacebookAppAccessToken {
 
-    @Getter
     @JsonAlias("access_token")
     private String accessToken;
 

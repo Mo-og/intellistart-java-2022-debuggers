@@ -7,7 +7,7 @@ import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -20,6 +20,7 @@ import com.intellias.intellistart.interviewplanning.services.AuthService.Faceboo
 import com.intellias.intellistart.interviewplanning.services.AuthService.FacebookTokenInfo.FbData;
 import com.intellias.intellistart.interviewplanning.services.AuthService.FacebookTokenResponse;
 import com.intellias.intellistart.interviewplanning.services.AuthService.FacebookUserProfile;
+import com.intellias.intellistart.interviewplanning.utils.DisabledWhenOffline;
 import com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils;
 import java.util.Collections;
 import java.util.Map;
@@ -28,7 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.core.env.Environment;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
@@ -38,11 +39,11 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 class AuthControllerTest {
 
-  public static final String FB_TOKEN = "FB_TOKEN";
-  private static final FacebookTokenResponse fbToken = new FacebookTokenResponse().setAccessToken(FB_TOKEN);
+  public static final String FB_TOKEN_VALUE = "FB_TOKEN";
+  private static final FacebookTokenResponse fbToken = new FacebookTokenResponse().setAccessToken(FB_TOKEN_VALUE);
   private static final FacebookUserProfile fbUserProfile = new FacebookUserProfile().setEmail(
       TestSecurityUtils.COORDINATOR_EMAIL);
-  private static final FacebookUserProfile fbUserProfileUnknown = new FacebookUserProfile().setEmail(
+  private static final FacebookUserProfile fbUserProfileNotInDb = new FacebookUserProfile().setEmail(
       "someNewEmail@mail.com");
   private static final FacebookTokenInfo fbTokenInfo = new FacebookTokenInfo().setData(
       new FbData().setValid(true).setUserId("1"));
@@ -55,7 +56,7 @@ class AuthControllerTest {
   private MockMvc mockMvc;
   @Autowired
   private AuthService authService;
-  @MockBean
+  @SpyBean
   private RestTemplate rest;
 
 
@@ -67,18 +68,19 @@ class AuthControllerTest {
   }
 
   @Test
+  @DisabledWhenOffline
     //integration
   void getAuthByCode() {
     //get FB token
-    when(rest.getForObject(any(String.class), eq(FacebookTokenResponse.class))).thenReturn(fbToken);
+    doReturn(fbToken).when(rest).getForObject(any(String.class), eq(FacebookTokenResponse.class));
 
     //get token info with FB user id
-    when(rest.getForObject(any(String.class), eq(FacebookTokenInfo.class))).thenReturn(fbTokenInfo);
+    doReturn(fbTokenInfo).when(rest).getForObject(any(String.class), eq(FacebookTokenInfo.class));
 
     String fbUserUri = authService.facebookUserProfileUri;
     assert fbUserUri != null;
-    when(rest.getForObject(format(fbUserUri, fbTokenInfo.getData().getUserId(), FB_TOKEN),
-        FacebookUserProfile.class)).thenReturn(fbUserProfile);
+    doReturn(fbUserProfile).when(rest)
+        .getForObject(format(fbUserUri, fbTokenInfo.getData().getUserId(), FB_TOKEN_VALUE), FacebookUserProfile.class);
 
     String token = checkResponseOk(get("/authenticate/code"), json(new JwtCode("code")), null, mockMvc);
     token = extractTokenValue(token);
@@ -95,17 +97,18 @@ class AuthControllerTest {
   }
 
   @Test
+  @DisabledWhenOffline
     //integration
   void getAuthByToken() {
     //get token info with FB user id
-    when(rest.getForObject(any(String.class), eq(FacebookTokenInfo.class))).thenReturn(fbTokenInfo);
+    doReturn(fbTokenInfo).when(rest).getForObject(any(String.class), eq(FacebookTokenInfo.class));
 
     String fbUserUri = authService.facebookUserProfileUri;
     assert fbUserUri != null;
-    when(rest.getForObject(format(fbUserUri, fbTokenInfo.getData().getUserId(), FB_TOKEN),
-        FacebookUserProfile.class)).thenReturn(fbUserProfile);
+    doReturn(fbUserProfile).when(rest)
+        .getForObject(format(fbUserUri, fbTokenInfo.getData().getUserId(), FB_TOKEN_VALUE), FacebookUserProfile.class);
 
-    String token = checkResponseOk(get("/authenticate/token"), json(new JwtToken(FB_TOKEN)), null, mockMvc);
+    String token = checkResponseOk(get("/authenticate/token"), json(new JwtToken(FB_TOKEN_VALUE)), null, mockMvc);
     token = extractTokenValue(token);
     String responseJson = checkResponseOk(get("/me").header("Authorization", "Bearer " + token), null, null, mockMvc);
     assertTrue(responseJson.contains("\"role\":\"" + UserRole.COORDINATOR.name() + "\""));
@@ -115,64 +118,67 @@ class AuthControllerTest {
     //integration
   void getAuthByTokenUserNotFoundGivesCandidateRole() {
     //get token info with FB user id
-    when(rest.getForObject(any(String.class), eq(FacebookTokenInfo.class))).thenReturn(fbTokenInfo);
+    doReturn(fbTokenInfo).when(rest).getForObject(any(String.class), eq(FacebookTokenInfo.class));
 
     String fbUserUri = authService.facebookUserProfileUri;
     assert fbUserUri != null;
-    when(rest.getForObject(format(fbUserUri, fbTokenInfo.getData().getUserId(), FB_TOKEN),
-        FacebookUserProfile.class)).thenReturn(fbUserProfileUnknown);
+    doReturn(fbUserProfileNotInDb).when(rest)
+        .getForObject(format(fbUserUri, fbTokenInfo.getData().getUserId(), FB_TOKEN_VALUE), FacebookUserProfile.class);
 
-    String token = checkResponseOk(get("/authenticate/token"), json(new JwtToken(FB_TOKEN)), null, mockMvc);
+    String token = checkResponseOk(get("/authenticate/token"), json(new JwtToken(FB_TOKEN_VALUE)), null, mockMvc);
     token = extractTokenValue(token);
     String responseJson = checkResponseOk(get("/me").header("Authorization", "Bearer " + token), null, null, mockMvc);
     assertTrue(responseJson.contains("\"role\":\"" + UserRole.CANDIDATE.name() + "\""));
   }
 
   @Test
+  @DisabledWhenOffline
     //integration
   void getAuthByTokenWrongCredentials() {
     //get token info with FB user id
-    when(rest.getForObject(any(String.class), eq(FacebookTokenInfo.class))).thenReturn(fbTokenInfoInvalid);
+    doReturn(fbTokenInfoInvalid).when(rest).getForObject(any(String.class), eq(FacebookTokenInfo.class));
 
     String fbUserUri = authService.facebookUserProfileUri;
     assert fbUserUri != null;
-    when(rest.getForObject(format(fbUserUri, fbTokenInfoInvalid.getData().getUserId(), FB_TOKEN),
-        FacebookUserProfile.class)).thenReturn(fbUserProfileUnknown);
+    doReturn(fbUserProfileNotInDb).when(rest).getForObject(
+        format(fbUserUri, fbTokenInfoInvalid.getData().getUserId(), FB_TOKEN_VALUE), FacebookUserProfile.class);
 
-    checkResponseBad(get("/authenticate/token"), json(new JwtToken(FB_TOKEN)), null, status().isBadRequest(), mockMvc);
+    checkResponseBad(get("/authenticate/token"), json(new JwtToken(FB_TOKEN_VALUE)), null, status().isBadRequest(),
+        mockMvc);
   }
 
   @Test
+  @DisabledWhenOffline
     //integration
   void getAuthByTokenNoEmailInFbProfile() {
     //get token info with FB user id
-    when(rest.getForObject(any(String.class), eq(FacebookTokenInfo.class))).thenReturn(fbTokenInfo);
+    doReturn(fbTokenInfo).when(rest).getForObject(any(String.class), eq(FacebookTokenInfo.class));
 
     String fbUserUri = authService.facebookUserProfileUri;
     assert fbUserUri != null;
-    when(rest.getForObject(format(fbUserUri, fbTokenInfoInvalid.getData().getUserId(), FB_TOKEN),
-        FacebookUserProfile.class)).thenReturn(new FacebookUserProfile());//no email set
+    doReturn(new FacebookUserProfile())
+        .when(rest)
+        .getForObject(format(fbUserUri, fbTokenInfoInvalid.getData().getUserId(), FB_TOKEN_VALUE),
+            FacebookUserProfile.class);//no email set
 
-    checkResponseBad(get("/authenticate/token"), json(new JwtToken(FB_TOKEN)), null, status().isBadRequest(), mockMvc);
+    checkResponseBad(
+        get("/authenticate/token"), json(new JwtToken(FB_TOKEN_VALUE)),
+        null, status().isBadRequest(), mockMvc
+    );
   }
 
   @Test
     //integration
   void getAuthByCodeInvalidCode() {
+    var tokenResponse = new FacebookTokenResponse().setError(
+        new FacebookTokenResponse.Error().setMessage("Test error"));
     //get token info with FB user id
-    when(rest.getForObject(any(String.class), eq(FacebookTokenResponse.class)))
-        .thenReturn(
-            new FacebookTokenResponse()
-                .setError(
-                    new FacebookTokenResponse
-                        .Error()
-                        .setMessage("Test error")
-                )
-        );
+    doReturn(tokenResponse).when(rest).getForObject(any(String.class), eq(FacebookTokenResponse.class));
     checkResponseBad(get("/authenticate/code"), json(new JwtCode("some code")), null, status().isBadRequest(), mockMvc);
   }
 
   @Test
+  @DisabledWhenOffline
     //integration
   void getAuthByTokenNullToken() {
     //get token info with FB user id
@@ -180,11 +186,13 @@ class AuthControllerTest {
   }
 
   @Test
+  @DisabledWhenOffline
     //integration
   void getAuthByTokenNullTokenInfo() {
     //get token info with FB user id
-    when(rest.getForObject(any(String.class), eq(FacebookTokenInfo.class))).thenReturn(null);
-    checkResponseBad(get("/authenticate/token"), json(new JwtToken(FB_TOKEN)), null, status().isBadRequest(), mockMvc);
+    doReturn(null).when(rest).getForObject(any(String.class), eq(FacebookTokenInfo.class));
+    checkResponseBad(get("/authenticate/token"), json(new JwtToken(FB_TOKEN_VALUE)), null, status().isBadRequest(),
+        mockMvc);
   }
 
 }
