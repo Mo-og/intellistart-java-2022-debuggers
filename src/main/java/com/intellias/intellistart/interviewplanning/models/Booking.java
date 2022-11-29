@@ -3,7 +3,6 @@ package com.intellias.intellistart.interviewplanning.models;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.intellias.intellistart.interviewplanning.utils.Utils;
-import com.intellias.intellistart.interviewplanning.validators.PeriodValidator;
 import java.time.LocalTime;
 import java.util.Objects;
 import javax.persistence.Column;
@@ -56,7 +55,6 @@ public class Booking {
    */
   public Booking(LocalTime from, LocalTime to, CandidateTimeSlot candidateSlot,
       InterviewerTimeSlot interviewerSlot, String subject, String description) {
-    PeriodValidator.validate(from.toString(), to.toString());
     this.from = from;
     this.to = to;
     this.candidateSlot = candidateSlot;

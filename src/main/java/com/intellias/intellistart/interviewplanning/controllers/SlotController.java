@@ -14,6 +14,7 @@ import com.intellias.intellistart.interviewplanning.services.CandidateService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import com.intellias.intellistart.interviewplanning.services.interfaces.WeekService;
 import com.intellias.intellistart.interviewplanning.utils.mappers.CandidateSlotMapper;
+import com.intellias.intellistart.interviewplanning.validators.PeriodValidator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -59,6 +60,7 @@ public class SlotController {
       @PathVariable Long interviewerId,
       Authentication auth) {
 
+    PeriodValidator.validate(interviewerTimeSlot.getFrom(), interviewerTimeSlot.getTo());
     checkAuthorized(auth, interviewerId);
     return interviewerService.createSlot(interviewerId, interviewerTimeSlot);
   }
@@ -74,6 +76,7 @@ public class SlotController {
       @RequestBody InterviewerTimeSlot interviewerTimeSlot,
       Authentication auth) {
 
+    PeriodValidator.validate(interviewerTimeSlot.getFrom(), interviewerTimeSlot.getTo());
     checkAuthorized(auth, interviewerId);
     return interviewerService.updateSlot(interviewerId, slotId, interviewerTimeSlot);
   }
@@ -102,6 +105,8 @@ public class SlotController {
       @RequestBody CandidateSlotDto candidateTimeSlot,
       @RequestParam(required = false) String email,
       Authentication auth) {
+
+    PeriodValidator.validate(candidateTimeSlot.getFrom(), candidateTimeSlot.getTo());
     User currentUser = (User) auth.getPrincipal();
     if (currentUser.getRole() == UserRole.COORDINATOR) {
       if (email == null || email.isBlank()) {
