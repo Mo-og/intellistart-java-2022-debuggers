@@ -55,6 +55,7 @@ class SlotControllerTest {
 
   @BeforeAll
   static void setupSlots() {
+    interviewer.setId(INTERVIEWER_ID);
     interviewerSlot.setId(1L);
     interviewerSlot.setInterviewer(TestSecurityUtils.interviewer);
     candidateSlot.setId(1L);
