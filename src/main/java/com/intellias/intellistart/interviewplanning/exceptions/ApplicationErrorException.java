@@ -75,8 +75,8 @@ public class ApplicationErrorException extends RuntimeException {
     INVALID_WEEK_NUM(HttpStatus.BAD_REQUEST, "Invalid week number"),
     REVOKE_USER_WITH_SLOT(HttpStatus.BAD_REQUEST,
         "Can not revoke user who has time slot in the future"),
-    DELETE_SLOT_WITH_BOOKING(HttpStatus.BAD_REQUEST,
-        "Can not delete time slot that has booking"),
+    MODIFY_SLOT_WITH_BOOKING(HttpStatus.BAD_REQUEST,
+        "Can not update or delete time slot that has booking"),
 
     //Forbidden error code
     SELF_ROLE_REVOKING(HttpStatus.FORBIDDEN, "Forbidden to revoke yourself"),

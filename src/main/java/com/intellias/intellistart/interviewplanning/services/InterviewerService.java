@@ -35,29 +35,17 @@ public class InterviewerService {
   private final InterviewerSlotValidator slotValidator;
 
   /**
-   * Create slot for interview. Interviewer can create slot for current or next week.
+   * Creates slot for interview. Interviewer can create slot for current or next week.
    *
    * @param interviewerId      id of interviewer to bind slot to
    * @param interviewerSlotDto dto to validate and save
-   * @return slot
+   * @return created slot
    */
   public InterviewerSlotDto createSlot(Long interviewerId, InterviewerSlotDto interviewerSlotDto) {
-    User interviewer = userRepository.getReferenceById(interviewerId);
-    InterviewerTimeSlot interviewerTimeSlot = InterviewerSlotMapper.mapToEntity(interviewer,
-        interviewerSlotDto);
-    slotValidator.validate(interviewerTimeSlot);
-    return InterviewerSlotMapper.mapToDto(
-        interviewerTimeSlotRepository.saveAndFlush(interviewerTimeSlot));
-  }
-
-  /**
-   * Get slot by id.
-   *
-   * @param id slot id
-   * @return slotById
-   */
-  public InterviewerTimeSlot getSlotById(Long id) {
-    return interviewerTimeSlotRepository.getReferenceById(id);
+    User interviewer = getInterviewerById(interviewerId);
+    InterviewerTimeSlot slot = InterviewerSlotMapper.mapToEntity(interviewer, interviewerSlotDto);
+    slotValidator.validate(slot);
+    return InterviewerSlotMapper.mapToDto(interviewerTimeSlotRepository.save(slot));
   }
 
   /**
@@ -65,20 +53,20 @@ public class InterviewerService {
    *
    * @param interviewerId id of interviewer to get slots from
    * @return time slots of requested interviewer for current week and future weeks
+   * @throws NotFoundException if no interviewer found
    */
   public List<InterviewerSlotDto> getRelevantInterviewerSlots(Long interviewerId) {
-    if (!userRepository.existsById(interviewerId)) {
-      throw NotFoundException.interviewer(interviewerId);
-    }
+    User interviewer = getInterviewerById(interviewerId);
+
     List<InterviewerTimeSlot> slots = interviewerTimeSlotRepository
         .findByInterviewerIdAndWeekNumGreaterThanEqual(
-            interviewerId, weekService.getCurrentWeekNum());
+            interviewer.getId(), weekService.getCurrentWeekNum());
 
     return getInterviewerSlotsWithBookings(slots);
   }
 
   /**
-   * Returns interviewer time slots for the specified week.
+   * Provides interviewer time slots for the specified week.
    *
    * @param interviewerId id of interviewer
    * @param weekId        id of week
@@ -86,21 +74,16 @@ public class InterviewerService {
    * @throws NotFoundException if no interviewer is found
    */
   public List<InterviewerSlotDto> getSlotsByWeekId(Long interviewerId, int weekId) {
-    User user = userRepository.findById(interviewerId)
-        .orElseThrow(() -> NotFoundException.user(interviewerId));
-
-    if (user.getRole() != UserRole.INTERVIEWER) {
-      throw NotFoundException.interviewer(interviewerId);
-    }
+    User interviewer = getInterviewerById(interviewerId);
 
     List<InterviewerTimeSlot> slots = interviewerTimeSlotRepository
-        .findByInterviewerIdAndWeekNum(interviewerId, weekId);
+        .findByInterviewerIdAndWeekNum(interviewer.getId(), weekId);
 
     return getInterviewerSlotsWithBookings(slots);
   }
 
   /**
-   * Returns interviewer slots with bookings.
+   * Provides interviewer slots with bookings.
    *
    * @param slots interviewer time slots
    * @return a list of interviewer time slots with bookings
@@ -116,50 +99,52 @@ public class InterviewerService {
   }
 
   /**
-   * Update slot by id.
+   * Updates interviewer slot by slot id.
    *
-   * @param slotId             slot id
-   * @param interviewerSlotDto slot dto
+   * @param userId  interviewer id
+   * @param slotId  slot id
+   * @param slotDto interviewer slot dto
    * @return updated slot
+   * @throws ApplicationErrorException if slot has active booking
    */
-  public InterviewerSlotDto updateSlot(Long interviewerId, Long slotId,
-      InterviewerSlotDto interviewerSlotDto) {
-    User interviewer = userRepository.getReferenceById(interviewerId);
-    InterviewerTimeSlot interviewerTimeSlot = InterviewerSlotMapper.mapToEntity(interviewer,
-        interviewerSlotDto);
-    slotValidator.validate(interviewerTimeSlot);
-    InterviewerTimeSlot slot = getSlotById(slotId);
-    if (!slot.getInterviewer().equals(interviewer)) {
-      throw NotFoundException.timeSlot(slotId, interviewerId);
+  public InterviewerSlotDto updateSlot(Long userId, Long slotId, InterviewerSlotDto slotDto) {
+    User interviewer = getInterviewerById(userId);
+    InterviewerTimeSlot slot = getSlotById(interviewer.getId(), slotId);
+
+    if (hasBooking(slot)) {
+      throw new ApplicationErrorException(ErrorCode.MODIFY_SLOT_WITH_BOOKING);
     }
-    slot.setFrom(interviewerTimeSlot.getFrom());
-    slot.setTo(interviewerTimeSlot.getTo());
-    slot.setDayOfWeek(interviewerTimeSlot.getDayOfWeek());
-    slot.setWeekNum(interviewerTimeSlot.getWeekNum());
+
+    slot.setFrom(slotDto.getFrom());
+    slot.setTo(slotDto.getTo());
+    slot.setDayOfWeek(slotDto.getDayOfWeek());
+    slot.setWeekNum(slotDto.getWeekNum());
     slot.setInterviewer(interviewer);
+    slotValidator.validate(slot);
     return InterviewerSlotMapper.mapToDto(interviewerTimeSlotRepository.save(slot));
   }
 
   /**
    * Deletes slot by interviewer time slot id.
    *
-   * @param interviewerId id of interviewer
-   * @param slotId        id of interviewer time slot
-   * @param currentUser   current user
+   * @param userId      id of interviewer
+   * @param slotId      id of interviewer time slot
+   * @param currentUser current user
    * @return deleted slot
+   * @throws ApplicationErrorException if slot has active booking
    */
-  public InterviewerSlotDto deleteSlot(Long interviewerId, Long slotId, User currentUser) {
-    InterviewerTimeSlot slot = getSlotById(slotId);
-    if (!slot.getInterviewer().getId().equals(interviewerId)) {
-      throw new ApplicationErrorException(ErrorCode.SLOT_NOT_FOUND,
-          "Slot of given id does not belong to specified interviewer");
-    }
-    if (currentUser.getRole() == UserRole.INTERVIEWER) {
+  public InterviewerSlotDto deleteSlot(Long userId, Long slotId, User currentUser) {
+    User interviewer = getInterviewerById(userId);
+    InterviewerTimeSlot slot = getSlotById(interviewer.getId(), slotId);
+
+    if (currentUser.getRole() != UserRole.COORDINATOR) {
       slotValidator.validate(slot);
     }
+
     if (hasBooking(slot)) {
-      throw new ApplicationErrorException(ErrorCode.DELETE_SLOT_WITH_BOOKING);
+      throw new ApplicationErrorException(ErrorCode.MODIFY_SLOT_WITH_BOOKING);
     }
+
     interviewerTimeSlotRepository.delete(slot);
     return InterviewerSlotMapper.mapToDto(slot);
   }
@@ -172,5 +157,42 @@ public class InterviewerService {
    */
   private boolean hasBooking(InterviewerTimeSlot slot) {
     return !bookingRepository.findByInterviewerSlot(slot).isEmpty();
+  }
+
+  /**
+   * Provides slot by slot id.
+   *
+   * @param userId id of interviewer
+   * @param slotId id of interviewer slot
+   * @return interviewer slot
+   * @throws NotFoundException if no interviewer slot found
+   */
+  public InterviewerTimeSlot getSlotById(Long userId, Long slotId) {
+    InterviewerTimeSlot slot = interviewerTimeSlotRepository.findById(slotId)
+        .orElseThrow(() -> NotFoundException.timeSlot(slotId));
+
+    if (!slot.getInterviewer().getId().equals(userId)) {
+      throw NotFoundException.timeSlot(slotId, userId);
+    }
+
+    return slot;
+  }
+
+  /**
+   * Provides interviewer by id.
+   *
+   * @param userId id of interviewer
+   * @return interviewer
+   * @throws NotFoundException if no interviewer found
+   */
+  public User getInterviewerById(Long userId) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> NotFoundException.user(userId));
+
+    if (user.getRole() != UserRole.INTERVIEWER) {
+      throw NotFoundException.interviewer(userId);
+    }
+
+    return user;
   }
 }

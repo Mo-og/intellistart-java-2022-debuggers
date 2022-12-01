@@ -40,18 +40,18 @@ import org.springframework.test.web.servlet.MockMvc;
 @WithCustomUser
 class SlotControllerTest {
 
-  private static final InterviewerTimeSlot interviewerSlot = new InterviewerTimeSlot("08:00", "10:00", "WEDNESDAY",
-      202240);
-  private static final CandidateTimeSlot candidateSlot = new CandidateTimeSlot(CANDIDATE_EMAIL, "2022-11-03", "08:00",
-      "10:00");
-  private static final BookingDto bookingDto = BookingDto.builder().from(LocalTime.of(8, 0)).to(LocalTime.of(10, 0))
+  private static final InterviewerTimeSlot interviewerSlot =
+      new InterviewerTimeSlot("08:00", "10:00", "WEDNESDAY", 202240);
+  private static final CandidateTimeSlot candidateSlot =
+      new CandidateTimeSlot(CANDIDATE_EMAIL, "2022-11-03", "08:00", "10:00");
+  private static final BookingDto bookingDto = BookingDto.builder()
+      .from(LocalTime.of(8, 0)).to(LocalTime.of(10, 0))
       .subject("some subject").description("some desc")
       .interviewerSlotId(interviewerSlot.getId())
       .candidateSlotId(candidateSlot.getId())
       .build();
+
   private final WeekService actualWeekService = new WeekServiceImp();
-  @SpyBean
-  private WeekServiceImp weekService;
 
   @BeforeAll
   static void setupSlots() {
@@ -72,6 +72,7 @@ class SlotControllerTest {
       new InterviewerSlotDto(INTERVIEWER_ID, actualWeekService.getNextWeekNum(),
           "friday", LocalTime.parse("08:00"),
           LocalTime.parse("10:00"), List.of(bookingDto));
+
   @Autowired
   private MockMvc mockMvc;
   @SpyBean
@@ -137,34 +138,36 @@ class SlotControllerTest {
 
   @Test
   void testDeleteSlots() {
-    when(interviewerService.getSlotById(interviewerSlot.getId()))
-        .thenReturn(interviewerSlot);
-    interviewer.setId(INTERVIEWER_ID); //git actions somehow reset id to 1 and break test
+    doReturn(interviewer).when(interviewerService).getInterviewerById(INTERVIEWER_ID);
+    doReturn(interviewerSlot).when(interviewerService)
+        .getSlotById(INTERVIEWER_ID, interviewerSlot.getId());
 
     checkResponseOk(
-        delete("/interviewers/{INTERVIEWER_ID}/slots/{slotId}", INTERVIEWER_ID, interviewerSlot.getId()),
+        delete("/interviewers/{INTERVIEWER_ID}/slots/{slotId}",
+            INTERVIEWER_ID, interviewerSlot.getId()),
         null, null, mockMvc);
   }
 
   @Test
   @WithCustomUser(TestSecurityUtils.INTERVIEWER_EMAIL)
   void testDeleteSlotsOfAnotherUserNoPermission() {
-    when(interviewerService.getSlotById(interviewerSlot.getId()))
-        .thenReturn(interviewerSlot);
+    doReturn(interviewerSlot).when(interviewerService)
+        .getSlotById(INTERVIEWER_ID, interviewerSlot.getId());
 
     checkResponseBad(
-        delete("/interviewers/{INTERVIEWER_ID}/slots/{slotId}", INTERVIEWER_ID + 2, interviewerSlot.getId()),
+        delete("/interviewers/{INTERVIEWER_ID}/slots/{slotId}",
+            INTERVIEWER_ID + 2, interviewerSlot.getId()),
         null, null, status().isForbidden(), mockMvc);
   }
 
   @Test
-    //auth as coordinator bypasses "edit only myself" check, but slot is not bounded to given in url interviewer id
   void testDeleteSlotsSlotBoundedToAnotherUser() {
-    when(interviewerService.getSlotById(interviewerSlot.getId()))
-        .thenReturn(interviewerSlot);
+    doReturn(interviewerSlot).when(interviewerService)
+        .getSlotById(INTERVIEWER_ID, interviewerSlot.getId());
 
     checkResponseBad(
-        delete("/interviewers/{INTERVIEWER_ID}/slots/{slotId}", INTERVIEWER_ID + 2, interviewerSlot.getId()),
+        delete("/interviewers/{INTERVIEWER_ID}/slots/{slotId}",
+            INTERVIEWER_ID + 2, interviewerSlot.getId()),
         null, null, status().isNotFound(), mockMvc);
   }
 }
