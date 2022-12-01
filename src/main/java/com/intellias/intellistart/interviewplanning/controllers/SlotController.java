@@ -11,6 +11,7 @@ import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.services.CandidateService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import com.intellias.intellistart.interviewplanning.services.interfaces.WeekService;
+import com.intellias.intellistart.interviewplanning.validators.PeriodValidator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -57,13 +58,17 @@ public class SlotController {
       Authentication auth) {
 
     checkAuthorized(auth, interviewerId);
+    PeriodValidator.validate(interviewerSlotDto.getFrom(), interviewerSlotDto.getTo());
     return interviewerService.createSlot(interviewerId, interviewerSlotDto);
   }
 
   @PostMapping("/candidates/current/slots")
   public CandidateSlotDto addSlotToCandidate(
-      Authentication authentication, @RequestBody CandidateSlotDto candidateSlotDto) {
-    return candidateService.createSlot(((User) authentication.getPrincipal()).getEmail(),
+      @RequestBody CandidateSlotDto candidateSlotDto,
+      Authentication auth) {
+
+    PeriodValidator.validate(candidateSlotDto.getFrom(), candidateSlotDto.getTo());
+    return candidateService.createSlot(((User) auth.getPrincipal()).getEmail(),
         candidateSlotDto);
   }
 
@@ -79,6 +84,7 @@ public class SlotController {
       Authentication auth) {
 
     checkAuthorized(auth, interviewerId);
+    PeriodValidator.validate(interviewerSlotDto.getFrom(), interviewerSlotDto.getTo());
     return interviewerService.updateSlot(interviewerId, slotId, interviewerSlotDto);
   }
 
@@ -115,6 +121,7 @@ public class SlotController {
             slotId, candidateSlotDto);
       }
     }
+    PeriodValidator.validate(candidateSlotDto.getFrom(), candidateSlotDto.getTo());
     return candidateService.updateSlot(((User) auth.getPrincipal()).getEmail(),
         slotId, candidateSlotDto);
   }
