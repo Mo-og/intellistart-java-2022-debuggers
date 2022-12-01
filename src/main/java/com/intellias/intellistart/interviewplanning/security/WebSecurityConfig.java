@@ -26,6 +26,7 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 @Slf4j
 public class WebSecurityConfig {
+
   private final JwtRequestFilter jwtRequestFilter;
 
   @Bean

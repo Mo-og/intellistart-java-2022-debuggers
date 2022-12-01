@@ -17,6 +17,7 @@ import com.intellias.intellistart.interviewplanning.repositories.BookingReposito
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import com.intellias.intellistart.interviewplanning.services.interfaces.WeekService;
+import com.intellias.intellistart.interviewplanning.utils.mappers.InterviewerSlotMapper;
 import com.intellias.intellistart.interviewplanning.validators.InterviewerSlotValidator;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -46,12 +47,11 @@ class InterviewerServiceTest {
           .toString(),
           "08:00", "13:00");
   private final InterviewerSlotDto interviewerSlotDto =
-      InterviewerSlotDto.builder()
-          .weekNum(nextWeekNum)
-          .dayOfWeek("Mon")
-          .from(LocalTime.of(9, 0))
-          .to(LocalTime.of(18, 0))
-          .build();
+      new InterviewerSlotDto("09:00",
+          "18:00", "Mon", nextWeekNum);
+  private final InterviewerSlotDto interviewerSlotDtoWithoutBooking =
+      new InterviewerSlotDto("09:00",
+          "18:00", "Mon", nextWeekNum);
 
   private final Booking booking =
       new Booking(
@@ -75,6 +75,7 @@ class InterviewerServiceTest {
 
   {
     timeSlot.setId(1L);
+    interviewerSlotDtoWithoutBooking.setId(1L);
     interviewerSlotDto.setId(1L);
     interviewerSlotDto.setBookings(List.of(bookingDto));
     interviewer.setId(1L);
@@ -106,8 +107,9 @@ class InterviewerServiceTest {
     when(userRepository.getReferenceById(1L)).thenReturn(interviewer);
     when(interviewerTimeSlotRepository.saveAndFlush(any(InterviewerTimeSlot.class)))
         .thenReturn(timeSlot);
-    InterviewerTimeSlot createdSlot = interviewerService.createSlot(1L, timeSlot);
-    assertEquals(timeSlot, createdSlot);
+    InterviewerSlotDto createdSlot = interviewerService.createSlot(1L,
+        InterviewerSlotMapper.mapToDto(timeSlot));
+    assertEquals(interviewerSlotDtoWithoutBooking, createdSlot);
   }
 
   @Test
@@ -130,7 +132,7 @@ class InterviewerServiceTest {
         .thenReturn(List.of(timeSlotWithUser));
     var retrievedSet = interviewerService
         .getRelevantInterviewerSlots(1L);
-    assertEquals(List.of(timeSlotWithUser), retrievedSet);
+    assertEquals(List.of(InterviewerSlotMapper.mapToDtoWithBookings(timeSlotWithUser, List.of())), retrievedSet);
   }
 
   @Test
@@ -198,7 +200,7 @@ class InterviewerServiceTest {
         .thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
     when(weekService.getNextWeekNum()).thenCallRealMethod();
     var slot = interviewerService
-        .updateSlot(1L, 1L, timeSlot);
+        .updateSlot(1L, 1L, interviewerSlotDtoWithoutBooking);
     assertEquals(timeSlot.getFrom(), slot.getFrom());
     assertEquals(timeSlot.getTo(), slot.getTo());
     assertEquals(timeSlot.getDayOfWeek(), slot.getDayOfWeek());
@@ -224,6 +226,6 @@ class InterviewerServiceTest {
         .getReferenceById(1L))
         .thenReturn(interviewerTimeSlot);
     assertThrows(NotFoundException.class,
-        () -> interviewerService.updateSlot(1L, 1L, timeSlot));
+        () -> interviewerService.updateSlot(1L, 1L, interviewerSlotDto));
   }
 }

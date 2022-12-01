@@ -58,12 +58,9 @@ class CoordinatorServiceTest {
           weekService.getCurrentWeekNum());
 
   private final InterviewerSlotDto interviewerSlotDto =
-      InterviewerSlotDto.builder()
-          .weekNum(weekService.getCurrentWeekNum())
-          .dayOfWeek("Mon")
-          .from(LocalTime.of(9, 0))
-          .to(LocalTime.of(18, 0))
-          .build();
+      new InterviewerSlotDto("09:00", "18:00", "Mon",
+          weekService.getCurrentWeekNum());
+
   private final Booking booking =
       new Booking(
           LocalTime.of(8, 0),

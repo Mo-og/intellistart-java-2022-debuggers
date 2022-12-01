@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.intellias.intellistart.interviewplanning.controllers.dto.BookingDto;
+import com.intellias.intellistart.interviewplanning.controllers.dto.CandidateSlotDto;
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
@@ -59,6 +60,9 @@ class SlotControllerTest {
     candidateSlot.setId(1L);
   }
 
+  private final CandidateSlotDto candidateSlotDto =
+      new CandidateSlotDto(candidateSlot.getId(), LocalTime.parse("08:00"),
+          LocalTime.parse("10:00"), actualWeekService.getCurrentDate(), List.of(bookingDto));
 
   private final InterviewerSlotDto interviewerSlotDto1 =
       new InterviewerSlotDto(INTERVIEWER_ID, actualWeekService.getCurrentWeekNum(),
@@ -77,37 +81,37 @@ class SlotControllerTest {
 
   @Test
   void testGetAllInterviewerSlots() {
-    doReturn(List.of(interviewerSlot)).when(interviewerService).getRelevantInterviewerSlots(1L);
+    doReturn(List.of(interviewerSlotDto1)).when(interviewerService).getRelevantInterviewerSlots(1L);
     checkResponseOk(
         get("/interviewers/{INTERVIEWER_ID}/slots", 1L),
-        null, json(List.of(interviewerSlot)), mockMvc);
+        null, json(List.of(interviewerSlotDto1)), mockMvc);
   }
 
   @Test
   void testAddSlotToInterviewer() {
-    doReturn(interviewerSlot).when(interviewerService).createSlot(1L, interviewerSlot);
+    doReturn(interviewerSlotDto1).when(interviewerService).createSlot(1L, interviewerSlotDto1);
     checkResponseOk(
         post("/interviewers/{INTERVIEWER_ID}/slots", 1L),
-        json(interviewerSlot), json(interviewerSlot), mockMvc);
+        json(interviewerSlotDto1), json(interviewerSlotDto1), mockMvc);
   }
 
   @Test
   void testUpdateInterviewerTimeSlot() {
-    doReturn(interviewerSlot).when(interviewerService).updateSlot(1L, 1L, interviewerSlot);
+    doReturn(interviewerSlotDto1).when(interviewerService).updateSlot(1L, 1L, interviewerSlotDto1);
     checkResponseOk(
         post("/interviewers/{INTERVIEWER_ID}/slots/{slotId}", 1L, 1L),
-        json(interviewerSlot), json(interviewerSlot), mockMvc);
+        json(interviewerSlotDto1), json(interviewerSlotDto1), mockMvc);
   }
 
   @Test
   @WithCustomUser(CANDIDATE_EMAIL)
   void testUpdateCandidateTimeSlot() {
     when(candidateService
-        .updateSlot(1L, candidateSlot))
-        .thenReturn(candidateSlot);
+        .updateSlot(CANDIDATE_EMAIL, 1L, candidateSlotDto))
+        .thenReturn(candidateSlotDto);
     checkResponseOk(
         post("/candidates/current/slots/{slotId}", 1L),
-        json(candidateSlot), json(candidateSlot), mockMvc);
+        json(candidateSlotDto), json(candidateSlotDto), mockMvc);
   }
 
   @Test

@@ -8,8 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
- * InterviewerSlotValidate class. Used to validate interviewer time slot before creating or
- * updating.
+ * InterviewerSlotValidate class. Used to validate interviewer time slot before creating or updating.
  */
 @Component
 @RequiredArgsConstructor

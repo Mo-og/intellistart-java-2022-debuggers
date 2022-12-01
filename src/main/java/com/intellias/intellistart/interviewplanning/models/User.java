@@ -48,7 +48,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 public class User implements UserDetails, OAuth2User {
 
   @Id
-  @SequenceGenerator(name = "user_seq", sequenceName = "USER_SEQUENCE", allocationSize = 5)
+  @SequenceGenerator(name = "user_seq", sequenceName = "USER_SEQUENCE", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
   @Column(nullable = false)
   private Long id;
