@@ -5,7 +5,7 @@ import java.time.Duration;
 import java.time.LocalTime;
 
 /**
- * PeriodValidator class.
+ * PeriodValidator class. Uses to validate from/to time.
  */
 public class PeriodValidator {
 
@@ -13,9 +13,14 @@ public class PeriodValidator {
   private static final LocalTime upperTimeExclusive = LocalTime.of(22, 1);
   private static final Integer roundToMinutes = 30;
   private static final Integer minPeriodInMinutes = 90;
+
   /**
    * Checks if period is valid.
-   *
+   * from/to time should be rounded to 00 or 30 minutes
+   * from time should be after 7:59 AM
+   * to time should be before 22:01 PM
+   * minimum period should be 1.5 hours
+   * 
    * @param from start time
    * @param to   end time
    * @return true if period is valid
@@ -31,6 +36,10 @@ public class PeriodValidator {
 
   /**
    * Method to validate period.
+   * from/to time should be rounded to 00 or 30 minutes
+   * from time should be after 7:59 AM
+   * to time should be before 22:01 PM
+   * minimum period should be 1.5 hours
    *
    * @param from start time
    * @param to   end time
