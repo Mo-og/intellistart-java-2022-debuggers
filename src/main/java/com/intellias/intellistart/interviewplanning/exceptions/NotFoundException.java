@@ -36,6 +36,11 @@ public class NotFoundException extends TemplateMessageException {
         String.format(" with id: %d, belonging to interviewer with id: %d", id, interviewerId));
   }
 
+  public static NotFoundException timeSlot(Long id, String userEmail) {
+    return new NotFoundException(ErrorCode.SLOT_NOT_FOUND,
+        String.format(" with id: %d, belonging to user with email: %s", id, userEmail));
+  }
+
   public static NotFoundException booking(Long id) {
     return new NotFoundException(ErrorCode.BOOKING_NOT_FOUND, " with id: " + id);
   }

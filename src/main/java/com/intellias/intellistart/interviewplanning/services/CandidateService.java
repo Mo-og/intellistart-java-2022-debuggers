@@ -88,14 +88,16 @@ public class CandidateService {
    * @param email            candidate email
    * @param slotId           slot id
    * @param candidateSlotDto candidate time slot dto
+   * @throws NotFoundException if no candidate slot is found
    */
   public CandidateSlotDto updateSlot(String email, Long slotId, CandidateSlotDto candidateSlotDto) {
     // validate from, to, date
     // check if current time is by end of Friday (00:00) of current week
-    if (!candidateTimeSlotRepository.existsById(slotId)) {
-      throw NotFoundException.timeSlot(slotId);
+    CandidateTimeSlot timeSlot = candidateTimeSlotRepository.findById(slotId)
+        .orElseThrow(() -> NotFoundException.timeSlot(slotId));
+    if (!timeSlot.getEmail().equalsIgnoreCase(email)) {
+      throw NotFoundException.timeSlot(slotId, email);
     }
-    CandidateTimeSlot timeSlot = candidateTimeSlotRepository.getReferenceById(slotId);
     timeSlot.setFrom(candidateSlotDto.getFrom());
     timeSlot.setTo(candidateSlotDto.getTo());
     timeSlot.setDate(candidateSlotDto.getDate());

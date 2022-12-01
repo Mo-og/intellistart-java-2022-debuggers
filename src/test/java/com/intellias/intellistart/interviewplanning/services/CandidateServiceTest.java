@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import javax.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -94,8 +95,7 @@ class CandidateServiceTest {
 
   @Test
   void testUpdateSlot() {
-    when(candidateSlotRepository.existsById(1L)).thenReturn(true);
-    when(candidateSlotRepository.getReferenceById(1L)).thenReturn(candidateSlot);
+    when(candidateSlotRepository.findById(1L)).thenReturn(Optional.of(candidateSlot));
     when(candidateSlotRepository.save(any())).thenAnswer(givenArgs -> givenArgs.getArgument(0));
     var slot = service.updateSlot(CANDIDATE_EMAIL, 1L, candidateSlotDto);
     assertEquals(candidateSlot.getFrom(), slot.getFrom());
@@ -105,7 +105,6 @@ class CandidateServiceTest {
 
   @Test
   void testUpdateSlotWrongId() {
-    when(candidateSlotRepository.existsById(-1L)).thenReturn(false);
     assertThrows(NotFoundException.class,
         () -> service.updateSlot(CANDIDATE_EMAIL, -1L, candidateSlotDto));
   }
