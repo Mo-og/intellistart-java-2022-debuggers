@@ -1,0 +1,68 @@
+spring:
+  jpa:
+    database: h2
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+  datasource:
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+    url: jdbc:h2:mem:test
+  security:
+    oauth2:
+      client:
+        registration:
+          facebook:
+            client-id: ${facebook.client-id}
+            client-secret: ${facebook.client-secret}
+            redirect-uri: ${facebook.uri.redirect}
+        provider:
+          facebook:
+            authorization-uri: "${facebook.uri.auth}?response_type=code&client_id=${facebook.client-id}&redirect_uri=${facebook.uri.redirect}"
+            token-uri: https://graph.facebook.com/v15.0/oauth/access_token
+            user-info-uri: https://graph.facebook.com/v3.0/me?fields=id,first_name,middle_name,last_name,name,email
+  profiles:
+    #    active: dev, offline
+    active: dev
+  sql:
+    init:
+      platform: h2
+      mode: always
+
+facebook:
+  client-id: ${FACEBOOK_CLIENT_ID}
+  client-secret: ${FACEBOOK_CLIENT_SECRET}
+  app-token: ${FACEBOOK_APP_TOKEN} # leave blank to get new (if left blank will fail app and tests when no internet)
+  uri:
+    auth: 'https://www.facebook.com/v15.0/dialog/oauth'
+    redirect: 'http://localhost:8080/authenticate/redirect'
+    get_token_by_code: 'https://graph.facebook.com/v15.0/oauth/access_token?client_id=${facebook.client-id}&redirect_uri=${facebook.uri.redirect}&client_secret=${facebook.client-secret}&code={0}'
+    token_verify: 'https://graph.facebook.com/v15.0/debug_token?input_token={0}&access_token={1}'
+    get_app_token: 'https://graph.facebook.com/v15.0/oauth/access_token?client_id=${facebook.client-id}&client_secret=${facebook.client-secret}&grant_type=client_credentials'
+    user_data: 'https://graph.facebook.com/{0}?fields=id,email,first_name,last_name,middle_name&access_token={1}'
+  native_user:
+    coordinator:
+      email: ${COORDINATOR_EMAIL}
+    interviewer:
+      email: ${INTERVIEWER_EMAIL}
+    offline:
+      email: ${facebook.native_user.coordinator.email}
+
+jwt:
+  secret: ${JWT_SECRET}
+
+logging:
+  level:
+    org:
+      springframework: info
+    com:
+      intellias:
+        intellistart:
+          interviewplanning:
+            configs: debug
+            controllers: debug
+            services: debug
+            InterviewPlanningApplication: debug
+  pattern:
+    console: "%clr(%d{dd.MM.yyyy HH:mm:ss}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%5.5t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"
