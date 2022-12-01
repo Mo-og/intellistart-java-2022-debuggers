@@ -62,8 +62,11 @@ public class SlotController {
     return interviewerService.createSlot(interviewerId, interviewerSlotDto);
   }
 
+  /**
+   *  Add slot to candidate.
+   */
   @PostMapping("/candidates/current/slots")
-  public CandidateSlotDto addSlotToCandidate(
+  public CandidateSlotDto candidateSlotDto(
       @RequestBody CandidateSlotDto candidateSlotDto,
       Authentication auth) {
 
