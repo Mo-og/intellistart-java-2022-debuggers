@@ -28,7 +28,7 @@ public class InterviewerSlotValidator {
     if (isWeekend(now)) {
       throw InvalidInputException.dayOfWeek(now);
     } else if (interviewerTimeSlot.getWeekNum() != weekService.getNextWeekNum()) {
-      throw InvalidInputException.weekNum(interviewerTimeSlot.getWeekNum());
+      throw InvalidInputException.slotWeekNum(interviewerTimeSlot.getWeekNum());
     }
   }
 

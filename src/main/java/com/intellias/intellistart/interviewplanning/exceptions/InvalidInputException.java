@@ -26,6 +26,11 @@ public class InvalidInputException extends TemplateMessageException {
         String.format(": cannot create or edit slot on %s", dayOfWeek.toString().toLowerCase()));
   }
 
+  public static InvalidInputException slotWeekNum(int weekNum) {
+    return new InvalidInputException(ErrorCode.INVALID_WEEK_NUM,
+        String.format(": cannot create or edit slot on week %d", weekNum));
+  }
+
   public static InvalidInputException weekNum(int weekNum) {
     return new InvalidInputException(ErrorCode.INVALID_WEEK_NUM,
         String.format(": cannot create or edit booking limit on week %d", weekNum));
