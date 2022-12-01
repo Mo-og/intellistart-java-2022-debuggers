@@ -34,6 +34,7 @@ public class CandidateTimeSlot {
   @Column(nullable = false)
   private Long id;
   private String email;
+  @Column(name = "date_value")
   private LocalDate date;
   @Column(name = "from_time")
   private LocalTime from;

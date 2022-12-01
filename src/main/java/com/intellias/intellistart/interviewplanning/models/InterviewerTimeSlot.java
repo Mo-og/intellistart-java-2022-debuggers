@@ -37,13 +37,13 @@ public class InterviewerTimeSlot {
   @JsonIgnore
   User interviewer;
   @Id
-  @SequenceGenerator(name = "interv_seq", sequenceName = "interviewer_slot_seq", allocationSize = 5)
+  @SequenceGenerator(name = "interv_seq", sequenceName = "interviewer_slot_sequence", allocationSize = 5)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "interv_seq")
   @Column(nullable = false)
   private Long id;
-  @Column(name = "FROM_TIME")
+  @Column(name = "from_time")
   private LocalTime from;
-  @Column(name = "TO_TIME")
+  @Column(name = "to_time")
   private LocalTime to;
   private DayOfWeek dayOfWeek;
   private int weekNum;
