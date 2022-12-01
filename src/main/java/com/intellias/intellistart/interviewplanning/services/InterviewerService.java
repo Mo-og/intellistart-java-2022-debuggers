@@ -112,7 +112,7 @@ public class InterviewerService {
     InterviewerTimeSlot slot = getSlotById(interviewer.getId(), slotId);
 
     if (hasBooking(slot)) {
-      throw new ApplicationErrorException(ErrorCode.MODIFY_SLOT_WITH_BOOKING);
+      throw new ApplicationErrorException(ErrorCode.CANNOT_EDIT_SLOT_WITH_BOOKING);
     }
 
     slot.setFrom(slotDto.getFrom());
@@ -142,7 +142,7 @@ public class InterviewerService {
     }
 
     if (hasBooking(slot)) {
-      throw new ApplicationErrorException(ErrorCode.MODIFY_SLOT_WITH_BOOKING);
+      throw new ApplicationErrorException(ErrorCode.CANNOT_EDIT_SLOT_WITH_BOOKING);
     }
 
     interviewerTimeSlotRepository.delete(slot);

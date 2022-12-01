@@ -27,7 +27,7 @@ public class InvalidInputException extends TemplateMessageException {
   }
 
   public static InvalidInputException slotWeekNum(int weekNum) {
-    return new InvalidInputException(ErrorCode.INVALID_WEEK_NUM,
+    return new InvalidInputException(ErrorCode.CANNOT_EDIT_THIS_WEEK,
         String.format(": cannot create or edit slot on week %d", weekNum));
   }
 
