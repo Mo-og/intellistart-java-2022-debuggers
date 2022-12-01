@@ -1,19 +1,14 @@
 spring:
   jpa:
-    database-platform:
-      org.hibernate.dialect.H2Dialect
-    properties:
-      hibernate:
-        hbm2ddl:
-          import_files: schema-h2.sql, data.sql
+    database: POSTGRESQL
+    show-sql: true
     hibernate:
-      ddl-auto: create
-    show-sql: false
+      ddl-auto: validate
   datasource:
-    driverClassName: org.h2.Driver
-    username: sa
-    password: password
-    url: jdbc:h2:file:./data/demo;AUTO_SERVER=TRUE;
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driverClassName: org.postgresql.Driver
   security:
     oauth2:
       client:
@@ -28,13 +23,17 @@ spring:
             token-uri: https://graph.facebook.com/v15.0/oauth/access_token
             user-info-uri: https://graph.facebook.com/v3.0/me?fields=id,first_name,middle_name,last_name,name,email
   profiles:
-#    active: dev, offline
+    #    active: dev, offline
     active: dev
+  sql:
+    init:
+      platform: postgres
+      mode: always
 
 facebook:
   client-id: ${FACEBOOK_CLIENT_ID}
   client-secret: ${FACEBOOK_CLIENT_SECRET}
-  app-token: ${FACEBOOK_APP_TOKEN} # leave blank ('') to get new (if left blank will fail app and tests when no internet)
+  app-token: ${FACEBOOK_APP_TOKEN} # leave blank to get new (if left blank will fail app and tests when no internet)
   uri:
     auth: 'https://www.facebook.com/v15.0/dialog/oauth'
     redirect: 'http://localhost:8080/authenticate/redirect'
