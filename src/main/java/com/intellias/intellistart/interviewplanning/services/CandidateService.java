@@ -1,8 +1,6 @@
 package com.intellias.intellistart.interviewplanning.services;
 
 import com.intellias.intellistart.interviewplanning.controllers.dto.CandidateSlotDto;
-import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
-import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException.ErrorCode;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
@@ -87,22 +85,20 @@ public class CandidateService {
   /**
    * Update slot by id.
    *
-   * @param slotId slot id
-   * @param slot   candidate time slot
+   * @param email            candidate email
+   * @param slotId           slot id
+   * @param candidateSlotDto candidate time slot dto
    */
-  public CandidateTimeSlot updateSlot(Long slotId, CandidateTimeSlot slot) {
+  public CandidateSlotDto updateSlot(String email, Long slotId, CandidateSlotDto candidateSlotDto) {
     // validate from, to, date
     // check if current time is by end of Friday (00:00) of current week
     if (!candidateTimeSlotRepository.existsById(slotId)) {
       throw NotFoundException.timeSlot(slotId);
     }
     CandidateTimeSlot timeSlot = candidateTimeSlotRepository.getReferenceById(slotId);
-    if (!timeSlot.getEmail().equals(slot.getEmail())) {
-      throw new ApplicationErrorException(ErrorCode.ATTEMPT_TO_EDIT_OTHER_USER_DATA);
-    }
-    timeSlot.setFrom(slot.getFrom());
-    timeSlot.setTo(slot.getTo());
-    timeSlot.setDate(slot.getDate());
-    return candidateTimeSlotRepository.save(slot);
+    timeSlot.setFrom(candidateSlotDto.getFrom());
+    timeSlot.setTo(candidateSlotDto.getTo());
+    timeSlot.setDate(candidateSlotDto.getDate());
+    return CandidateSlotMapper.mapToDto(candidateTimeSlotRepository.save(timeSlot));
   }
 }

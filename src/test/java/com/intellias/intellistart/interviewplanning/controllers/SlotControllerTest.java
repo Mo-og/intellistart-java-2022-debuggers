@@ -1,14 +1,14 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
-import static com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils.CANDIDATE_EMAIL;
 import static com.intellias.intellistart.interviewplanning.utils.TestUtils.checkResponseOk;
 import static com.intellias.intellistart.interviewplanning.utils.TestUtils.json;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-import com.intellias.intellistart.interviewplanning.controllers.dto.BookingDto;
+import com.intellias.intellistart.interviewplanning.controllers.dto.CandidateSlotDto;
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
+import com.intellias.intellistart.interviewplanning.controllers.dto.BookingDto;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.services.CandidateService;
@@ -33,11 +33,13 @@ import org.springframework.test.web.servlet.MockMvc;
 @WithCustomUser
 class SlotControllerTest {
 
+  public static final String CANDIDATE_EMAIL = "candidate@test.com";
   private static final InterviewerTimeSlot interviewerSlot =
       new InterviewerTimeSlot("08:00", "10:00", "WEDNESDAY", 202240);
   private static final CandidateTimeSlot candidateSlot =
       new CandidateTimeSlot(CANDIDATE_EMAIL, "2022-11-03", "08:00", "10:00");
   private static final Long interviewerId = 1L;
+  private static final Long candidateId = 1L;
   @SpyBean
   private WeekServiceImp weekService;
   private final WeekService actualWeekService = new WeekServiceImp();
@@ -50,6 +52,9 @@ class SlotControllerTest {
           .interviewerSlotId(interviewerSlot.getId())
           .candidateSlotId(candidateSlot.getId())
           .build();
+  private final CandidateSlotDto candidateSlotDto =
+      new CandidateSlotDto(candidateId,LocalTime.parse("08:00"),
+          LocalTime.parse("10:00"),actualWeekService.getCurrentDate(),List.of(bookingDto));
   private final InterviewerSlotDto interviewerSlotDto1 =
       new InterviewerSlotDto(interviewerId, actualWeekService.getCurrentWeekNum(),
           "friday", LocalTime.parse("08:00"),
@@ -77,41 +82,41 @@ class SlotControllerTest {
   void testGetAllInterviewerSlots() {
     when(interviewerService
         .getRelevantInterviewerSlots(1L))
-        .thenReturn(List.of(interviewerSlot));
+        .thenReturn(List.of(interviewerSlotDto1));
     checkResponseOk(
         get("/interviewers/{interviewerId}/slots", 1L),
-        null, json(List.of(interviewerSlot)), mockMvc);
+        null, json(List.of(interviewerSlotDto1)), mockMvc);
   }
 
   @Test
   void testAddSlotToInterviewer() {
     when(interviewerService
-        .createSlot(1L, interviewerSlot))
-        .thenReturn(interviewerSlot);
+        .createSlot(1L, interviewerSlotDto1))
+        .thenReturn(interviewerSlotDto1);
     checkResponseOk(
         post("/interviewers/{interviewerId}/slots", 1L),
-        json(interviewerSlot), json(interviewerSlot), mockMvc);
+        json(interviewerSlotDto1), json(interviewerSlotDto1), mockMvc);
   }
 
   @Test
   void testUpdateInterviewerTimeSlot() {
     when(interviewerService
-        .updateSlot(1L, 1L, interviewerSlot))
-        .thenReturn(interviewerSlot);
+        .updateSlot(1L, 1L, interviewerSlotDto1))
+        .thenReturn(interviewerSlotDto1);
     checkResponseOk(
         post("/interviewers/{interviewerId}/slots/{slotId}", 1L, 1L),
-        json(interviewerSlot), json(interviewerSlot), mockMvc);
+        json(interviewerSlotDto1), json(interviewerSlotDto1), mockMvc);
   }
 
   @Test
   @WithCustomUser(CANDIDATE_EMAIL)
   void testUpdateCandidateTimeSlot() {
     when(candidateService
-        .updateSlot(1L, candidateSlot))
-        .thenReturn(candidateSlot);
+        .updateSlot(CANDIDATE_EMAIL, 1L, candidateSlotDto))
+        .thenReturn(candidateSlotDto);
     checkResponseOk(
         post("/candidates/current/slots/{slotId}", 1L),
-        json(candidateSlot), json(candidateSlot), mockMvc);
+        json(candidateSlotDto), json(candidateSlotDto), mockMvc);
   }
 
   @Test

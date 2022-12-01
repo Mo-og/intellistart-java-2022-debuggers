@@ -97,7 +97,7 @@ class CandidateServiceTest {
     when(candidateSlotRepository.existsById(1L)).thenReturn(true);
     when(candidateSlotRepository.getReferenceById(1L)).thenReturn(candidateSlot);
     when(candidateSlotRepository.save(any())).thenAnswer(givenArgs -> givenArgs.getArgument(0));
-    var slot = service.updateSlot(1L, candidateSlot);
+    var slot = service.updateSlot(CANDIDATE_EMAIL,1L, candidateSlotDto);
     assertEquals(candidateSlot.getFrom(), slot.getFrom());
     assertEquals(candidateSlot.getTo(), slot.getTo());
     assertEquals(candidateSlot.getDate(), slot.getDate());
@@ -107,6 +107,6 @@ class CandidateServiceTest {
   void testUpdateSlotWrongId() {
     when(candidateSlotRepository.existsById(-1L)).thenReturn(false);
     assertThrows(NotFoundException.class,
-        () -> service.updateSlot(-1L, candidateSlot));
+        () -> service.updateSlot(CANDIDATE_EMAIL,-1L, candidateSlotDto));
   }
 }

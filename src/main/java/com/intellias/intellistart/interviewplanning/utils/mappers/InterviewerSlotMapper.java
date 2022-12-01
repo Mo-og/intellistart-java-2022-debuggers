@@ -3,6 +3,7 @@ package com.intellias.intellistart.interviewplanning.utils.mappers;
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
+import com.intellias.intellistart.interviewplanning.models.User;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 
@@ -23,18 +24,13 @@ public class InterviewerSlotMapper {
     if (slot == null) {
       return null;
     }
-    return InterviewerSlotDto.builder()
-        .id(slot.getId())
-        .weekNum(slot.getWeekNum())
-        .dayOfWeek(slot.getShortDayOfWeek())
-        .from(slot.getFrom())
-        .to(slot.getTo())
-        .bookings(BookingMapper.mapSetToDto(bookings))
-        .build();
+    return new InterviewerSlotDto(slot.getId(), slot.getWeekNum(),
+        slot.getShortDayOfWeek(), slot.getFrom(), slot.getTo(),
+        BookingMapper.mapSetToDto(bookings));
   }
 
   /**
-   * Maps to InterviewerSlotDto.
+   * to InterviewerSlotDto.
    *
    * @param slot entity
    * @return InterviewerSlotDto
@@ -43,12 +39,28 @@ public class InterviewerSlotMapper {
     if (slot == null) {
       return null;
     }
-    return InterviewerSlotDto.builder()
-        .id(slot.getId())
-        .weekNum(slot.getWeekNum())
-        .dayOfWeek(slot.getShortDayOfWeek())
-        .from(slot.getFrom())
-        .to(slot.getTo())
-        .build();
+    return new InterviewerSlotDto(slot.getId(), slot.getWeekNum(),
+        slot.getShortDayOfWeek(), slot.getFrom(), slot.getTo());
+  }
+
+  /**
+   * to InterviewerTimeSlot.
+   *
+   * @param interviewer our interviewer
+   * @param slotDto     slot dto
+   * @return InterviewerSlotDto
+   */
+  public InterviewerTimeSlot mapToEntity(User interviewer, InterviewerSlotDto slotDto) {
+    if (slotDto == null) {
+      return null;
+    }
+    InterviewerTimeSlot interviewerSlot = new InterviewerTimeSlot();
+    interviewerSlot.setInterviewer(interviewer);
+    interviewerSlot.setDayOfWeek(slotDto.getDayOfWeek());
+    interviewerSlot.setWeekNum(slotDto.getWeekNum());
+    interviewerSlot.setFrom(slotDto.getFrom());
+    interviewerSlot.setTo(slotDto.getTo());
+    interviewerSlot.setId(slotDto.getId());
+    return interviewerSlot;
   }
 }
