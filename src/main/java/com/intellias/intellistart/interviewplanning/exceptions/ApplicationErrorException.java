@@ -23,9 +23,9 @@ public class ApplicationErrorException extends RuntimeException {
    * @param errorMessage user-friendly error message
    */
   public ApplicationErrorException(ErrorCode errorCode, String errorMessage) {
-    super(errorCode.message + errorMessage);
+    super(errorMessage);
     this.errorCode = errorCode;
-    this.errorMessage = errorCode.message + errorMessage;
+    this.errorMessage = errorMessage;
   }
 
   /**

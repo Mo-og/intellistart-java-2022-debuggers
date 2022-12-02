@@ -21,11 +21,9 @@ public class NotFoundException extends ApplicationErrorException {
     return new NotFoundException(ErrorCode.INTERVIEWER_NOT_FOUND, " with id: " + id);
   }
 
-
   public static NotFoundException coordinator(Long id) {
     return new NotFoundException(ErrorCode.COORDINATOR_NOT_FOUND, " with id: " + id);
   }
-
 
   public static NotFoundException timeSlot(Long id) {
     return new NotFoundException(ErrorCode.SLOT_NOT_FOUND, " with id: " + id);
@@ -52,4 +50,5 @@ public class NotFoundException extends ApplicationErrorException {
         String.format(": interviewer %d does not have any booking limit on week %d",
             interviewerId, weekNum));
   }
+
 }
