@@ -47,6 +47,7 @@ public class InterviewerService {
     InterviewerTimeSlot interviewerTimeSlot = InterviewerSlotMapper.mapToEntity(interviewer,
         interviewerSlotDto);
     slotValidator.validate(interviewerTimeSlot);
+
     return InterviewerSlotMapper.mapToDto(
         interviewerTimeSlotRepository.saveAndFlush(interviewerTimeSlot));
   }
@@ -125,6 +126,7 @@ public class InterviewerService {
    */
   public InterviewerSlotDto updateSlot(Long interviewerId, Long slotId,
       InterviewerSlotDto interviewerSlotDto) {
+
     User interviewer = userRepository.getReferenceById(interviewerId);
     InterviewerTimeSlot interviewerTimeSlot = InterviewerSlotMapper.mapToEntity(interviewer,
         interviewerSlotDto);

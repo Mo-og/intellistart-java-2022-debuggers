@@ -9,30 +9,18 @@ import com.intellias.intellistart.interviewplanning.utils.mappers.CandidateSlotM
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**
  * Candidate service.
  */
 @Service
+@RequiredArgsConstructor
 public class CandidateService {
 
   private final CandidateTimeSlotRepository candidateTimeSlotRepository;
   private final BookingRepository bookingRepository;
-
-  /**
-   * Constructor.
-   *
-   * @param candidateTimeSlotRepository time slot repository bean
-   * @param bookingRepository           booking repository bean
-   */
-  @Autowired
-  public CandidateService(CandidateTimeSlotRepository candidateTimeSlotRepository,
-      BookingRepository bookingRepository) {
-    this.candidateTimeSlotRepository = candidateTimeSlotRepository;
-    this.bookingRepository = bookingRepository;
-  }
 
   /**
    * Create slot for candidate. Candidate slot must be in the future.
@@ -48,7 +36,7 @@ public class CandidateService {
   }
 
   /**
-   * Get slot by id.
+   * Get candidate time slot by id.
    *
    * @param id slot id
    * @return slotById

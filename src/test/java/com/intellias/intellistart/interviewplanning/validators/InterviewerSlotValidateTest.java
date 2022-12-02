@@ -27,7 +27,7 @@ class InterviewerSlotValidateTest {
   }
 
   @Test
-  void validateSlotToBeUpdated() {
+  void testSlotToBeUpdated() {
     if (LocalDate.now().getDayOfWeek().getValue() <= DayOfWeek.FRIDAY.getValue()) {
       assertDoesNotThrow(() -> slotValidator.validate(nextWeekSlot));
     } else {
@@ -40,7 +40,7 @@ class InterviewerSlotValidateTest {
   }
 
   @Test
-  void validateSlotToBeCreated() {
+  void testSlotToBeCreated() {
     if (LocalDate.now().getDayOfWeek().getValue() <= DayOfWeek.FRIDAY.getValue()) {
       assertDoesNotThrow(() -> slotValidator.validate(nextWeekSlot));
     } else {
