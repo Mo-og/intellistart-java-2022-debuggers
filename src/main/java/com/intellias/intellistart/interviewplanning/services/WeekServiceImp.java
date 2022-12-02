@@ -4,7 +4,6 @@ import com.intellias.intellistart.interviewplanning.services.interfaces.WeekServ
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.IsoFields;
 import java.time.temporal.WeekFields;
@@ -17,8 +16,6 @@ import org.springframework.stereotype.Service;
 @Service
 @Qualifier("WeekService")
 public class WeekServiceImp implements WeekService {
-
-  public static final ZoneId ZONE_ID = ZoneId.of("Europe/Kiev");
 
   /**
    * Returns current zoned date.

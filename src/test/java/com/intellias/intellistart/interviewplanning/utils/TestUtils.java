@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 public abstract class TestUtils {
 
   private static final ObjectWriter jsonWriter;
+  public static boolean debug = true;
 
   static {
     jsonWriter = new ObjectMapper()
@@ -31,14 +32,13 @@ public abstract class TestUtils {
   }
 
   @SneakyThrows
-  public static void checkResponseOk(MockHttpServletRequestBuilder methodAndUrl, String requestBody,
+  public static String checkResponseOk(MockHttpServletRequestBuilder methodAndUrl, String requestBody,
       String responseBody, MockMvc mock) {
-    checkResponseBad(methodAndUrl, requestBody, responseBody, status().isOk(), mock);
+    return checkResponseBad(methodAndUrl, requestBody, responseBody, status().isOk(), mock);
   }
 
   @SneakyThrows
-  public static void checkResponseBad(MockHttpServletRequestBuilder methodAndUrl,
-      String requestBody,
+  public static String checkResponseBad(MockHttpServletRequestBuilder methodAndUrl, String requestBody,
       String responseBody, ResultMatcher resultMatcher, MockMvc mock) {
     methodAndUrl
         .contentType(MediaType.APPLICATION_JSON)
@@ -46,11 +46,14 @@ public abstract class TestUtils {
     if (requestBody != null) {
       methodAndUrl = methodAndUrl.content(requestBody);
     }
-    var result = mock.perform(methodAndUrl)
-        .andDo(print())
-        .andExpect(resultMatcher);
+    var result = mock.perform(methodAndUrl);
+    if (debug) {
+      result.andDo(print());
+    }
+    result.andExpect(resultMatcher);
     if (responseBody != null) {
       result.andExpect(content().json(responseBody));
     }
+    return result.andReturn().getResponse().getContentAsString();
   }
 }

@@ -1,12 +1,16 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
+import static com.intellias.intellistart.interviewplanning.utils.TestUtils.checkResponseBad;
 import static com.intellias.intellistart.interviewplanning.utils.TestUtils.checkResponseOk;
 import static com.intellias.intellistart.interviewplanning.utils.TestUtils.json;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.intellias.intellistart.interviewplanning.security.jwt.JwtRequestFilter;
 import com.intellias.intellistart.interviewplanning.services.CoordinatorService;
 import com.intellias.intellistart.interviewplanning.services.WeekServiceImp;
+import java.time.DateTimeException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -50,5 +54,11 @@ class WeekControllerTest {
         null, mockMvc);
   }
 
+  @Test
+  void testExceptionHandles() {
+    when(coordinatorService.getWeekDashboard(-1)).thenThrow(new DateTimeException("Invalid weekNum"));
+    checkResponseBad(get("/weeks/{weekId}/dashboard", -1), null,
+        null, status().is5xxServerError(), mockMvc);
+  }
 
 }

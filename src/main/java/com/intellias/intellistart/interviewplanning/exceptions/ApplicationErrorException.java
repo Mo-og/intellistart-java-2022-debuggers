@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 @JsonIgnoreProperties({"cause", "stackTrace", "message", "suppressed", "localizedMessage"})
 public class ApplicationErrorException extends RuntimeException {
 
-
   private final ErrorCode errorCode;
 
   private final String errorMessage;
@@ -74,10 +73,11 @@ public class ApplicationErrorException extends RuntimeException {
     INVALID_BOUNDARIES(HttpStatus.BAD_REQUEST, "Invalid time boundaries"),
     INVALID_DAY_OF_WEEK(HttpStatus.BAD_REQUEST, "Invalid day of week"),
     INVALID_WEEK_NUM(HttpStatus.BAD_REQUEST, "Invalid week number"),
+    CANNOT_EDIT_THIS_WEEK(HttpStatus.BAD_REQUEST, "Cannot edit current or previous week"),
     REVOKE_USER_WITH_SLOT(HttpStatus.BAD_REQUEST,
         "Can not revoke user who has time slot in the future"),
-    DELETE_SLOT_WITH_BOOKING(HttpStatus.BAD_REQUEST,
-        "Can not delete time slot that has booking"),
+    CANNOT_EDIT_SLOT_WITH_BOOKING(HttpStatus.BAD_REQUEST,
+        "Can not update or delete time slot that has booking"),
 
     //Forbidden error code
     SELF_ROLE_REVOKING(HttpStatus.FORBIDDEN, "Forbidden to revoke yourself"),

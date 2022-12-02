@@ -5,7 +5,7 @@ import java.time.DayOfWeek;
 /**
  * InvalidInputException class.
  */
-public class InvalidInputException extends ApplicationErrorException {
+public class InvalidInputException extends TemplateMessageException {
 
   /**
    * constructor.
@@ -23,7 +23,7 @@ public class InvalidInputException extends ApplicationErrorException {
    */
   public static InvalidInputException timeUpperBound() {
     return new InvalidInputException(ErrorCode.INVALID_BOUNDARIES,
-        "end time cannot be after 10PM");
+        ": end time cannot be after 10PM");
   }
 
   /**
@@ -33,7 +33,7 @@ public class InvalidInputException extends ApplicationErrorException {
    */
   public static InvalidInputException timeLowerBound() {
     return new InvalidInputException(ErrorCode.INVALID_BOUNDARIES,
-        "start time cannot be before 8AM");
+        ": start time cannot be before 8AM");
   }
 
   /**
@@ -44,7 +44,7 @@ public class InvalidInputException extends ApplicationErrorException {
    */
   public static InvalidInputException rounding(String time) {
     return new InvalidInputException(ErrorCode.INVALID_BOUNDARIES,
-        String.format("'%s' should be rounded to 00 or 30 minutes", time));
+        String.format(": '%s' should be rounded to 00 or 30 minutes", time));
   }
 
   /**
@@ -54,7 +54,7 @@ public class InvalidInputException extends ApplicationErrorException {
    */
   public static InvalidInputException minPeriod() {
     return new InvalidInputException(ErrorCode.INVALID_BOUNDARIES,
-        "period cannot be less than 1.5h");
+        ": period cannot be less than 1.5h");
   }
 
   /**
@@ -64,7 +64,7 @@ public class InvalidInputException extends ApplicationErrorException {
    */
   public static InvalidInputException periodIntersection() {
     return new InvalidInputException(ErrorCode.INVALID_BOUNDARIES,
-        "slot at this time already exists");
+        ": slot at this time already exists");
   }
 
   /**
@@ -75,7 +75,7 @@ public class InvalidInputException extends ApplicationErrorException {
    */
   public static InvalidInputException dayOfWeek(DayOfWeek dayOfWeek) {
     return new InvalidInputException(ErrorCode.INVALID_DAY_OF_WEEK,
-        String.format("cannot create or edit slot on '%s'", dayOfWeek.toString().toLowerCase()));
+        String.format(": cannot create or edit slot on %s", dayOfWeek.toString().toLowerCase()));
   }
 
   /**
@@ -86,7 +86,18 @@ public class InvalidInputException extends ApplicationErrorException {
    */
   public static InvalidInputException weekNum(int weekNum) {
     return new InvalidInputException(ErrorCode.INVALID_WEEK_NUM,
-        String.format("cannot create or edit booking limit on week '%d'", weekNum));
+        String.format(": cannot create or edit booking limit on week '%d'", weekNum));
+  }
+
+  /**
+   * Invalid slot week number exception.
+   *
+   * @param weekNum week number
+   * @return exception
+   */
+  public static InvalidInputException slotWeekNum(int weekNum) {
+    return new InvalidInputException(ErrorCode.CANNOT_EDIT_THIS_WEEK,
+        String.format(": cannot create or edit slot on week '%d'", weekNum));
   }
 
   /**
@@ -99,9 +110,8 @@ public class InvalidInputException extends ApplicationErrorException {
   public static InvalidInputException bookingLimit(int bookingLimit, int bookingNum) {
     return new InvalidInputException(ErrorCode.INVALID_BOOKING_LIMIT,
         String.format(
-            "booking limit '%d' cannot be lower than the number of existing bookings '%d'",
-            bookingLimit,
-            bookingNum));
+            ": booking limit '%d' cannot be lower than the number of existing bookings '%d'",
+            bookingLimit, bookingNum));
   }
 
 }

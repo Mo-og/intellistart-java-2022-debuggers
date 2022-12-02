@@ -3,7 +3,6 @@ package com.intellias.intellistart.interviewplanning.security;
 import static com.intellias.intellistart.interviewplanning.models.User.UserRole.COORDINATOR;
 import static com.intellias.intellistart.interviewplanning.models.User.UserRole.INTERVIEWER;
 
-import com.intellias.intellistart.interviewplanning.security.jwt.JwtAuthenticationEntryPoint;
 import com.intellias.intellistart.interviewplanning.security.jwt.JwtRequestFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,8 +26,8 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 @Slf4j
 public class WebSecurityConfig {
+
   private final JwtRequestFilter jwtRequestFilter;
-  private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
   @Bean
   public static PropertySourcesPlaceholderConfigurer ppc() {
@@ -52,8 +51,6 @@ public class WebSecurityConfig {
 
     http.addFilterBefore(this.jwtRequestFilter,
         OAuth2AuthorizationRequestRedirectFilter.class);
-
-    http.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
 
     http.authorizeRequests(authorize -> authorize
         .antMatchers("/authenticate/**", "/auth-link", "/").permitAll()

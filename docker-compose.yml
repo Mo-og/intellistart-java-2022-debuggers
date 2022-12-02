@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  postgres:
+    image: 'postgres:15-alpine'
+    container_name: 'debuggers-postgres-bd'
+    ports:
+      - "5433:5432"
+    environment:
+      - 'POSTGRES_USER=debugger'
+      - 'POSTGRES_PASSWORD=123'
+      - 'POSTGRES_DB=debuggers'
+  app:
+    build: ./
+    container_name: 'debuggers-backend'
+    ports:
+      - "8080:8080"

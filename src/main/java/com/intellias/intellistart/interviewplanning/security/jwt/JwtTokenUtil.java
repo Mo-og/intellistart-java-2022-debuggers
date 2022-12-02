@@ -84,6 +84,7 @@ public class JwtTokenUtil implements Serializable {
         .setExpiration(expiresAt)
         .signWith(getKey())
         .compact();
+    //to keep api same as it was before: "tokenValue" -> "token"
     class Oauth2AccessTokenFormatted extends OAuth2AccessToken {
 
       public Oauth2AccessTokenFormatted(TokenType tokenType, String tokenValue, Instant issuedAt, Instant expiresAt) {
@@ -109,15 +110,9 @@ public class JwtTokenUtil implements Serializable {
     if (key != null) {
       return key;
     }
-    if (secret == null) {
-      log.error("JWT secret is null");
+    if (secret == null || secret.isBlank()) {
+      log.error("JWT secret is not set");
       throw new NullPointerException("Secret for jwt token was not retrieved");
-    } else {
-      if (secret.isBlank()) {
-        log.error("Secret is not set");
-      } else {
-        log.debug("Secret is set successfully");
-      }
     }
     key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     return key;

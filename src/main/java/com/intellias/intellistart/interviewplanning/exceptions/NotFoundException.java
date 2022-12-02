@@ -3,7 +3,7 @@ package com.intellias.intellistart.interviewplanning.exceptions;
 /**
  * Not found exception class.
  */
-public class NotFoundException extends ApplicationErrorException {
+public class NotFoundException extends TemplateMessageException {
 
   public NotFoundException(ErrorCode errorCode, String errorMessage) {
     super(errorCode, errorMessage);
@@ -32,6 +32,11 @@ public class NotFoundException extends ApplicationErrorException {
   public static NotFoundException timeSlot(Long id, Long interviewerId) {
     return new NotFoundException(ErrorCode.SLOT_NOT_FOUND,
         String.format(" with id: %d, belonging to interviewer with id: %d", id, interviewerId));
+  }
+
+  public static NotFoundException timeSlot(Long id, String userEmail) {
+    return new NotFoundException(ErrorCode.SLOT_NOT_FOUND,
+        String.format(" with id: %d, belonging to user with email: %s", id, userEmail));
   }
 
   public static NotFoundException booking(Long id) {

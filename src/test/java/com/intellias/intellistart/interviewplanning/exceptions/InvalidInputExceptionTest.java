@@ -17,7 +17,7 @@ class InvalidInputExceptionTest {
       throw exception;
     } catch (InvalidInputException e) {
       assertEquals(ErrorCode.INVALID_BOUNDARIES.code, e.getErrorCode());
-      assertEquals("'08:01' should be rounded to 00 or 30 minutes",
+      assertEquals("Invalid time boundaries: '08:01' should be rounded to 00 or 30 minutes",
           e.getMessage());
     }
   }
@@ -29,7 +29,7 @@ class InvalidInputExceptionTest {
       throw exception;
     } catch (InvalidInputException e) {
       assertEquals(ErrorCode.INVALID_BOUNDARIES.code, e.getErrorCode());
-      assertEquals("end time cannot be after 10PM",
+      assertEquals("Invalid time boundaries: end time cannot be after 10PM",
           e.getMessage());
     }
   }
@@ -41,7 +41,7 @@ class InvalidInputExceptionTest {
       throw exception;
     } catch (InvalidInputException e) {
       assertEquals(ErrorCode.INVALID_BOUNDARIES.code, e.getErrorCode());
-      assertEquals("start time cannot be before 8AM",
+      assertEquals("Invalid time boundaries: start time cannot be before 8AM",
           e.getMessage());
     }
   }
@@ -53,7 +53,7 @@ class InvalidInputExceptionTest {
       throw exception;
     } catch (InvalidInputException e) {
       assertEquals(ErrorCode.INVALID_BOUNDARIES.code, e.getErrorCode());
-      assertEquals("period cannot be less than 1.5h",
+      assertEquals("Invalid time boundaries: period cannot be less than 1.5h",
           e.getMessage());
     }
   }
@@ -65,7 +65,7 @@ class InvalidInputExceptionTest {
       throw exception;
     } catch (InvalidInputException e) {
       assertEquals(ErrorCode.INVALID_BOUNDARIES.code, e.getErrorCode());
-      assertEquals("slot at this time already exists",
+      assertEquals("Invalid time boundaries: slot at this time already exists",
           e.getMessage());
     }
   }
@@ -77,7 +77,7 @@ class InvalidInputExceptionTest {
       throw exception;
     } catch (InvalidInputException e) {
       assertEquals(ErrorCode.INVALID_WEEK_NUM.code, e.getErrorCode());
-      assertEquals("cannot create or edit booking limit on week '202201'",
+      assertEquals("Invalid week number: cannot create or edit booking limit on week '202201'",
           e.getMessage());
     }
   }
@@ -89,7 +89,7 @@ class InvalidInputExceptionTest {
       throw exception;
     } catch (InvalidInputException e) {
       assertEquals(ErrorCode.INVALID_DAY_OF_WEEK.code, e.getErrorCode());
-      assertEquals("cannot create or edit slot on 'friday'",
+      assertEquals("Invalid day of week: cannot create or edit slot on friday",
           e.getMessage());
     }
   }
@@ -102,7 +102,7 @@ class InvalidInputExceptionTest {
     } catch (InvalidInputException e) {
       assertEquals(ErrorCode.INVALID_BOOKING_LIMIT.code, e.getErrorCode());
       assertEquals(
-          "booking limit '5' cannot be lower than the number of existing bookings '3'",
+          "Invalid booking limit number: booking limit '5' cannot be lower than the number of existing bookings '3'",
           e.getMessage());
     }
   }

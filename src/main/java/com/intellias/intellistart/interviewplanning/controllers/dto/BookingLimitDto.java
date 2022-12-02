@@ -1,12 +1,13 @@
 package com.intellias.intellistart.interviewplanning.controllers.dto;
 
-import java.util.Objects;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 /**
  * DTO from front end request.
  */
 @Getter
+@EqualsAndHashCode
 public class BookingLimitDto {
 
   private final Integer bookingLimit;
@@ -24,21 +25,4 @@ public class BookingLimitDto {
     this.weekNum = weekNum;
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    BookingLimitDto that = (BookingLimitDto) o;
-    return Objects.equals(bookingLimit, that.bookingLimit) && Objects.equals(
-        weekNum, that.weekNum);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(bookingLimit, weekNum);
-  }
 }

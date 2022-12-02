@@ -4,18 +4,17 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.intellias.intellistart.interviewplanning.utils.Utils;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.Hibernate;
 
 /**
  * Candidate time slot.
@@ -25,6 +24,7 @@ import org.hibernate.Hibernate;
 @Setter
 @ToString
 @NoArgsConstructor
+@EqualsAndHashCode
 public class CandidateTimeSlot {
 
   @Id
@@ -33,6 +33,7 @@ public class CandidateTimeSlot {
   @Column(nullable = false)
   private Long id;
   private String email;
+  @Column(name = "date_value")
   private LocalDate date;
   @Column(name = "from_time")
   private LocalTime from;
@@ -67,28 +68,5 @@ public class CandidateTimeSlot {
   @JsonGetter("date")
   public String getDateAsString() {
     return date.toString();
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
-      return false;
-    }
-    CandidateTimeSlot that = (CandidateTimeSlot) o;
-    if (id != null) {
-      return Objects.equals(id, that.id);
-    }
-    return Objects.equals(email, that.email)
-        && Objects.equals(from, that.from)
-        && Objects.equals(to, that.to)
-        && Objects.equals(date, that.date);
-  }
-
-  @Override
-  public int hashCode() {
-    return getClass().hashCode();
   }
 }
