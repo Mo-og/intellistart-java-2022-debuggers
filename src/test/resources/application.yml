@@ -1,14 +1,14 @@
 spring:
   jpa:
-    database: POSTGRESQL
+    database: h2
     show-sql: true
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create-drop
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driverClassName: org.postgresql.Driver
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+    url: jdbc:h2:mem:test
   security:
     oauth2:
       client:
@@ -27,7 +27,7 @@ spring:
     active: dev
   sql:
     init:
-      platform: postgres
+      platform: h2
       mode: always
 
 facebook:
@@ -51,7 +51,6 @@ facebook:
 
 jwt:
   secret: ${JWT_SECRET}
-
 
 logging:
   level:

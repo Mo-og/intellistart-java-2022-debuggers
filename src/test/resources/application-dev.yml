@@ -1,0 +1,14 @@
+
+facebook:
+  client-id: 639777021199239
+  client-secret: 93d125256e4cbaa74630c32b87de2899
+  app-token: 639777021199239|MgSXqUESV4E9dc0CkashoTnHBq0
+  native_user:
+    coordinator:
+      email: coordinator_maguywn_debugger@tfbnw.net
+    interviewer:
+      email: interviewer_joavqsu_debugger@tfbnw.net
+
+jwt:
+  secret: somesecretsomesecretsomesecretsomesecretsomesecretsomesecretsomesecretsomesecretsomesecretsomesecretsomesecret
+
