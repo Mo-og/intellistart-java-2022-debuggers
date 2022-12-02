@@ -1,6 +1,8 @@
 package com.intellias.intellistart.interviewplanning.services;
 
 import static com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils.CANDIDATE_EMAIL;
+import static com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils.INTERVIEWER_ID;
+import static com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils.interviewer;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -13,6 +15,7 @@ import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException
 import com.intellias.intellistart.interviewplanning.models.Booking;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
+import com.intellias.intellistart.interviewplanning.repositories.BookingLimitRepository;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
 import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
@@ -59,6 +62,7 @@ class BookingServiceTest {
 
   static {
     INTERVIEWER_SLOT.setId(1L);
+    INTERVIEWER_SLOT.setInterviewer(interviewer);
     CANDIDATE_SLOT.setId(1L);
     BOOKING.setId(1L);
     BOOKING_DTO.setId(1L);
@@ -71,6 +75,8 @@ class BookingServiceTest {
   @Mock
   BookingRepository bookingRepository;
   @Mock
+  BookingLimitRepository bookingLimitRepository;
+  @Mock
   InterviewerTimeSlotRepository interviewerTimeSlotRepository;
   @Mock
   CandidateTimeSlotRepository candidateTimeSlotRepository;
@@ -78,8 +84,9 @@ class BookingServiceTest {
 
   @BeforeEach
   void setService() {
-    service = new BookingService(bookingRepository, interviewerTimeSlotRepository,
-        candidateTimeSlotRepository);
+    service = new BookingService(bookingRepository, bookingLimitRepository,
+        interviewerTimeSlotRepository, candidateTimeSlotRepository);
+    interviewer.setId(INTERVIEWER_ID);
   }
 
   @Test
@@ -88,6 +95,9 @@ class BookingServiceTest {
         .thenReturn(Optional.of(INTERVIEWER_SLOT));
     when(candidateTimeSlotRepository.findById(CANDIDATE_SLOT.getId()))
         .thenReturn(Optional.of(CANDIDATE_SLOT));
+    when(bookingLimitRepository
+        .findByInterviewerIdAndWeekNum(INTERVIEWER_ID, INTERVIEWER_SLOT.getWeekNum()))
+        .thenReturn(Optional.empty());
     when(bookingRepository
         .save(any()))
         .thenReturn(BOOKING);
