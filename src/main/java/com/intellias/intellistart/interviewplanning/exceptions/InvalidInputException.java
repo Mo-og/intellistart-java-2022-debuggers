@@ -23,7 +23,7 @@ public class InvalidInputException extends TemplateMessageException {
    */
   public static InvalidInputException timeUpperBound() {
     return new InvalidInputException(ErrorCode.INVALID_BOUNDARIES,
-        ": end time cannot be after 10PM");
+        ": end time cannot be after 22:00");
   }
 
   /**
@@ -33,18 +33,17 @@ public class InvalidInputException extends TemplateMessageException {
    */
   public static InvalidInputException timeLowerBound() {
     return new InvalidInputException(ErrorCode.INVALID_BOUNDARIES,
-        ": start time cannot be before 8AM");
+        ": start time cannot be before 08:00");
   }
 
   /**
    * Invalid time rounding exception.
    *
-   * @param time time
    * @return exception
    */
-  public static InvalidInputException rounding(String time) {
+  public static InvalidInputException minutes() {
     return new InvalidInputException(ErrorCode.INVALID_BOUNDARIES,
-        String.format(": '%s' should be rounded to 00 or 30 minutes", time));
+        ": minutes should be rounded to 00 or 30 minutes");
   }
 
   /**
@@ -52,7 +51,7 @@ public class InvalidInputException extends TemplateMessageException {
    *
    * @return exception
    */
-  public static InvalidInputException minPeriod() {
+  public static InvalidInputException period() {
     return new InvalidInputException(ErrorCode.INVALID_BOUNDARIES,
         ": period cannot be less than 1.5h");
   }
@@ -62,8 +61,8 @@ public class InvalidInputException extends TemplateMessageException {
    *
    * @return exception
    */
-  public static InvalidInputException periodIntersection() {
-    return new InvalidInputException(ErrorCode.INVALID_BOUNDARIES,
+  public static InvalidInputException periodOverlapping() {
+    return new InvalidInputException(ErrorCode.SLOT_IS_OVERLAPPING,
         ": slot at this time already exists");
   }
 
