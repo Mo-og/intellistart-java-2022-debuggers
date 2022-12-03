@@ -2,7 +2,6 @@ package com.intellias.intellistart.interviewplanning.controllers;
 
 import com.intellias.intellistart.interviewplanning.controllers.dto.BookingDto;
 import com.intellias.intellistart.interviewplanning.services.BookingService;
-import com.intellias.intellistart.interviewplanning.validators.PeriodValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,7 +26,6 @@ public class BookingController {
    */
   @PostMapping("/bookings")
   public BookingDto createBooking(@RequestBody BookingDto bookingDto) {
-    PeriodValidator.validate(bookingDto.getFrom(), bookingDto.getTo());
     return bookingService.createBooking(bookingDto);
   }
 
@@ -41,7 +39,6 @@ public class BookingController {
   @PostMapping("/bookings/{bookingId}")
   public BookingDto updateBooking(@PathVariable long bookingId,
       @RequestBody BookingDto bookingDto) {
-    PeriodValidator.validate(bookingDto.getFrom(), bookingDto.getTo());
     return bookingService.updateBooking(bookingId, bookingDto);
   }
 

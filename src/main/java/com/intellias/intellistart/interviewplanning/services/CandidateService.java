@@ -6,6 +6,7 @@ import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
 import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.utils.mappers.CandidateSlotMapper;
+import com.intellias.intellistart.interviewplanning.validators.PeriodValidator;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,8 +31,16 @@ public class CandidateService {
    * @return slot
    */
   public CandidateSlotDto createSlot(String email, CandidateSlotDto candidateSlotDto) {
-    //todo validation of slot
     CandidateTimeSlot candidateSlot = CandidateSlotMapper.mapToEntity(email, candidateSlotDto);
+    PeriodValidator.validate(candidateSlotDto.getFrom(), candidateSlotDto.getTo());
+    PeriodValidator.validateCandidateSlotOverlapping(
+        candidateSlotDto.getFrom(),
+        candidateSlotDto.getTo(),
+        candidateSlotDto.getDate(),
+        candidateTimeSlotRepository.findByDateAndEmail(
+            candidateSlotDto.getDate(),
+            email
+        ));
     return CandidateSlotMapper.mapToDto(candidateTimeSlotRepository.save(candidateSlot));
   }
 
@@ -79,16 +88,27 @@ public class CandidateService {
    * @throws NotFoundException if no candidate slot is found
    */
   public CandidateSlotDto updateSlot(String email, Long slotId, CandidateSlotDto candidateSlotDto) {
-    // validate from, to, date
-    // check if current time is by end of Friday (00:00) of current week
+    // TODO Candidate can update only if there is no bookings
     CandidateTimeSlot timeSlot = candidateTimeSlotRepository.findById(slotId)
         .orElseThrow(() -> NotFoundException.timeSlot(slotId));
     if (!timeSlot.getEmail().equalsIgnoreCase(email)) {
       throw NotFoundException.timeSlot(slotId, email);
     }
+    PeriodValidator.validate(candidateSlotDto.getFrom(), candidateSlotDto.getTo());
+    PeriodValidator.validateCandidateSlotOverlapping(
+        candidateSlotDto.getFrom(),
+        candidateSlotDto.getTo(),
+        candidateSlotDto.getDate(),
+        candidateTimeSlotRepository.findByDateAndEmail(
+            candidateSlotDto.getDate(),
+            email
+        ).stream().filter(s -> !s.getId().equals(slotId)).collect(Collectors.toList())
+    );
+
     timeSlot.setFrom(candidateSlotDto.getFrom());
     timeSlot.setTo(candidateSlotDto.getTo());
     timeSlot.setDate(candidateSlotDto.getDate());
     return CandidateSlotMapper.mapToDto(candidateTimeSlotRepository.save(timeSlot));
   }
+
 }

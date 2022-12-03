@@ -12,12 +12,12 @@ class InvalidInputExceptionTest {
 
   @Test
   void invalidRoundingTest() {
-    exception = InvalidInputException.rounding("08:01");
+    exception = InvalidInputException.minutes();
     try {
       throw exception;
     } catch (InvalidInputException e) {
       assertEquals(ErrorCode.INVALID_BOUNDARIES.code, e.getErrorCode());
-      assertEquals("Invalid time boundaries: '08:01' should be rounded to 00 or 30 minutes",
+      assertEquals("Invalid time boundaries: minutes should be rounded to 00 or 30",
           e.getMessage());
     }
   }
@@ -29,7 +29,7 @@ class InvalidInputExceptionTest {
       throw exception;
     } catch (InvalidInputException e) {
       assertEquals(ErrorCode.INVALID_BOUNDARIES.code, e.getErrorCode());
-      assertEquals("Invalid time boundaries: end time cannot be after 10PM",
+      assertEquals("Invalid time boundaries: end time cannot be after 22:00",
           e.getMessage());
     }
   }
@@ -41,14 +41,14 @@ class InvalidInputExceptionTest {
       throw exception;
     } catch (InvalidInputException e) {
       assertEquals(ErrorCode.INVALID_BOUNDARIES.code, e.getErrorCode());
-      assertEquals("Invalid time boundaries: start time cannot be before 8AM",
+      assertEquals("Invalid time boundaries: start time cannot be before 08:00",
           e.getMessage());
     }
   }
 
   @Test
   void invalidMinPeriodTest() {
-    exception = InvalidInputException.minPeriod();
+    exception = InvalidInputException.period();
     try {
       throw exception;
     } catch (InvalidInputException e) {
@@ -60,12 +60,12 @@ class InvalidInputExceptionTest {
 
   @ Test
   void periodIntersectionTest() {
-   exception = InvalidInputException.periodIntersection();
+   exception = InvalidInputException.periodOverlapping();
     try {
       throw exception;
     } catch (InvalidInputException e) {
-      assertEquals(ErrorCode.INVALID_BOUNDARIES.code, e.getErrorCode());
-      assertEquals("Invalid time boundaries: slot at this time already exists",
+      assertEquals(ErrorCode.SLOT_IS_OVERLAPPING.code, e.getErrorCode());
+      assertEquals("Slot overlaps another one by time: slot at provided time already exists",
           e.getMessage());
     }
   }

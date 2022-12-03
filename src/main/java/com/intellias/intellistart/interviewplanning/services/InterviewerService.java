@@ -14,6 +14,7 @@ import com.intellias.intellistart.interviewplanning.services.interfaces.WeekServ
 import com.intellias.intellistart.interviewplanning.utils.Utils;
 import com.intellias.intellistart.interviewplanning.utils.mappers.InterviewerSlotMapper;
 import com.intellias.intellistart.interviewplanning.validators.InterviewerSlotValidator;
+import com.intellias.intellistart.interviewplanning.validators.PeriodValidator;
 import java.time.DayOfWeek;
 import java.util.Comparator;
 import java.util.List;
@@ -45,6 +46,15 @@ public class InterviewerService {
     User interviewer = getInterviewerById(interviewerId);
     InterviewerTimeSlot slot = InterviewerSlotMapper.mapToEntity(interviewer, interviewerSlotDto);
     slotValidator.validate(slot);
+    PeriodValidator.validate(interviewerSlotDto.getFrom(), interviewerSlotDto.getTo());
+    PeriodValidator.validateInterviewerSlotOverlapping(
+        interviewerSlotDto.getFrom(),
+        interviewerSlotDto.getTo(),
+        interviewerSlotDto.getDayOfWeek(),
+        interviewerTimeSlotRepository.findByInterviewerIdAndWeekNum(
+            interviewerId,
+            interviewerSlotDto.getWeekNum()
+        ));
     return InterviewerSlotMapper.mapToDto(interviewerTimeSlotRepository.save(slot));
   }
 
@@ -103,24 +113,36 @@ public class InterviewerService {
    *
    * @param userId  interviewer id
    * @param slotId  slot id
-   * @param slotDto interviewer slot dto
+   * @param interviewerSlotDto interviewer slot dto
    * @return updated slot
    * @throws ApplicationErrorException if slot has active booking
    */
-  public InterviewerSlotDto updateSlot(Long userId, Long slotId, InterviewerSlotDto slotDto) {
+  public InterviewerSlotDto updateSlot(Long userId, Long slotId,
+      InterviewerSlotDto interviewerSlotDto) {
     User interviewer = getInterviewerById(userId);
     InterviewerTimeSlot slot = getSlotById(interviewer.getId(), slotId);
 
+    slotValidator.validate(slot);
+    PeriodValidator.validate(interviewerSlotDto.getFrom(), interviewerSlotDto.getTo());
+    PeriodValidator.validateInterviewerSlotOverlapping(
+        interviewerSlotDto.getFrom(),
+        interviewerSlotDto.getTo(),
+        interviewerSlotDto.getDayOfWeek(),
+        interviewerTimeSlotRepository.findByInterviewerIdAndWeekNum(
+            interviewer.getId(),
+            interviewerSlotDto.getWeekNum()
+        ).stream().filter(s -> !s.getId().equals(slotId)).collect(Collectors.toList())
+    );
     if (hasBooking(slot)) {
       throw new ApplicationErrorException(ErrorCode.CANNOT_EDIT_SLOT_WITH_BOOKING);
     }
 
-    slot.setFrom(slotDto.getFrom());
-    slot.setTo(slotDto.getTo());
-    slot.setDayOfWeek(slotDto.getDayOfWeek());
-    slot.setWeekNum(slotDto.getWeekNum());
+    slot.setFrom(interviewerSlotDto.getFrom());
+    slot.setTo(interviewerSlotDto.getTo());
+    slot.setDayOfWeek(interviewerSlotDto.getDayOfWeek());
+    slot.setWeekNum(interviewerSlotDto.getWeekNum());
     slot.setInterviewer(interviewer);
-    slotValidator.validate(slot);
+
     return InterviewerSlotMapper.mapToDto(interviewerTimeSlotRepository.save(slot));
   }
 
