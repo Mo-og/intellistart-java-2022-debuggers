@@ -40,7 +40,7 @@ public class BookingService {
    * @throws NotFoundException if slot with the specified id is not found
    */
   public BookingDto createBooking(BookingDto bookingDto) {
-    checkBookingInfo(bookingDto);
+    validateBooking(bookingDto);
 
     Long interviewerSlotId = bookingDto.getInterviewerSlotId();
     InterviewerTimeSlot interviewerSlot = interviewerTimeSlotRepository.findById(interviewerSlotId)
@@ -62,15 +62,15 @@ public class BookingService {
    *
    * @param bookingDto booking
    */
-  private void checkBookingInfo(BookingDto bookingDto) {
-    int maxSubject = 255;
-    int maxDescription = 4000;
+  private void validateBooking(BookingDto bookingDto) {
+    int maxSubjectLength = 255;
+    int maxDescriptionLength = 4000;
     PeriodValidator.validate(bookingDto.getFromAsString(), bookingDto.getToAsString());
 
-    if (bookingDto.getSubject().length() > maxSubject) {
+    if (bookingDto.getSubject().length() > maxSubjectLength) {
       throw InvalidInputException.subject(bookingDto.getSubject().length());
     }
-    if (bookingDto.getDescription().length() > maxDescription) {
+    if (bookingDto.getDescription().length() > maxDescriptionLength) {
       throw InvalidInputException.description(bookingDto.getDescription().length());
     }
   }
@@ -137,7 +137,7 @@ public class BookingService {
    * @throws NotFoundException if booking with the specified id is not found
    */
   public BookingDto updateBooking(Long id, BookingDto bookingDto) {
-    checkBookingInfo(bookingDto);
+    validateBooking(bookingDto);
     Booking booking = bookingRepository.findById(id)
         .orElseThrow(() -> NotFoundException.booking(id));
     booking.setFrom(bookingDto.getFrom());
