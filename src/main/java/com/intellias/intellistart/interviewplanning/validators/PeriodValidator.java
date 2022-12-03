@@ -1,9 +1,11 @@
 package com.intellias.intellistart.interviewplanning.validators;
 
 import com.intellias.intellistart.interviewplanning.exceptions.InvalidInputException;
+import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import java.time.DayOfWeek;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -43,33 +45,51 @@ public class PeriodValidator {
    * @throws InvalidInputException if period is invalid
    */
   public static void validate(LocalTime from, LocalTime to) {
-    if (to.getMinute() % roundToMinutes != 0) {
-      throw InvalidInputException.rounding(to.toString());
-    } else if (from.getMinute() % roundToMinutes != 0) {
-      throw InvalidInputException.rounding(from.toString());
+    if (to.getMinute() % roundToMinutes != 0
+        || from.getMinute() % roundToMinutes != 0) {
+      throw InvalidInputException.minutes();
     } else if (!from.isAfter(lowerTimeExclusive)) {
       throw InvalidInputException.timeLowerBound();
     } else if (!to.isBefore(upperTimeExclusive)) {
       throw InvalidInputException.timeUpperBound();
     } else if (Duration.between(from, to).toMinutes() < minPeriodInMinutes) {
-      throw InvalidInputException.minPeriod();
+      throw InvalidInputException.period();
     }
   }
 
   /**
-   * Method to validate intersection with other slots.
+   * Method to validate interviewer time slot overlapping.
    *
    * @param from     start time
    * @param to       end time
    * @param allSlots list of slots
    */
-  public static void validateIntersection(LocalTime from, LocalTime to, DayOfWeek dayOfWeek,
+  public static void validateInterviewerSlotOverlapping(LocalTime from, LocalTime to,
+      DayOfWeek dayOfWeek,
       List<InterviewerTimeSlot> allSlots) {
     allSlots.stream()
         .filter(slot -> slot.getDayOfWeek().equals(dayOfWeek))
         .forEach((slot) -> {
           if (!(slot.getFrom().isAfter(to) || slot.getTo().isBefore(from))) {
-            throw InvalidInputException.periodIntersection();
+            throw InvalidInputException.periodOverlapping();
+          }
+        });
+  }
+
+  /**
+   * Method to validate candidate time slot overlapping.
+   *
+   * @param from     start time
+   * @param to       end time
+   * @param allSlots list of slots
+   */
+  public static void validateCandidateSlotOverlapping(LocalTime from, LocalTime to, LocalDate date,
+      List<CandidateTimeSlot> allSlots) {
+    allSlots.stream()
+        .filter(slot -> slot.getDate().equals(date))
+        .forEach((slot) -> {
+          if (!(slot.getFrom().isAfter(to) || slot.getTo().isBefore(from))) {
+            throw InvalidInputException.periodOverlapping();
           }
         });
   }
