@@ -63,14 +63,12 @@ public class BookingService {
    * @param bookingDto booking
    */
   private void validateBooking(BookingDto bookingDto) {
-    int maxSubjectLength = 255;
-    int maxDescriptionLength = 4000;
     PeriodValidator.validate(bookingDto.getFromAsString(), bookingDto.getToAsString());
 
-    if (bookingDto.getSubject().length() > maxSubjectLength) {
+    if (bookingDto.getSubject().length() > Booking.MAX_SUBJECT_LENGTH) {
       throw InvalidInputException.subject(bookingDto.getSubject().length());
     }
-    if (bookingDto.getDescription().length() > maxDescriptionLength) {
+    if (bookingDto.getDescription().length() > Booking.MAX_DESCRIPTION_LENGTH) {
       throw InvalidInputException.description(bookingDto.getDescription().length());
     }
   }

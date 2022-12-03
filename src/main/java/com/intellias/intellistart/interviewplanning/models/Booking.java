@@ -39,10 +39,11 @@ public class Booking {
   @ManyToOne
   @JsonIgnore
   private CandidateTimeSlot candidateSlot;
-
   @ManyToOne
   @JsonIgnore
   private InterviewerTimeSlot interviewerSlot;
+  public static final int MAX_SUBJECT_LENGTH = 255;
+  public static final int MAX_DESCRIPTION_LENGTH = 4000;
 
   /**
    * Constructor.
