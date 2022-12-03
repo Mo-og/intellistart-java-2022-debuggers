@@ -2,7 +2,7 @@
 # Interview planning application
 ## Run with Docker
 
-### Docker are required to run the application.
+### Docker is required to run the application.
 
 #### - Open terminal in project directory.
 #### - Run following command:
