@@ -14,7 +14,7 @@ docker-compose up
 ```
 ## If you make changes to the application, you must rebuild the docker images:
 ```shell
-./mvnq clean package
+./mvnw clean package
 docker compose build
 docker-compose up
 ```
