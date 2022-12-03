@@ -12,6 +12,7 @@ import com.intellias.intellistart.interviewplanning.repositories.BookingReposito
 import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.utils.mappers.BookingMapper;
+import com.intellias.intellistart.interviewplanning.validators.PeriodValidator;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -39,7 +40,8 @@ public class BookingService {
    * @throws NotFoundException if slot with the specified id is not found
    */
   public BookingDto createBooking(BookingDto bookingDto) {
-    //Todo calculate possible time
+    checkBookingInfo(bookingDto);
+
     Long interviewerSlotId = bookingDto.getInterviewerSlotId();
     InterviewerTimeSlot interviewerSlot = interviewerTimeSlotRepository.findById(interviewerSlotId)
         .orElseThrow(() -> NotFoundException.timeSlot(interviewerSlotId));
@@ -53,6 +55,24 @@ public class BookingService {
     Booking booking = BookingMapper.mapToEntity(bookingDto, interviewerSlot, candidateSlot);
 
     return BookingMapper.mapToDto(bookingRepository.save(booking));
+  }
+
+  /**
+   * Checks the time boundaries,the length of the subject and description of the booking.
+   *
+   * @param bookingDto booking
+   */
+  private void checkBookingInfo(BookingDto bookingDto) {
+    int maxSubject = 255;
+    int maxDescription = 4000;
+    PeriodValidator.validate(bookingDto.getFromAsString(), bookingDto.getToAsString());
+
+    if (bookingDto.getSubject().length() > maxSubject) {
+      throw InvalidInputException.subject(bookingDto.getSubject().length());
+    }
+    if (bookingDto.getDescription().length() > maxDescription) {
+      throw InvalidInputException.description(bookingDto.getDescription().length());
+    }
   }
 
   /**
@@ -75,7 +95,7 @@ public class BookingService {
       int bookingWeekCount = getInterviewerWeekBookingCount(interviewerId, weekNum);
       int bookingWeekLimitCount = bookingLimit.get().getBookingLimit();
 
-      if (bookingWeekLimitCount < bookingWeekCount + 1) {
+      if (bookingWeekLimitCount <= bookingWeekCount) {
         throw InvalidInputException.exceedsBookingLimit(bookingWeekLimitCount);
       }
     }
@@ -117,7 +137,7 @@ public class BookingService {
    * @throws NotFoundException if booking with the specified id is not found
    */
   public BookingDto updateBooking(Long id, BookingDto bookingDto) {
-    //Todo validate new booking info
+    checkBookingInfo(bookingDto);
     Booking booking = bookingRepository.findById(id)
         .orElseThrow(() -> NotFoundException.booking(id));
     booking.setFrom(bookingDto.getFrom());
