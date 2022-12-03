@@ -55,12 +55,24 @@ public class InvalidInputException extends TemplateMessageException {
             bookingLimit, bookingNum));
   }
 
+  /**
+   * Invalid booking exception due to subject length.
+   *
+   * @param length subject length
+   * @return exception
+   */
   public static InvalidInputException subject(int length) {
     return new InvalidInputException(ErrorCode.CANNOT_CREATE_BOOKING,
         String.format(
             ": booking subject length is %d, but must be less than 255 characters", length));
   }
 
+  /**
+   * Invalid booking exception due to description length.
+   *
+   * @param length description length
+   * @return exception
+   */
   public static InvalidInputException description(int length) {
     return new InvalidInputException(ErrorCode.CANNOT_CREATE_BOOKING,
         String.format(
