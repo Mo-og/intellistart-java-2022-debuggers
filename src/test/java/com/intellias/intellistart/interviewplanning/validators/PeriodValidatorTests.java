@@ -1,9 +1,7 @@
 package com.intellias.intellistart.interviewplanning.validators;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.intellias.intellistart.interviewplanning.exceptions.InvalidInputException;
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
@@ -21,23 +19,8 @@ class PeriodValidatorTests {
   private static final WeekService weekService = new WeekServiceImp();
 
   @Test
-  void isValidTest() {
-    assertTrue(PeriodValidator.isValid(LocalTime.of(8, 0), LocalTime.of(9, 30)));
-    assertTrue(PeriodValidator.isValid(LocalTime.of(8, 0), LocalTime.of(10, 0)));
-    assertTrue(PeriodValidator.isValid(LocalTime.of(8, 0), LocalTime.of(22, 0)));
-  }
-
-  @Test
-  void isNotValidTest() {
-    assertFalse(PeriodValidator.isValid(LocalTime.of(8, 0), LocalTime.of(9, 0)));
-    assertFalse(PeriodValidator.isValid(LocalTime.of(7, 0), LocalTime.of(9, 30)));
-    assertFalse(PeriodValidator.isValid(LocalTime.of(8, 0), LocalTime.of(23, 0)));
-    assertFalse(PeriodValidator.isValid(LocalTime.of(8, 0), LocalTime.of(10, 10)));
-  }
-
-  @Test
   void validateCorrectPeriodTest() {
-    assertDoesNotThrow(() -> PeriodValidator.isValid(LocalTime.of(8, 0), LocalTime.of(9, 30)));
+    assertDoesNotThrow(() -> PeriodValidator.validate(LocalTime.of(8, 0), LocalTime.of(9, 30)));
     assertDoesNotThrow(() -> PeriodValidator.validate(LocalTime.of(8, 0), LocalTime.of(10, 0)));
     assertDoesNotThrow(() -> PeriodValidator.validate(LocalTime.of(8, 0), LocalTime.of(22, 0)));
   }

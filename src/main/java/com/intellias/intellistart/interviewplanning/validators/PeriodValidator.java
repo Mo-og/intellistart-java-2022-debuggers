@@ -10,7 +10,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 /**
- * PeriodValidator class. Uses to validate from/to time.
+ * PeriodValidator class. Validates 'from/to' time of candidate and interviewer slots.
  */
 public class PeriodValidator {
 
@@ -18,23 +18,6 @@ public class PeriodValidator {
   private static final LocalTime upperTimeExclusive = LocalTime.of(22, 1);
   private static final Integer roundToMinutes = 30;
   private static final Integer minPeriodInMinutes = 90;
-
-  /**
-   * Checks if period is valid. from/to time should be rounded to 00 or 30 minutes from time should
-   * be after 7:59 AM to time should be before 22:01 PM minimum period should be 1.5 hours
-   *
-   * @param from start time
-   * @param to   end time
-   * @return true if period is valid
-   */
-  public static boolean isValid(LocalTime from, LocalTime to) {
-    return to.minusMinutes(89).isAfter(from)
-        && to.getMinute() % roundToMinutes == 0
-        && from.getMinute() % roundToMinutes == 0
-        && from.isAfter(lowerTimeExclusive)
-        && to.isBefore(upperTimeExclusive)
-        && Duration.between(from, to).toMinutes() >= minPeriodInMinutes;
-  }
 
   /**
    * Method to validate period. from/to time should be rounded to 00 or 30 minutes. from time should

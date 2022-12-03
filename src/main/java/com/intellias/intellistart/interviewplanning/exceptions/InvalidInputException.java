@@ -43,7 +43,7 @@ public class InvalidInputException extends TemplateMessageException {
    */
   public static InvalidInputException minutes() {
     return new InvalidInputException(ErrorCode.INVALID_BOUNDARIES,
-        ": minutes should be rounded to 00 or 30 minutes");
+        ": minutes should be rounded to 00 or 30");
   }
 
   /**
@@ -63,7 +63,7 @@ public class InvalidInputException extends TemplateMessageException {
    */
   public static InvalidInputException periodOverlapping() {
     return new InvalidInputException(ErrorCode.SLOT_IS_OVERLAPPING,
-        ": slot at this time already exists");
+        ": slot at provided time already exists");
   }
 
   /**
