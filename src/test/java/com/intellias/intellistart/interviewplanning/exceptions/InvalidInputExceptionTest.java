@@ -17,7 +17,7 @@ class InvalidInputExceptionTest {
       throw exception;
     } catch (InvalidInputException e) {
       assertEquals(ErrorCode.INVALID_BOUNDARIES.code, e.getErrorCode());
-      assertEquals("Invalid time boundaries: minutes should be rounded to 00 or 30 minutes",
+      assertEquals("Invalid time boundaries: minutes should be rounded to 00 or 30",
           e.getMessage());
     }
   }
@@ -65,7 +65,7 @@ class InvalidInputExceptionTest {
       throw exception;
     } catch (InvalidInputException e) {
       assertEquals(ErrorCode.SLOT_IS_OVERLAPPING.code, e.getErrorCode());
-      assertEquals("Slot overlaps another one by time: slot at this time already exists",
+      assertEquals("Slot overlaps another one by time: slot at provided time already exists",
           e.getMessage());
     }
   }
