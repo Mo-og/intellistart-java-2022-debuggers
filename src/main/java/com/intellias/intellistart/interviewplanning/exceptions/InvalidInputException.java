@@ -100,6 +100,11 @@ public class InvalidInputException extends TemplateMessageException {
         String.format(": cannot create or edit slot on week '%d'", weekNum));
   }
 
+  public static InvalidInputException exceedsBookingLimit(int bookingLimit) {
+    return new InvalidInputException(ErrorCode.CANNOT_CREATE_BOOKING,
+        String.format(": exceeds interviewer booking limit %d", bookingLimit));
+  }
+
   /**
    * Invalid booking limit exception.
    *
