@@ -15,9 +15,12 @@ class PeriodValidatorTests {
 
   @Test
   void validateCorrectPeriodTest() {
-    assertDoesNotThrow(() -> PeriodValidator.validate(LocalTime.of(8, 0), LocalTime.of(9, 30)));
-    assertDoesNotThrow(() -> PeriodValidator.validate(LocalTime.of(8, 0), LocalTime.of(10, 0)));
-    assertDoesNotThrow(() -> PeriodValidator.validate(LocalTime.of(8, 0), LocalTime.of(22, 0)));
+    assertDoesNotThrow(() -> PeriodValidator.validate(
+        new InterviewerTimeSlot("08:00", "09:30", "Mon", 1)));
+    assertDoesNotThrow(() -> PeriodValidator.validate(
+        new InterviewerTimeSlot("08:00", "10:00", "Mon", 1)));
+    assertDoesNotThrow(() -> PeriodValidator.validate(
+        new InterviewerTimeSlot("08:00", "22:00", "Mon", 1)));
   }
 
   @Test

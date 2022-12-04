@@ -112,7 +112,7 @@ class InterviewerServiceTest {
         .save(any(InterviewerTimeSlot.class)))
         .thenReturn(timeSlot);
 
-    when(weekService.getNowDay()).thenReturn(DayOfWeek.MONDAY);
+    when(weekService.getCurrentDay()).thenReturn(DayOfWeek.MONDAY);
 
     InterviewerSlotDto createdSlot = interviewerService.createSlot(1L, interviewerSlotDto);
     assertEquals(interviewerSlotDtoWithoutBooking, createdSlot);
@@ -204,7 +204,7 @@ class InterviewerServiceTest {
         .thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
 
     when(weekService.getNextWeekNum()).thenCallRealMethod();
-    when(weekService.getNowDay()).thenReturn(DayOfWeek.MONDAY);
+    when(weekService.getCurrentDay()).thenReturn(DayOfWeek.MONDAY);
 
     var slot = interviewerService
         .updateSlot(1L, 1L, interviewerSlotDtoWithoutBooking);
