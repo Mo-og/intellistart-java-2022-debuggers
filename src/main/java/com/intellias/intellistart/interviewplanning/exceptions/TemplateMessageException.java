@@ -9,4 +9,5 @@ public class TemplateMessageException extends ApplicationErrorException {
   public TemplateMessageException(ErrorCode errorCode, String errorMessage) {
     super(errorCode, errorCode.message + errorMessage);
   }
+
 }

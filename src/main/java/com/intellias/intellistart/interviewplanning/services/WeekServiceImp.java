@@ -81,4 +81,5 @@ public class WeekServiceImp implements WeekService {
   public DayOfWeek getNowDay() {
     return LocalDate.now().getDayOfWeek();
   }
+
 }
