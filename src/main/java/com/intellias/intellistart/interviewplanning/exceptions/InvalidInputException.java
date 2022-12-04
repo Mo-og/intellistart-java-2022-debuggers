@@ -99,6 +99,12 @@ public class InvalidInputException extends TemplateMessageException {
         String.format(": cannot create or edit slot on week '%d'", weekNum));
   }
 
+  /**
+   * Exceeds booking limit exception.
+   *
+   * @param bookingLimit booking limit
+   * @return exception
+   */
   public static InvalidInputException exceedsBookingLimit(int bookingLimit) {
     return new InvalidInputException(ErrorCode.CANNOT_CREATE_BOOKING,
         String.format(": exceeds interviewer booking limit %d", bookingLimit));
@@ -116,6 +122,16 @@ public class InvalidInputException extends TemplateMessageException {
         String.format(
             ": booking limit '%d' cannot be lower than the number of existing bookings '%d'",
             bookingLimit, bookingNum));
+  }
+
+  /**
+   * Invalid sate time exception
+   *
+   * @return exception
+   */
+  public static InvalidInputException dateTime() {
+    return new InvalidInputException(ErrorCode.INVALID_DATE_TIME,
+        ": slot cannot be before current date and time");
   }
 
 }

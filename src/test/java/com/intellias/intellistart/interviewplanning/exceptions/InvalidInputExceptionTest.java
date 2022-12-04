@@ -106,4 +106,18 @@ class InvalidInputExceptionTest {
           e.getMessage());
     }
   }
+
+  @Test
+  void invalidDateTimeTest() {
+    exception = InvalidInputException.dateTime();
+    try {
+      throw exception;
+    } catch (InvalidInputException e) {
+      assertEquals(ErrorCode.INVALID_DATE_TIME.code, e.getErrorCode());
+      assertEquals(
+          "Invalid date and time: slot cannot be before current date and time",
+          e.getMessage());
+    }
+  }
+
 }
