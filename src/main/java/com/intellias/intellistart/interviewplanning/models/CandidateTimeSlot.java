@@ -1,8 +1,10 @@
 package com.intellias.intellistart.interviewplanning.models;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.intellias.intellistart.interviewplanning.models.interfaces.TimeSlot;
 import com.intellias.intellistart.interviewplanning.utils.Utils;
 import com.intellias.intellistart.interviewplanning.validators.PeriodValidator;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import javax.persistence.Column;
@@ -26,7 +28,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @EqualsAndHashCode
-public class CandidateTimeSlot {
+public class CandidateTimeSlot implements TimeSlot {
 
   @Id
   @SequenceGenerator(name = "cnd_seq", sequenceName = "candidate_slot_sequence", allocationSize = 5)
@@ -71,4 +73,15 @@ public class CandidateTimeSlot {
   public String getDateAsString() {
     return date.toString();
   }
+
+  @Override
+  public DayOfWeek getDayOfWeek() {
+    return date.getDayOfWeek();
+  }
+
+  @Override
+  public int getWeekNum() {
+    return Utils.getWeekNumByDate(date);
+  }
+
 }
