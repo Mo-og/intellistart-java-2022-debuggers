@@ -125,7 +125,7 @@ public class InvalidInputException extends TemplateMessageException {
   }
 
   /**
-   * Invalid sate time exception
+   * Invalid sate time exception.
    *
    * @return exception
    */
