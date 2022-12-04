@@ -21,8 +21,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@EqualsAndHashCode
-public class Booking {
+public class Booking implements TimeSlot {
 
   @Id
   @SequenceGenerator(name = "booking_seq", sequenceName = "booking_sequence", allocationSize = 5)
