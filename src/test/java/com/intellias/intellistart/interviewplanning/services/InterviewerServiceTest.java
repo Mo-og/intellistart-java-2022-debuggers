@@ -18,7 +18,7 @@ import com.intellias.intellistart.interviewplanning.repositories.InterviewerTime
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import com.intellias.intellistart.interviewplanning.services.interfaces.WeekService;
 import com.intellias.intellistart.interviewplanning.utils.mappers.InterviewerSlotMapper;
-import com.intellias.intellistart.interviewplanning.validators.InterviewerSlotValidator;
+import com.intellias.intellistart.interviewplanning.validators.SlotValidator;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
@@ -100,7 +100,7 @@ class InterviewerServiceTest {
   @BeforeEach
   void setService() {
     interviewerService = new InterviewerService(interviewerTimeSlotRepository, userRepository,
-        bookingRepository, weekService, new InterviewerSlotValidator(weekService));
+        bookingRepository, weekService, new SlotValidator(weekService));
   }
 
   @Test

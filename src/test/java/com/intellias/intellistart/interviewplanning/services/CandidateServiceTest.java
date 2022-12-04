@@ -10,7 +10,10 @@ import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
 import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSlotRepository;
+import com.intellias.intellistart.interviewplanning.services.interfaces.WeekService;
+import com.intellias.intellistart.interviewplanning.validators.SlotValidator;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
@@ -53,16 +56,22 @@ class CandidateServiceTest {
   @Mock
   BookingRepository bookingRepository;
 
+  @Mock
+  WeekService weekService;
+  SlotValidator slotValidator;
+
   private CandidateService service;
 
   @BeforeEach
   void setService() {
-    service = new CandidateService(candidateSlotRepository, bookingRepository);
+    slotValidator = new SlotValidator(weekService);
+    service = new CandidateService(candidateSlotRepository, bookingRepository, slotValidator);
   }
 
   @Test
   void testCreateSlot() {
     when(candidateSlotRepository.save(candidateSlot)).thenReturn(candidateSlot);
+    when(weekService.getCurrentDateTime()).thenReturn(LocalDateTime.of(2022, 11, 1, 0, 0));
     var slot = service.createSlot(CANDIDATE_EMAIL, candidateSlotDto);
     assertEquals(candidateSlotDto, slot);
   }
@@ -97,6 +106,7 @@ class CandidateServiceTest {
   void testUpdateSlot() {
     when(candidateSlotRepository.findById(1L)).thenReturn(Optional.of(candidateSlot));
     when(candidateSlotRepository.save(any())).thenAnswer(givenArgs -> givenArgs.getArgument(0));
+    when(weekService.getCurrentDateTime()).thenReturn(LocalDateTime.of(2022, 11, 1, 0, 0));
     var slot = service.updateSlot(CANDIDATE_EMAIL, 1L, candidateSlotDto);
     assertEquals(candidateSlot.getFrom(), slot.getFrom());
     assertEquals(candidateSlot.getTo(), slot.getTo());

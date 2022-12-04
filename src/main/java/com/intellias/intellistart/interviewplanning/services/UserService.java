@@ -89,5 +89,4 @@ public class UserService implements UserDetailsService {
         .orElseThrow(() -> new UsernameNotFoundException("No user found with username " + username));
   }
 
-
 }
