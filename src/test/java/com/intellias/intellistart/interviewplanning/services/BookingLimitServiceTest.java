@@ -68,7 +68,7 @@ class BookingLimitServiceTest {
         bookingLimitRequest);
     assertEquals(bookingLimit.getId(), newBookingLimit.getId());
     assertEquals(bookingLimit.getInterviewerId(), newBookingLimit.getInterviewerId());
-    assertEquals(bookingLimit.getBookingLimit(), newBookingLimit.getBookingLimit());
+    assertEquals(bookingLimit.getValue(), newBookingLimit.getValue());
   }
 
   @Test
@@ -100,7 +100,7 @@ class BookingLimitServiceTest {
         bookingLimitRequest);
     assertEquals(bookingLimit.getId(), newBookingLimit.getId());
     assertEquals(bookingLimit.getInterviewerId(), newBookingLimit.getInterviewerId());
-    assertEquals(bookingLimit.getBookingLimit(), newBookingLimit.getBookingLimit());
+    assertEquals(bookingLimit.getValue(), newBookingLimit.getValue());
   }
 
   @Test
