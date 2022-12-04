@@ -11,8 +11,9 @@ facebook:
 jwt:
   secret: somesecretsomesecretsomesecretsomesecretsomesecretsomesecretsomesecretsomesecretsomesecretsomesecretsomesecret
 
+# NOT FOR TEST application-dev.yml
 spring:
   datasource:
-    url: "jdbc:postgresql://debuggers-postgres-bd:5432/debuggers"
-    username: debugger
-    password: 123
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/debuggers}
+    username: ${DB_USERNAME:debugger}
+    password: ${DB_PASSWORD:123}

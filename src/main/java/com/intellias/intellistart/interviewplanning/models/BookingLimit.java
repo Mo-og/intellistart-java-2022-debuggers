@@ -1,6 +1,7 @@
 package com.intellias.intellistart.interviewplanning.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -21,6 +22,7 @@ public class BookingLimit {
   private Long id;
   private Long interviewerId;
   private int weekNum;
+  @Column(name = "limit_value")
   private int value;
 
   /**

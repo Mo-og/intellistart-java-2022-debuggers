@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS booking_limit
     id             BIGINT  NOT NULL,
     interviewer_id BIGINT,
     week_num       INTEGER NOT NULL,
-    booking_limit  INTEGER NOT NULL,
+    limit_value    INTEGER NOT NULL,
     CONSTRAINT pk_bookinglimit PRIMARY KEY (id)
 );
 

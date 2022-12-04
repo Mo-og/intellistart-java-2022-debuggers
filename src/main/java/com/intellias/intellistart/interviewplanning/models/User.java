@@ -80,6 +80,7 @@ public class User implements UserDetails, OAuth2User {
     authorities = List.of(role);
   }
 
+  @JsonIgnore
   @Override
   public Map<String, Object> getAttributes() {
     Map<String, Object> map = new HashMap<>();
@@ -161,6 +162,7 @@ public class User implements UserDetails, OAuth2User {
     return getClass().hashCode();
   }
 
+  @JsonIgnore
   @Override
   public String getName() {
     return getUsername();

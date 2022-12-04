@@ -33,7 +33,7 @@ spring:
 facebook:
   client-id: ${FACEBOOK_CLIENT_ID}
   client-secret: ${FACEBOOK_CLIENT_SECRET}
-  app-token: ${FACEBOOK_APP_TOKEN} # leave blank to get new (if left blank will fail app and tests when no internet)
+  app-token: ${FACEBOOK_APP_TOKEN:} # leave blank to get new (if left blank will fail app and tests when no internet)
   uri:
     auth: 'https://www.facebook.com/v15.0/dialog/oauth'
     redirect: 'http://localhost:8080/authenticate/redirect'
