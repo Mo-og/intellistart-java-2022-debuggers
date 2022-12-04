@@ -1,9 +1,9 @@
 package com.intellias.intellistart.interviewplanning.services;
 
-import static com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils.COORDINATOR_EMAIL;
-import static com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils.INTERVIEWER_EMAIL;
-import static com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils.coordinator;
-import static com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils.interviewer;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestSecurityUtils.COORDINATOR_EMAIL;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestSecurityUtils.INTERVIEWER_EMAIL;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestSecurityUtils.coordinator;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestSecurityUtils.interviewer;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

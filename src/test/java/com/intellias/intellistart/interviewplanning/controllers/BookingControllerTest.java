@@ -1,15 +1,15 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
-import static com.intellias.intellistart.interviewplanning.utils.TestUtils.checkResponseOk;
-import static com.intellias.intellistart.interviewplanning.utils.TestUtils.json;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestUtils.checkResponseOk;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestUtils.json;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import com.intellias.intellistart.interviewplanning.controllers.dto.BookingDto;
 import com.intellias.intellistart.interviewplanning.services.BookingService;
-import com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils;
-import com.intellias.intellistart.interviewplanning.utils.WithCustomUser;
+import com.intellias.intellistart.interviewplanning.test_utils.TestSecurityUtils;
+import com.intellias.intellistart.interviewplanning.test_utils.WithCustomUser;
 import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

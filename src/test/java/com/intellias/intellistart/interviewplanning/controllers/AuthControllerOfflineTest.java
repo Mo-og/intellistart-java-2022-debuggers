@@ -1,7 +1,7 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
-import static com.intellias.intellistart.interviewplanning.utils.TestUtils.checkResponseOk;
-import static com.intellias.intellistart.interviewplanning.utils.TestUtils.json;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestUtils.checkResponseOk;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestUtils.json;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import com.intellias.intellistart.interviewplanning.controllers.AuthController.JwtToken;
@@ -11,7 +11,7 @@ import com.intellias.intellistart.interviewplanning.services.AuthService.Faceboo
 import com.intellias.intellistart.interviewplanning.services.AuthService.FacebookTokenInfo.FbData;
 import com.intellias.intellistart.interviewplanning.services.AuthService.FacebookTokenResponse;
 import com.intellias.intellistart.interviewplanning.services.AuthService.FacebookUserProfile;
-import com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils;
+import com.intellias.intellistart.interviewplanning.test_utils.TestSecurityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

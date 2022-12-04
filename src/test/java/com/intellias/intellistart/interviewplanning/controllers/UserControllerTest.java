@@ -1,8 +1,8 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
-import static com.intellias.intellistart.interviewplanning.utils.TestUtils.checkResponseBad;
-import static com.intellias.intellistart.interviewplanning.utils.TestUtils.checkResponseOk;
-import static com.intellias.intellistart.interviewplanning.utils.TestUtils.json;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestUtils.checkResponseBad;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestUtils.checkResponseOk;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestUtils.json;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -16,8 +16,8 @@ import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.services.CoordinatorService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
-import com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils;
-import com.intellias.intellistart.interviewplanning.utils.WithCustomUser;
+import com.intellias.intellistart.interviewplanning.test_utils.TestSecurityUtils;
+import com.intellias.intellistart.interviewplanning.test_utils.WithCustomUser;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

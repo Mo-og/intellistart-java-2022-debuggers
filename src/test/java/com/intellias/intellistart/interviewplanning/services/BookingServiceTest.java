@@ -1,8 +1,8 @@
 package com.intellias.intellistart.interviewplanning.services;
 
-import static com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils.CANDIDATE_EMAIL;
-import static com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils.INTERVIEWER_ID;
-import static com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils.interviewer;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestSecurityUtils.CANDIDATE_EMAIL;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestSecurityUtils.INTERVIEWER_ID;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestSecurityUtils.interviewer;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

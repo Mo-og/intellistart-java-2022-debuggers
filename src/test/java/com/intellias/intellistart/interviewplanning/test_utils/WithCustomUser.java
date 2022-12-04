@@ -1,4 +1,4 @@
-package com.intellias.intellistart.interviewplanning.utils;
+package com.intellias.intellistart.interviewplanning.test_utils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

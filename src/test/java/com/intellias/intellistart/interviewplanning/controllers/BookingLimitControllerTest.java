@@ -1,7 +1,7 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
-import static com.intellias.intellistart.interviewplanning.utils.TestUtils.checkResponseOk;
-import static com.intellias.intellistart.interviewplanning.utils.TestUtils.json;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestUtils.checkResponseOk;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestUtils.json;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -15,8 +15,8 @@ import com.intellias.intellistart.interviewplanning.models.BookingLimit;
 import com.intellias.intellistart.interviewplanning.services.BookingLimitService;
 import com.intellias.intellistart.interviewplanning.services.WeekServiceImp;
 import com.intellias.intellistart.interviewplanning.services.interfaces.WeekService;
-import com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils;
-import com.intellias.intellistart.interviewplanning.utils.WithCustomUser;
+import com.intellias.intellistart.interviewplanning.test_utils.TestSecurityUtils;
+import com.intellias.intellistart.interviewplanning.test_utils.WithCustomUser;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

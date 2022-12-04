@@ -1,8 +1,8 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
-import static com.intellias.intellistart.interviewplanning.utils.TestUtils.checkResponseBad;
-import static com.intellias.intellistart.interviewplanning.utils.TestUtils.checkResponseOk;
-import static com.intellias.intellistart.interviewplanning.utils.TestUtils.json;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestUtils.checkResponseBad;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestUtils.checkResponseOk;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestUtils.json;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;

@@ -1,4 +1,4 @@
-package com.intellias.intellistart.interviewplanning.utils;
+package com.intellias.intellistart.interviewplanning.test_utils;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;

@@ -1,8 +1,8 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
-import static com.intellias.intellistart.interviewplanning.utils.TestUtils.checkResponseBad;
-import static com.intellias.intellistart.interviewplanning.utils.TestUtils.checkResponseOk;
-import static com.intellias.intellistart.interviewplanning.utils.TestUtils.json;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestUtils.checkResponseBad;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestUtils.checkResponseOk;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestUtils.json;
 import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -20,8 +20,8 @@ import com.intellias.intellistart.interviewplanning.services.AuthService.Faceboo
 import com.intellias.intellistart.interviewplanning.services.AuthService.FacebookTokenInfo.FbData;
 import com.intellias.intellistart.interviewplanning.services.AuthService.FacebookTokenResponse;
 import com.intellias.intellistart.interviewplanning.services.AuthService.FacebookUserProfile;
-import com.intellias.intellistart.interviewplanning.utils.DisabledWhenOffline;
-import com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils;
+import com.intellias.intellistart.interviewplanning.test_utils.DisabledWhenOffline;
+import com.intellias.intellistart.interviewplanning.test_utils.TestSecurityUtils;
 import java.util.Collections;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;

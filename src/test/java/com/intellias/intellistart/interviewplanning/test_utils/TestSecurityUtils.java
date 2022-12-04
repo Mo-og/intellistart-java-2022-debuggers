@@ -1,4 +1,4 @@
-package com.intellias.intellistart.interviewplanning.utils;
+package com.intellias.intellistart.interviewplanning.test_utils;
 
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;

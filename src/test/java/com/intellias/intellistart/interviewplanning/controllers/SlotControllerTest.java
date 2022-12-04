@@ -1,11 +1,11 @@
 package com.intellias.intellistart.interviewplanning.controllers;
 
-import static com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils.CANDIDATE_EMAIL;
-import static com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils.INTERVIEWER_ID;
-import static com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils.interviewer;
-import static com.intellias.intellistart.interviewplanning.utils.TestUtils.checkResponseBad;
-import static com.intellias.intellistart.interviewplanning.utils.TestUtils.checkResponseOk;
-import static com.intellias.intellistart.interviewplanning.utils.TestUtils.json;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestSecurityUtils.CANDIDATE_EMAIL;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestSecurityUtils.INTERVIEWER_ID;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestSecurityUtils.interviewer;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestUtils.checkResponseBad;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestUtils.checkResponseOk;
+import static com.intellias.intellistart.interviewplanning.test_utils.TestUtils.json;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -22,8 +22,8 @@ import com.intellias.intellistart.interviewplanning.services.CandidateService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import com.intellias.intellistart.interviewplanning.services.WeekServiceImp;
 import com.intellias.intellistart.interviewplanning.services.interfaces.WeekService;
-import com.intellias.intellistart.interviewplanning.utils.TestSecurityUtils;
-import com.intellias.intellistart.interviewplanning.utils.WithCustomUser;
+import com.intellias.intellistart.interviewplanning.test_utils.TestSecurityUtils;
+import com.intellias.intellistart.interviewplanning.test_utils.WithCustomUser;
 import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
