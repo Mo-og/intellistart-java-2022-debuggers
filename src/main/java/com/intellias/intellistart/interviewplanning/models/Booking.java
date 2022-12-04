@@ -2,8 +2,10 @@ package com.intellias.intellistart.interviewplanning.models;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.intellias.intellistart.interviewplanning.models.interfaces.TimeSlot;
 import com.intellias.intellistart.interviewplanning.utils.Utils;
 import java.time.LocalTime;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,9 +13,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.Hibernate;
 
 /**
  * Booking.
@@ -73,6 +75,23 @@ public class Booking implements TimeSlot {
   @JsonGetter("to")
   public String getToAsString() {
     return Utils.timeAsString(to);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
+      return false;
+    }
+    Booking booking = (Booking) o;
+    return id != null && Objects.equals(id, booking.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
   }
 
 }
