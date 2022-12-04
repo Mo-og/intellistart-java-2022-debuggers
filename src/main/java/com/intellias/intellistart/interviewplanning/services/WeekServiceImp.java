@@ -78,7 +78,7 @@ public class WeekServiceImp implements WeekService {
         .with(WeekFields.ISO.dayOfWeek(), dayOfWeek.getValue());
   }
 
-  public DayOfWeek getNowDay() {
+  public DayOfWeek getCurrentDay() {
     return LocalDate.now().getDayOfWeek();
   }
 

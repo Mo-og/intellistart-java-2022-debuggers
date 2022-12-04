@@ -47,5 +47,6 @@ public interface WeekService {
    */
   LocalDate getDateByWeekNumAndDayOfWeek(int weekNum, DayOfWeek dayOfWeek);
 
-  DayOfWeek getNowDay();
+  DayOfWeek getCurrentDay();
+
 }
