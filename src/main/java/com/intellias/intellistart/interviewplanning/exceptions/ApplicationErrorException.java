@@ -75,7 +75,7 @@ public class ApplicationErrorException extends RuntimeException {
     INVALID_WEEK_NUM(HttpStatus.BAD_REQUEST, "Invalid week number"),
     INVALID_DATE_TIME(HttpStatus.BAD_REQUEST, "Invalid date and time"),
     CANNOT_EDIT_THIS_WEEK(HttpStatus.BAD_REQUEST, "Cannot edit current or previous week"),
-    CANNOT_CREATE_BOOKING(HttpStatus.BAD_REQUEST, "Cannot create booking"),
+    CANNOT_CREATE_BOOKING(HttpStatus.BAD_REQUEST, "Invalid booking"),
     CANNOT_EDIT_SLOT_WITH_BOOKING(HttpStatus.BAD_REQUEST,
         "Cannot update or delete time slot that has booking"),
     REVOKE_USER_WITH_SLOT(HttpStatus.BAD_REQUEST,

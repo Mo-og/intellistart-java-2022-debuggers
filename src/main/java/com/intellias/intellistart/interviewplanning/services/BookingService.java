@@ -12,6 +12,7 @@ import com.intellias.intellistart.interviewplanning.repositories.BookingReposito
 import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.utils.mappers.BookingMapper;
+import com.intellias.intellistart.interviewplanning.validators.PeriodValidator;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -39,12 +40,12 @@ public class BookingService {
    * @throws NotFoundException if slot with the specified id is not found
    */
   public BookingDto createBooking(BookingDto bookingDto) {
-    //Todo calculate possible time
+    validate(bookingDto);
     Long interviewerSlotId = bookingDto.getInterviewerSlotId();
     InterviewerTimeSlot interviewerSlot = interviewerTimeSlotRepository.findById(interviewerSlotId)
         .orElseThrow(() -> NotFoundException.timeSlot(interviewerSlotId));
 
-    checkBookingLimit(interviewerSlot);
+    checkFitsBookingLimit(interviewerSlot);
 
     Long candidateSlotId = bookingDto.getCandidateSlotId();
     CandidateTimeSlot candidateSlot = candidateTimeSlotRepository.findById(candidateSlotId)
@@ -56,55 +57,71 @@ public class BookingService {
   }
 
   /**
-   * Checks or the interviewer booking limit allows to create a new booking.
+   * Checks time boundaries, length of subject and description of the booking.
+   *
+   * @param bookingDto booking
+   */
+  private void validate(BookingDto bookingDto) {
+    PeriodValidator.validate(bookingDto);
+    validateTextFieldsLength(bookingDto);
+  }
+
+  private void validateTextFieldsLength(BookingDto bookingDto) {
+    if (bookingDto.getSubject().length() > Booking.MAX_SUBJECT_LENGTH) {
+      throw InvalidInputException.subject(bookingDto.getSubject().length());
+    }
+    if (bookingDto.getDescription().length() > Booking.MAX_DESCRIPTION_LENGTH) {
+      throw InvalidInputException.description(bookingDto.getDescription().length());
+    }
+  }
+
+  /**
+   * Checks if the interviewer booking limit allows to create a new booking.
    *
    * @param interviewerSlot interviewer time slot
    */
-  private void checkBookingLimit(InterviewerTimeSlot interviewerSlot) {
+  private void checkFitsBookingLimit(InterviewerTimeSlot interviewerSlot) {
     Long interviewerId = interviewerSlot.getInterviewer().getId();
     int weekNum = interviewerSlot.getWeekNum();
 
-    Optional<BookingLimit> bookingLimit = bookingLimitRepository
-        .findByInterviewerIdAndWeekNum(interviewerId, weekNum);
+    BookingLimit bookingLimit = getOrCreateBookingLimit(interviewerId, weekNum);
+    int maxBookings = bookingLimit.getValue();
+    int currentBookingsCount = getBookingsCountForWeek(interviewerId, weekNum);
 
-    if (bookingLimit.isEmpty()) {
-      bookingLimit = setPreviousBookingLimit(interviewerId, weekNum);
-    }
-
-    if (bookingLimit.isPresent()) {
-      int bookingWeekCount = getInterviewerWeekBookingCount(interviewerId, weekNum);
-      int bookingWeekLimitCount = bookingLimit.get().getBookingLimit();
-
-      if (bookingWeekLimitCount < bookingWeekCount + 1) {
-        throw InvalidInputException.exceedsBookingLimit(bookingWeekLimitCount);
-      }
+    if (maxBookings < currentBookingsCount + 1) {
+      throw InvalidInputException.exceedsBookingLimit(maxBookings);
     }
   }
 
-  private Optional<BookingLimit> setPreviousBookingLimit(Long interviewerId, int weekNum) {
-    List<BookingLimit> bookingLimits = bookingLimitRepository
-        .findByInterviewerIdAndWeekNumLessThan(interviewerId, weekNum);
+  private BookingLimit getOrCreateBookingLimit(Long interviewerId, int weekNum) {
+    Optional<BookingLimit> bookingLimit = bookingLimitRepository.findByInterviewerIdAndWeekNum(interviewerId, weekNum);
+    if (bookingLimit.isEmpty()) {
+      return saveAndGetPreviousBookingLimit(interviewerId, weekNum);
+    }
+    return bookingLimit.get();
+  }
+
+  private BookingLimit saveAndGetPreviousBookingLimit(Long interviewerId, int weekNum) {
+    List<BookingLimit> bookingLimits = bookingLimitRepository.findByInterviewerIdAndWeekNumLessThan(interviewerId,
+        weekNum);
+    if (bookingLimits.isEmpty()) {
+      return bookingLimitRepository.save(new BookingLimit(interviewerId, weekNum, Integer.MAX_VALUE));
+    }
 
     bookingLimits.sort(Comparator.comparing(BookingLimit::getWeekNum).reversed());
-    Optional<BookingLimit> bookingLimit = bookingLimits.stream().findFirst();
-
-    if (bookingLimit.isPresent()) {
-      bookingLimit.get().setWeekNum(weekNum);
-      bookingLimitRepository.save(bookingLimit.get());
-    }
-
-    return bookingLimit;
+    BookingLimit bookingLimit = bookingLimits.get(0);
+    bookingLimit.setWeekNum(weekNum);
+    return bookingLimitRepository.save(bookingLimit);
   }
 
-  private int getInterviewerWeekBookingCount(Long interviewerId, int weekNum) {
-    List<InterviewerTimeSlot> weekInterviewerSlots = interviewerTimeSlotRepository
-        .findByInterviewerIdAndWeekNum(interviewerId, weekNum);
+  private int getBookingsCountForWeek(Long interviewerId, int weekNum) {
+    List<InterviewerTimeSlot> weekInterviewerSlots =
+        interviewerTimeSlotRepository.findByInterviewerIdAndWeekNum(interviewerId, weekNum);
 
     List<Booking> weekInterviewerBookings = new ArrayList<>();
     for (InterviewerTimeSlot slot : weekInterviewerSlots) {
       weekInterviewerBookings.addAll(bookingRepository.findByInterviewerSlot(slot));
     }
-
     return weekInterviewerBookings.size();
   }
 
@@ -117,7 +134,7 @@ public class BookingService {
    * @throws NotFoundException if booking with the specified id is not found
    */
   public BookingDto updateBooking(Long id, BookingDto bookingDto) {
-    //Todo validate new booking info
+    validate(bookingDto);
     Booking booking = bookingRepository.findById(id)
         .orElseThrow(() -> NotFoundException.booking(id));
     booking.setFrom(bookingDto.getFrom());
