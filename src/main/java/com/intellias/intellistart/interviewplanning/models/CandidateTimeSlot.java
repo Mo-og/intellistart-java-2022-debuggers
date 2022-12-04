@@ -3,7 +3,6 @@ package com.intellias.intellistart.interviewplanning.models;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.intellias.intellistart.interviewplanning.models.interfaces.TimeSlot;
 import com.intellias.intellistart.interviewplanning.utils.Utils;
-import com.intellias.intellistart.interviewplanning.validators.PeriodValidator;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -52,7 +51,6 @@ public class CandidateTimeSlot implements TimeSlot {
    * @param to    end time
    */
   public CandidateTimeSlot(String email, String date, String from, String to) {
-    PeriodValidator.validate(from, to);
     this.email = email;
     this.date = LocalDate.parse(date);
     this.from = LocalTime.parse(from);

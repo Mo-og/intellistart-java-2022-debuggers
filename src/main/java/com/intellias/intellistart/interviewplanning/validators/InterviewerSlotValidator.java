@@ -8,7 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
- * InterviewerSlotValidate class. Used to validate interviewer time slot before creating or updating.
+ * InterviewerSlotValidate class. Uses to validate interviewer time slot before creating or
+ * updating.
  */
 @Component
 @RequiredArgsConstructor
@@ -24,9 +25,9 @@ public class InterviewerSlotValidator {
    * @throws InvalidInputException if editing slot on weekend
    */
   public void validate(InterviewerTimeSlot interviewerTimeSlot) {
-    var now = weekService.getNowDay();
-    if (isWeekend(now)) {
-      throw InvalidInputException.dayOfWeek(now);
+    DayOfWeek today = weekService.getNowDay();
+    if (isWeekend(today)) {
+      throw InvalidInputException.dayOfWeek(today);
     } else if (interviewerTimeSlot.getWeekNum() != weekService.getNextWeekNum()) {
       throw InvalidInputException.slotWeekNum(interviewerTimeSlot.getWeekNum());
     }
@@ -35,4 +36,5 @@ public class InterviewerSlotValidator {
   private static boolean isWeekend(DayOfWeek dayOfWeek) {
     return dayOfWeek.getValue() > DayOfWeek.FRIDAY.getValue();
   }
+
 }

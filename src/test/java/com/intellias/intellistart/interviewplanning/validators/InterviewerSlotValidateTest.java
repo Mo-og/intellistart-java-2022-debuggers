@@ -2,54 +2,39 @@ package com.intellias.intellistart.interviewplanning.validators;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
-import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
+import com.intellias.intellistart.interviewplanning.exceptions.InvalidInputException;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.services.WeekServiceImp;
-import com.intellias.intellistart.interviewplanning.services.interfaces.WeekService;
 import java.time.DayOfWeek;
-import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+@ExtendWith(MockitoExtension.class)
 class InterviewerSlotValidateTest {
 
-  private final InterviewerTimeSlot currentWeekSlot;
-  private final InterviewerTimeSlot nextWeekSlot;
-  private final WeekService weekService = new WeekServiceImp();
-  private final InterviewerSlotValidator slotValidator = new InterviewerSlotValidator(weekService);
+  private final WeekServiceImp weekService = Mockito.mock(WeekServiceImp.class);
 
-  {
-    currentWeekSlot = new InterviewerTimeSlot(
-        "08:00", "22:00", "MONDAY", weekService.getCurrentWeekNum());
+  private final InterviewerSlotValidator interviewerSlotValidator = new InterviewerSlotValidator(weekService);
 
-    nextWeekSlot = new InterviewerTimeSlot(
-        "08:00", "22:00", "MONDAY", weekService.getNextWeekNum());
+  private final InterviewerTimeSlot interviewerTimeSlot = new InterviewerTimeSlot("10:00", "11:00", "MONDAY", 1);
+
+
+  @Test
+  void validateSlotOnWeekendTest() {
+    when(weekService.getNowDay()).thenReturn(DayOfWeek.MONDAY);
+    when(weekService.getNextWeekNum()).thenReturn(1);
+    assertDoesNotThrow(() -> interviewerSlotValidator.validate(interviewerTimeSlot));
   }
 
   @Test
-  void validateSlotToBeUpdated() {
-    if (LocalDate.now().getDayOfWeek().getValue() <= DayOfWeek.FRIDAY.getValue()) {
-      assertDoesNotThrow(() -> slotValidator.validate(nextWeekSlot));
-    } else {
-      assertThrows(ApplicationErrorException.class,
-          () -> slotValidator.validate(nextWeekSlot));
-    }
-
-    assertThrows(ApplicationErrorException.class,
-        () -> slotValidator.validate(currentWeekSlot));
-  }
-
-  @Test
-  void validateSlotToBeCreated() {
-    if (LocalDate.now().getDayOfWeek().getValue() <= DayOfWeek.FRIDAY.getValue()) {
-      assertDoesNotThrow(() -> slotValidator.validate(nextWeekSlot));
-    } else {
-      assertThrows(ApplicationErrorException.class,
-          () -> slotValidator.validate(nextWeekSlot));
-    }
-
-    assertThrows(ApplicationErrorException.class,
-        () -> slotValidator.validate(currentWeekSlot));
+  void validateSlotOnWeekdayTest() {
+    when(weekService.getNowDay()).thenReturn(DayOfWeek.SUNDAY);
+    when(weekService.getNextWeekNum()).thenReturn(1);
+    assertThrows(InvalidInputException.class, () -> interviewerSlotValidator.validate(interviewerTimeSlot));
   }
 
 }

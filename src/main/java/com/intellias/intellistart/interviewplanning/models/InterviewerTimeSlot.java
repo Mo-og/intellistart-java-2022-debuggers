@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.intellias.intellistart.interviewplanning.models.interfaces.TimeSlot;
 import com.intellias.intellistart.interviewplanning.utils.Utils;
-import com.intellias.intellistart.interviewplanning.validators.PeriodValidator;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -59,7 +58,6 @@ public class InterviewerTimeSlot implements TimeSlot {
    * @param weekNum week number
    */
   public InterviewerTimeSlot(String from, String to, String day, int weekNum) {
-    PeriodValidator.validate(from, to);
     this.from = LocalTime.parse(from);
     this.to = LocalTime.parse(to);
     this.weekNum = weekNum;
