@@ -4,6 +4,16 @@
 
 ## Run with Docker
 
+#### - Include `db.env` file with environment variables for `postgresDB`
+
+Environment variables include:
+
+- `POSTGRES_USER` (Name of user)
+- `POSTGRES_PASSWORD` (User's password)
+- `POSTGRES_DB` (Name of database)
+
+-- look at `example_db.env` as an example of `db.env`
+
 #### - Include `docker.env` file with environment variables for `application.yml`
 
 Environment variables include:
@@ -17,6 +27,8 @@ Environment variables include:
 - `COORDINATOR_EMAIL` (base admin user)
 - `INTERVIEWER_EMAIL` (base interviewer user)
 - `JWT_SECRET`
+
+-- look at `template_docker.env` as an example of `docker.env`
 
 #### - Open terminal in project directory.
 
