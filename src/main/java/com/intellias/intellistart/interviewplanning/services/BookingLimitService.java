@@ -41,7 +41,7 @@ public class BookingLimitService {
             bookingLimitRequest.getWeekNum())
         .orElseGet(() -> new BookingLimit(interviewerId));
     bookingLimit.setWeekNum(bookingLimitRequest.getWeekNum());
-    bookingLimit.setValue(bookingLimitRequest.getBookingLimit());
+    bookingLimit.setBookingLimit(bookingLimitRequest.getBookingLimit());
     return bookingLimitRepository.save(bookingLimit);
   }
 

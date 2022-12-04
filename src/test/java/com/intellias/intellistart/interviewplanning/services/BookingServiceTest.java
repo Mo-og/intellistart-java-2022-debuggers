@@ -101,7 +101,6 @@ class BookingServiceTest {
     when(bookingRepository
         .save(any()))
         .thenReturn(BOOKING);
-    when(bookingLimitRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
     var createdBooking = service.createBooking(BOOKING_DTO);
     assertEquals(BOOKING_DTO, createdBooking);
   }
@@ -119,7 +118,6 @@ class BookingServiceTest {
         .thenReturn(Optional.of(INTERVIEWER_SLOT));
     when(candidateTimeSlotRepository.findById(-1L))
         .thenThrow(NotFoundException.timeSlot(-1L));
-    when(bookingLimitRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
     assertThrows(NotFoundException.class, () -> service.createBooking(BOOKING_DTO_WITH_WRONG_SLOT));
   }
 

@@ -21,7 +21,7 @@ public class BookingLimit {
   private Long id;
   private Long interviewerId;
   private int weekNum;
-  private int value;
+  private int bookingLimit;
 
   /**
    * Constructor.
@@ -32,7 +32,7 @@ public class BookingLimit {
   public BookingLimit(Long interviewerId, int weekNum, int limit) {
     this.interviewerId = interviewerId;
     this.weekNum = weekNum;
-    this.value = limit;
+    this.bookingLimit = limit;
   }
 
   public BookingLimit(Long interviewerId) {
