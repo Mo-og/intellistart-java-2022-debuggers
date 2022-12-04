@@ -161,4 +161,5 @@ public class SlotController {
     checkAuthorized(auth, interviewerId);
     return interviewerService.getSlotsByWeekId(interviewerId, weekService.getNextWeekNum());
   }
+
 }

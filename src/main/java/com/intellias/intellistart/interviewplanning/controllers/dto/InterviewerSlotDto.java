@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.intellias.intellistart.interviewplanning.utils.Utils;
-import com.intellias.intellistart.interviewplanning.validators.PeriodValidator;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
@@ -76,7 +75,6 @@ public class InterviewerSlotDto {
    * @param weekNum week number
    */
   public InterviewerSlotDto(String from, String to, String day, int weekNum) {
-    PeriodValidator.validate(from, to);
     this.from = LocalTime.parse(from);
     this.to = LocalTime.parse(to);
     this.weekNum = weekNum;
