@@ -3,20 +3,20 @@ package com.intellias.intellistart.interviewplanning.models;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.intellias.intellistart.interviewplanning.models.interfaces.TimeSlot;
 import com.intellias.intellistart.interviewplanning.utils.Utils;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.Hibernate;
 
 /**
  * Candidate time slot.
@@ -26,7 +26,6 @@ import lombok.ToString;
 @Setter
 @ToString
 @NoArgsConstructor
-@EqualsAndHashCode
 public class CandidateTimeSlot implements TimeSlot {
 
   @Id
@@ -73,13 +72,20 @@ public class CandidateTimeSlot implements TimeSlot {
   }
 
   @Override
-  public DayOfWeek getDayOfWeek() {
-    return date.getDayOfWeek();
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
+      return false;
+    }
+    CandidateTimeSlot that = (CandidateTimeSlot) o;
+    return id != null && Objects.equals(id, that.id);
   }
 
   @Override
-  public int getWeekNum() {
-    return Utils.getWeekNumByDate(date);
+  public int hashCode() {
+    return getClass().hashCode();
   }
 
 }
