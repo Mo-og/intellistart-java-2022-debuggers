@@ -1,19 +1,34 @@
 package com.intellias.intellistart.interviewplanning.models.interfaces;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.intellias.intellistart.interviewplanning.utils.Utils;
 import java.time.LocalTime;
 
+/**
+ * TimeSlot interface. Represents time slot.
+ */
 public interface TimeSlot {
 
   LocalTime getFrom();
 
   LocalTime getTo();
 
-  DayOfWeek getDayOfWeek();
+  @JsonGetter("from")
+  default String getFromAsString() {
+    return Utils.timeAsString(getFrom());
+  }
 
-  int getWeekNum();
+  @JsonGetter("to")
+  default String getToAsString() {
+    return Utils.timeAsString(getTo());
+  }
 
-  LocalDate getDate();
+  default boolean isAfterOrEqual(TimeSlot slot) {
+    return getFrom().isAfter(slot.getTo()) || getFrom().equals(slot.getTo());
+  }
+
+  default boolean isBeforeOrEqual(TimeSlot slot) {
+    return getTo().isBefore(slot.getFrom()) || getTo().equals(slot.getFrom());
+  }
 
 }

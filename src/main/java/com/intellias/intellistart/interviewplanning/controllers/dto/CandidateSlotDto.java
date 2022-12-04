@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.intellias.intellistart.interviewplanning.models.interfaces.TimeSlot;
 import com.intellias.intellistart.interviewplanning.utils.Utils;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -46,16 +45,6 @@ public class CandidateSlotDto implements TimeSlot {
   @JsonGetter("date")
   public String getDateAsString() {
     return date.toString();
-  }
-
-  @Override
-  public DayOfWeek getDayOfWeek() {
-    return date.getDayOfWeek();
-  }
-
-  @Override
-  public int getWeekNum() {
-    return Utils.getWeekNumByDate(date);
   }
 
 }

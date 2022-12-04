@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.intellias.intellistart.interviewplanning.models.interfaces.TimeSlot;
 import com.intellias.intellistart.interviewplanning.utils.Utils;
 import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import lombok.Data;
@@ -104,11 +103,6 @@ public class InterviewerSlotDto implements TimeSlot {
     } else {
       this.dayOfWeek = DayOfWeek.valueOf(dayOfWeek.toUpperCase());
     }
-  }
-
-  @Override
-  public LocalDate getDate() {
-    return Utils.getDateByWeekNumAndDayOfWeek(weekNum, dayOfWeek);
   }
 
 }

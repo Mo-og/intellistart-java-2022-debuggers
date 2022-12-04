@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.intellias.intellistart.interviewplanning.models.interfaces.TimeSlot;
 import com.intellias.intellistart.interviewplanning.utils.Utils;
 import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.TextStyle;
 import java.util.Locale;
@@ -118,8 +117,4 @@ public class InterviewerTimeSlot implements TimeSlot {
     return getClass().hashCode();
   }
 
-  @Override
-  public LocalDate getDate() {
-    return Utils.getDateByWeekNumAndDayOfWeek(weekNum, dayOfWeek);
-  }
 }
