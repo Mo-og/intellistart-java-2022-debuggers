@@ -8,6 +8,8 @@ import com.intellias.intellistart.interviewplanning.exceptions.InvalidInputExcep
 import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.services.WeekServiceImp;
+import com.intellias.intellistart.interviewplanning.utils.mappers.CandidateSlotMapper;
+import com.intellias.intellistart.interviewplanning.utils.mappers.InterviewerSlotMapper;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,7 +35,9 @@ class SlotValidatorTest {
   void validateInterviewerSlotOnWeekendTest() {
     when(weekService.getCurrentDay()).thenReturn(DayOfWeek.MONDAY);
     when(weekService.getNextWeekNum()).thenReturn(1);
-    assertDoesNotThrow(() -> slotValidator.validateInterviewerSlot(interviewerTimeSlot));
+    assertDoesNotThrow(() -> slotValidator.validateInterviewerSlot(
+        InterviewerSlotMapper.mapToDto(interviewerTimeSlot)
+    ));
   }
 
   @Test
@@ -41,20 +45,26 @@ class SlotValidatorTest {
     when(weekService.getCurrentDay()).thenReturn(DayOfWeek.SUNDAY);
     when(weekService.getNextWeekNum()).thenReturn(1);
     assertThrows(InvalidInputException.class,
-        () -> slotValidator.validateInterviewerSlot(interviewerTimeSlot));
+        () -> slotValidator.validateInterviewerSlot(
+            InterviewerSlotMapper.mapToDto(interviewerTimeSlot)
+        ));
   }
 
   @Test
   void validateCandidateSlotInFuture() {
     when(weekService.getCurrentDateTime()).thenReturn(LocalDateTime.of(2022, 12, 11, 0, 0));
-    assertDoesNotThrow(() -> slotValidator.validateCandidateSlot(candidateTimeSlot));
+    assertDoesNotThrow(() -> slotValidator.validateCandidateSlot(
+        CandidateSlotMapper.mapToDto(candidateTimeSlot)
+    ));
   }
 
   @Test
   void validateCandidateSlotInPast() {
     when(weekService.getCurrentDateTime()).thenReturn(LocalDateTime.of(2022, 12, 13, 0, 0));
     assertThrows(InvalidInputException.class,
-        () -> slotValidator.validateCandidateSlot(candidateTimeSlot));
+        () -> slotValidator.validateCandidateSlot(
+            CandidateSlotMapper.mapToDto(candidateTimeSlot)
+        ));
   }
 
   @Test

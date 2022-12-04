@@ -8,9 +8,8 @@ import java.util.Objects;
 import org.springframework.security.core.Authentication;
 
 /**
- * Util class. Checks if authenticated user has same id as specified in request or a COORDINATOR
- * role which means they have permission to perform the request. Otherwise, throws an exception
- * which results in 403 response status code
+ * Util class. Checks if authenticated user has same id as specified in request or a COORDINATOR role which means they
+ * have permission to perform the request. Otherwise, throws an exception which results in 403 response status code
  */
 public class PermissionValidator {
 
@@ -18,8 +17,8 @@ public class PermissionValidator {
   }
 
   /**
-   * Checks if authenticated user has same id as specified in request or a COORDINATOR role which
-   * means they have permission to perform the request.
+   * Checks if authenticated user has same id as specified in request or a COORDINATOR role which means they have
+   * permission to perform the request.
    *
    * @param auth        Spring Security object retrieved from controller
    * @param requestedId user id to compare current user id to
@@ -67,4 +66,5 @@ public class PermissionValidator {
       throw new ApplicationErrorException(ErrorCode.INVALID_USER_CREDENTIALS);
     }
   }
+
 }
