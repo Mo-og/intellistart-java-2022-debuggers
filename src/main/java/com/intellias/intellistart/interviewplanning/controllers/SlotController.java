@@ -105,7 +105,7 @@ public class SlotController {
   }
 
   /**
-   * Adds a slot to candidate if the requester a candidate themselves or uses 'email' request param
+   * Update a slot of candidate if the requester is a candidate or uses 'email' request param
    * if the requester is COORDINATOR.
    */
   @PostMapping("/candidates/current/slots/{slotId}")
@@ -117,6 +117,20 @@ public class SlotController {
 
     String candidateEmail = getUserEmail(auth, email);
     return candidateService.updateSlot(candidateEmail, slotId, candidateSlotDto);
+  }
+
+  /**
+   * Delete a candidate slot if the requester is a candidate or uses 'email' request param
+   * if the requester is COORDINATOR.
+   */
+  @DeleteMapping("/candidates/current/slots/{slotId}")
+  public CandidateSlotDto deleteCandidateTimeSlot(
+      @PathVariable Long slotId,
+      @RequestParam(required = false) String email,
+      Authentication auth) {
+
+    String candidateEmail = getUserEmail(auth, email);
+    return candidateService.deleteSlot(candidateEmail, slotId);
   }
 
   /**

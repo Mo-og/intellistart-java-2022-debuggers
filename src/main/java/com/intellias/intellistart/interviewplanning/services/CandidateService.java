@@ -120,4 +120,25 @@ public class CandidateService {
     return !bookingRepository.findByCandidateSlot(candidateTimeSlot).isEmpty();
   }
 
+  /**
+   * Delete slot by id.
+   *
+   * @param email  candidate email
+   * @param slotId slot id
+   * @return candidate slot dto
+   */
+  public CandidateSlotDto deleteSlot(String email, Long slotId) {
+    CandidateTimeSlot timeSlot = candidateTimeSlotRepository.findById(slotId)
+        .orElseThrow(() -> NotFoundException.timeSlot(slotId));
+    if (!timeSlot.getEmail().equalsIgnoreCase(email)) {
+      throw NotFoundException.timeSlot(slotId, email);
+    }
+    if (hasBooking(timeSlot)) {
+      throw new ApplicationErrorException(ErrorCode.CANNOT_EDIT_SLOT_WITH_BOOKING);
+    }
+    CandidateTimeSlot slot = getSlot(slotId);
+    candidateTimeSlotRepository.delete(slot);
+    return CandidateSlotMapper.mapToDto(slot);
+  }
+
 }
