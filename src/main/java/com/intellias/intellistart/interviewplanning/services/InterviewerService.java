@@ -13,7 +13,6 @@ import com.intellias.intellistart.interviewplanning.repositories.BookingReposito
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
 import com.intellias.intellistart.interviewplanning.services.interfaces.WeekService;
-import com.intellias.intellistart.interviewplanning.utils.Utils;
 import com.intellias.intellistart.interviewplanning.utils.mappers.InterviewerSlotMapper;
 import com.intellias.intellistart.interviewplanning.validators.PeriodValidator;
 import com.intellias.intellistart.interviewplanning.validators.SlotValidator;
@@ -50,7 +49,8 @@ public class InterviewerService {
     slotValidator.validateInterviewerSlot(interviewerSlotDto);
     PeriodValidator.validate(interviewerSlotDto);
     validateSlotOverlapping(interviewerSlotDto,
-        interviewerTimeSlotRepository.findByInterviewerIdAndWeekNum(interviewerId, slot.getWeekNum())
+        interviewerTimeSlotRepository
+            .findByInterviewerIdAndWeekNum(interviewerId, slot.getWeekNum())
             .stream()
             .filter(s -> s.getDayOfWeek().equals(slot.getDayOfWeek()))
             .collect(Collectors.toList()));
@@ -102,8 +102,7 @@ public class InterviewerService {
     return slots.stream()
         .map(slot -> InterviewerSlotMapper.mapToDtoWithBookings(slot,
             bookingRepository.findByInterviewerSlot(slot)))
-        .sorted(Comparator.comparing((InterviewerSlotDto dto) ->
-                DayOfWeek.from(Utils.DAY_OF_WEEK_FORMATTER.parse(dto.getDayOfWeek().toString())))
+        .sorted(Comparator.comparing((InterviewerSlotDto dto) -> DayOfWeek.from(dto.getDayOfWeek()))
             .thenComparing(InterviewerSlotDto::getFrom))
         .collect(Collectors.toList());
   }
