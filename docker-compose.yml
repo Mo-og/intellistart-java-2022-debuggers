@@ -4,6 +4,8 @@ services:
   postgres:
     image: 'postgres:15-alpine'
     container_name: 'debuggers-db'
+    ports:
+      - "5433:5432"
     env_file:
       - db.env
   app:
