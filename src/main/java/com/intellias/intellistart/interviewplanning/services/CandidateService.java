@@ -90,7 +90,6 @@ public class CandidateService {
    * @throws NotFoundException if no candidate slot is found
    */
   public CandidateSlotDto updateSlot(String email, Long slotId, CandidateSlotDto candidateSlotDto) {
-    // TODO Candidate can update only if there is no bookings
     CandidateTimeSlot timeSlot = candidateTimeSlotRepository.findById(slotId)
         .orElseThrow(() -> NotFoundException.timeSlot(slotId));
     if (!timeSlot.getEmail().equalsIgnoreCase(email)) {
