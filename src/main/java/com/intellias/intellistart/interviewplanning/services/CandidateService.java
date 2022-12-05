@@ -136,9 +136,8 @@ public class CandidateService {
     if (hasBooking(timeSlot)) {
       throw new ApplicationErrorException(ErrorCode.CANNOT_EDIT_SLOT_WITH_BOOKING);
     }
-    CandidateTimeSlot slot = getSlot(slotId);
-    candidateTimeSlotRepository.delete(slot);
-    return CandidateSlotMapper.mapToDto(slot);
+    candidateTimeSlotRepository.delete(timeSlot);
+    return CandidateSlotMapper.mapToDto(timeSlot);
   }
 
 }
