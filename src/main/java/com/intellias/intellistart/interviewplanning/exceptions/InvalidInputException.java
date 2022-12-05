@@ -158,4 +158,8 @@ public class InvalidInputException extends TemplateMessageException {
             ": booking description length is %d, but must be less than 4000 characters", length));
   }
 
+  public static InvalidInputException bookingLimitValue(Integer limit) {
+    return new InvalidInputException(ErrorCode.INVALID_BOOKING_LIMIT,
+        String.format(": booking limit '%d' cannot be less than 0", limit));
+  }
 }
