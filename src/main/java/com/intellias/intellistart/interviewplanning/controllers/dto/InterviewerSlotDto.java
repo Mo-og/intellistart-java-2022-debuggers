@@ -8,7 +8,9 @@ import com.intellias.intellistart.interviewplanning.models.interfaces.TimeSlot;
 import com.intellias.intellistart.interviewplanning.utils.Utils;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -90,6 +92,11 @@ public class InterviewerSlotDto implements TimeSlot {
   @JsonGetter("to")
   public String getToAsString() {
     return Utils.timeAsString(to);
+  }
+
+  @JsonGetter("dayOfWeek")
+  public String getShortDayOfWeek() {
+    return dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.US);
   }
 
   /**
