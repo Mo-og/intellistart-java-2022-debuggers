@@ -79,7 +79,7 @@ public class ApplicationErrorException extends RuntimeException {
     CANNOT_EDIT_SLOT_WITH_BOOKING(HttpStatus.BAD_REQUEST,
         "Cannot update or delete time slot that has booking"),
     REVOKE_USER_WITH_SLOT(HttpStatus.BAD_REQUEST,
-        "Cannot revoke user who has time slot in the future"),
+        "Cannot revoke or grant user who has time slot in the future"),
 
     // Forbidden error code
     SELF_ROLE_REVOKING(HttpStatus.FORBIDDEN, "Forbidden to revoke or grant yourself"),
