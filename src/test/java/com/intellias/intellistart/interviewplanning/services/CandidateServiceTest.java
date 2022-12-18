@@ -7,7 +7,7 @@ import static org.mockito.Mockito.when;
 
 import com.intellias.intellistart.interviewplanning.controllers.dto.CandidateSlotDto;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
-import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
+import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlotImpl;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
 import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.services.interfaces.WeekService;
@@ -29,8 +29,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class CandidateServiceTest {
 
   public static final String CANDIDATE_EMAIL = "test.candidate@test.com";
-  private static final CandidateTimeSlot candidateSlot =
-      new CandidateTimeSlot(CANDIDATE_EMAIL, "2022-11-03", "08:00", "13:00");
+  private static final CandidateTimeSlotImpl candidateSlot =
+      new CandidateTimeSlotImpl(CANDIDATE_EMAIL, "2022-11-03", "08:00", "13:00");
   private static final CandidateSlotDto candidateSlotDto =
       CandidateSlotDto.builder()
           .date(LocalDate.of(2022, 11, 3))

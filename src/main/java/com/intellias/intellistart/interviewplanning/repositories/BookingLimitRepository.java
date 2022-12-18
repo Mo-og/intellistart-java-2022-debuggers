@@ -17,4 +17,5 @@ public interface BookingLimitRepository extends JpaRepository<BookingLimit, Long
   List<BookingLimit> findByInterviewerIdAndWeekNumLessThan(Long interviewerId, Integer weekNum);
 
   List<BookingLimit> findAllByWeekNum(Integer weekNum);
+
 }

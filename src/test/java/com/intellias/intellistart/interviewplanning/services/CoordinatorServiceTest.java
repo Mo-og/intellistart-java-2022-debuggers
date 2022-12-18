@@ -11,9 +11,9 @@ import com.intellias.intellistart.interviewplanning.controllers.dto.DayDashboard
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
 import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
-import com.intellias.intellistart.interviewplanning.models.Booking;
-import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
-import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
+import com.intellias.intellistart.interviewplanning.models.BookingImpl;
+import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlotImpl;
+import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlotImpl;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
@@ -45,7 +45,7 @@ class CoordinatorServiceTest {
   public static final String CANDIDATE_EMAIL = "test.candidate@test.com";
   private static final User coordinator = new User(COORDINATOR_EMAIL, UserRole.COORDINATOR);
   private static final User interviewer = new User(INTERVIEWER_EMAIL, UserRole.INTERVIEWER);
-  private final CandidateTimeSlot candidateSlot = new CandidateTimeSlot(CANDIDATE_EMAIL,
+  private final CandidateTimeSlotImpl candidateSlot = new CandidateTimeSlotImpl(CANDIDATE_EMAIL,
       weekService.getCurrentDate().toString(), "08:00", "13:00");
   private final CandidateSlotDto candidateSlotDto =
       CandidateSlotDto.builder()
@@ -53,16 +53,16 @@ class CoordinatorServiceTest {
           .from(LocalTime.of(8, 0))
           .to(LocalTime.of(13, 0))
           .build();
-  private final InterviewerTimeSlot interviewerSlot =
-      new InterviewerTimeSlot("09:00", "18:00", "Mon",
+  private final InterviewerTimeSlotImpl interviewerSlot =
+      new InterviewerTimeSlotImpl("09:00", "18:00", "Mon",
           weekService.getCurrentWeekNum());
 
   private final InterviewerSlotDto interviewerSlotDto =
-      new InterviewerSlotDto("09:00", "18:00", "Mon",
-          weekService.getCurrentWeekNum());
+      new InterviewerSlotDto(1L, weekService.getCurrentWeekNum(), "Mon",
+          LocalTime.of(9, 0), LocalTime.of(18, 0));
 
-  private final Booking booking =
-      new Booking(
+  private final BookingImpl booking =
+      new BookingImpl(
           LocalTime.of(8, 0),
           LocalTime.of(10, 0),
           candidateSlot,

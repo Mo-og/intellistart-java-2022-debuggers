@@ -12,13 +12,14 @@ import static org.mockito.Mockito.when;
 
 import com.intellias.intellistart.interviewplanning.controllers.dto.BookingDto;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
-import com.intellias.intellistart.interviewplanning.models.Booking;
-import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
-import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
+import com.intellias.intellistart.interviewplanning.models.BookingImpl;
+import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlotImpl;
+import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlotImpl;
 import com.intellias.intellistart.interviewplanning.repositories.BookingLimitRepository;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
 import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
+import com.intellias.intellistart.interviewplanning.validators.BookingValidator;
 import java.time.LocalTime;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,12 +31,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class BookingServiceTest {
 
-  private static final InterviewerTimeSlot INTERVIEWER_SLOT =
-      new InterviewerTimeSlot("08:00", "18:00", "WEDNESDAY", 202240);
-  private static final CandidateTimeSlot CANDIDATE_SLOT =
-      new CandidateTimeSlot(CANDIDATE_EMAIL, "2022-11-03", "08:00", "13:00");
-  private static final Booking BOOKING =
-      new Booking(
+  private static final InterviewerTimeSlotImpl INTERVIEWER_SLOT =
+      new InterviewerTimeSlotImpl("08:00", "18:00", "WEDNESDAY", 202240);
+  private static final CandidateTimeSlotImpl CANDIDATE_SLOT =
+      new CandidateTimeSlotImpl(CANDIDATE_EMAIL, "2022-11-03", "08:00", "13:00");
+  private static final BookingImpl BOOKING =
+      new BookingImpl(
           LocalTime.of(8, 0),
           LocalTime.of(10, 0),
           CANDIDATE_SLOT,
@@ -80,12 +81,14 @@ class BookingServiceTest {
   InterviewerTimeSlotRepository interviewerTimeSlotRepository;
   @Mock
   CandidateTimeSlotRepository candidateTimeSlotRepository;
+  @Mock
+  private BookingValidator bookingValidator;
   private BookingService service;
 
   @BeforeEach
-  void setService() {
+  void setUp() {
     service = new BookingService(bookingRepository, bookingLimitRepository,
-        interviewerTimeSlotRepository, candidateTimeSlotRepository);
+        interviewerTimeSlotRepository, candidateTimeSlotRepository, bookingValidator);
     interviewer.setId(INTERVIEWER_ID);
   }
 
@@ -158,4 +161,5 @@ class BookingServiceTest {
     when(bookingRepository.findById(2L)).thenThrow(NotFoundException.booking(2L));
     assertThrows(NotFoundException.class, () -> service.deleteBooking(2L));
   }
+
 }

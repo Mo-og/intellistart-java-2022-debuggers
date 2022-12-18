@@ -8,9 +8,9 @@ import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerS
 import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
 import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException.ErrorCode;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
-import com.intellias.intellistart.interviewplanning.models.Booking;
-import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
-import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
+import com.intellias.intellistart.interviewplanning.models.BookingImpl;
+import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlotImpl;
+import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlotImpl;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
@@ -75,10 +75,10 @@ public class CoordinatorService {
   public DayDashboardDto getDayDashboard(int weekNum, DayOfWeek day) {
     LocalDate date = weekService.getDateByWeekNumAndDayOfWeek(weekNum, day);
 
-    List<InterviewerTimeSlot> interviewerSlots = interviewerTimeSlotRepository
+    List<InterviewerTimeSlotImpl> interviewerSlots = interviewerTimeSlotRepository
         .findByWeekNumAndDayOfWeek(weekNum, day);
-    List<CandidateTimeSlot> candidateSlots = candidateTimeSlotRepository.findByDate(date);
-    List<Booking> bookings = bookingRepository.findByCandidateSlotDate(date);
+    List<CandidateTimeSlotImpl> candidateSlots = candidateTimeSlotRepository.findByDate(date);
+    List<BookingImpl> bookings = bookingRepository.findByCandidateSlotDate(date);
 
     return DayDashboardDto.builder()
         .date(date)
@@ -95,7 +95,7 @@ public class CoordinatorService {
    * @param slots interviewer time slots
    * @return a list of interviewer time slots with bookings
    */
-  public List<InterviewerSlotDto> getInterviewerSlotsWithBookings(List<InterviewerTimeSlot> slots) {
+  public List<InterviewerSlotDto> getInterviewerSlotsWithBookings(List<InterviewerTimeSlotImpl> slots) {
     return slots.stream()
         .map(slot -> InterviewerSlotMapper.mapToDtoWithBookings(slot,
             bookingRepository.findByInterviewerSlot(slot)))
@@ -109,7 +109,7 @@ public class CoordinatorService {
    * @param slots candidate time slots
    * @return a list of candidate time slots with bookings
    */
-  public List<CandidateSlotDto> getCandidateSlotsWithBookings(List<CandidateTimeSlot> slots) {
+  public List<CandidateSlotDto> getCandidateSlotsWithBookings(List<CandidateTimeSlotImpl> slots) {
     return slots.stream()
         .map(slot -> CandidateSlotMapper.mapToDtoWithBookings(slot,
             bookingRepository.findByCandidateSlot(slot)))
@@ -123,7 +123,7 @@ public class CoordinatorService {
    * @param bookings list of bookings
    * @return map of bookings as map bookingId bookingData
    */
-  public Map<Long, BookingDto> getBookingMap(List<Booking> bookings) {
+  public Map<Long, BookingDto> getBookingMap(List<BookingImpl> bookings) {
     return bookings.stream()
         .map(BookingMapper::mapToDto)
         .collect(Collectors.toMap(BookingDto::getId, Function.identity()));
@@ -222,8 +222,8 @@ public class CoordinatorService {
    * @return true if user has active slots, otherwise - false
    */
   private boolean hasActiveSlot(User user) {
-    List<InterviewerTimeSlot> slots = interviewerTimeSlotRepository.findByInterviewer(user);
-    for (InterviewerTimeSlot slot : slots) {
+    List<InterviewerTimeSlotImpl> slots = interviewerTimeSlotRepository.findByInterviewer(user);
+    for (InterviewerTimeSlotImpl slot : slots) {
       if (weekService.getDateByWeekNumAndDayOfWeek(slot.getWeekNum(), slot.getDayOfWeek())
           .atTime(slot.getFrom())
           .isAfter(weekService.getCurrentDateTime())) {
@@ -232,5 +232,4 @@ public class CoordinatorService {
     }
     return false;
   }
-
 }

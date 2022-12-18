@@ -4,7 +4,7 @@ import com.intellias.intellistart.interviewplanning.controllers.dto.CandidateSlo
 import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
 import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException.ErrorCode;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
-import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
+import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlotImpl;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
 import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.utils.mappers.CandidateSlotMapper;
@@ -37,7 +37,7 @@ public class CandidateService {
   public CandidateSlotDto createSlot(String email, CandidateSlotDto candidateSlotDto) {
     slotValidator.validateCandidateSlot(candidateSlotDto);
     PeriodValidator.validate(candidateSlotDto);
-    List<CandidateTimeSlot> slots = candidateTimeSlotRepository.findByDateAndEmail(
+    List<CandidateTimeSlotImpl> slots = candidateTimeSlotRepository.findByDateAndEmail(
         candidateSlotDto.getDate(), email);
     SlotValidator.validateSlotOverlapping(candidateSlotDto, slots);
 
@@ -52,7 +52,7 @@ public class CandidateService {
    * @param id slot id
    * @return slotById
    */
-  public CandidateTimeSlot getSlot(Long id) {
+  public CandidateTimeSlotImpl getSlot(Long id) {
     return candidateTimeSlotRepository.getReferenceById(id);
   }
 
@@ -72,7 +72,7 @@ public class CandidateService {
    * @param slots candidate time slots
    * @return a list of candidate time slots with bookings
    */
-  public List<CandidateSlotDto> getCandidateSlotsWithBookings(List<CandidateTimeSlot> slots) {
+  public List<CandidateSlotDto> getCandidateSlotsWithBookings(List<CandidateTimeSlotImpl> slots) {
     return slots.stream()
         .map(slot -> CandidateSlotMapper
             .mapToDtoWithBookings(slot, bookingRepository.findByCandidateSlot(slot)))
@@ -90,7 +90,7 @@ public class CandidateService {
    * @throws NotFoundException if no candidate slot is found
    */
   public CandidateSlotDto updateSlot(String email, Long slotId, CandidateSlotDto candidateSlotDto) {
-    CandidateTimeSlot timeSlot = candidateTimeSlotRepository.findById(slotId)
+    CandidateTimeSlotImpl timeSlot = candidateTimeSlotRepository.findById(slotId)
         .orElseThrow(() -> NotFoundException.timeSlot(slotId));
     if (!timeSlot.getEmail().equalsIgnoreCase(email)) {
       throw NotFoundException.timeSlot(slotId, email);
@@ -115,7 +115,7 @@ public class CandidateService {
     return CandidateSlotMapper.mapToDto(candidateTimeSlotRepository.save(timeSlot));
   }
 
-  private boolean hasBooking(CandidateTimeSlot candidateTimeSlot) {
+  private boolean hasBooking(CandidateTimeSlotImpl candidateTimeSlot) {
     return !bookingRepository.findByCandidateSlot(candidateTimeSlot).isEmpty();
   }
 
@@ -127,7 +127,7 @@ public class CandidateService {
    * @return candidate slot dto
    */
   public CandidateSlotDto deleteSlot(String email, Long slotId) {
-    CandidateTimeSlot timeSlot = candidateTimeSlotRepository.findById(slotId)
+    CandidateTimeSlotImpl timeSlot = candidateTimeSlotRepository.findById(slotId)
         .orElseThrow(() -> NotFoundException.timeSlot(slotId));
     if (!timeSlot.getEmail().equalsIgnoreCase(email)) {
       throw NotFoundException.timeSlot(slotId, email);

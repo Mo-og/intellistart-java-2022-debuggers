@@ -3,15 +3,16 @@ package com.intellias.intellistart.interviewplanning.services;
 import com.intellias.intellistart.interviewplanning.controllers.dto.BookingDto;
 import com.intellias.intellistart.interviewplanning.exceptions.InvalidInputException;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
-import com.intellias.intellistart.interviewplanning.models.Booking;
+import com.intellias.intellistart.interviewplanning.models.BookingImpl;
 import com.intellias.intellistart.interviewplanning.models.BookingLimit;
-import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
-import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
+import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlotImpl;
+import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlotImpl;
 import com.intellias.intellistart.interviewplanning.repositories.BookingLimitRepository;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
 import com.intellias.intellistart.interviewplanning.repositories.CandidateTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.utils.mappers.BookingMapper;
+import com.intellias.intellistart.interviewplanning.validators.BookingValidator;
 import com.intellias.intellistart.interviewplanning.validators.PeriodValidator;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -31,6 +32,7 @@ public class BookingService {
   private final BookingLimitRepository bookingLimitRepository;
   private final InterviewerTimeSlotRepository interviewerTimeSlotRepository;
   private final CandidateTimeSlotRepository candidateTimeSlotRepository;
+  private final BookingValidator bookingValidator;
 
   /**
    * Creates new booking.
@@ -40,39 +42,22 @@ public class BookingService {
    * @throws NotFoundException if slot with the specified id is not found
    */
   public BookingDto createBooking(BookingDto bookingDto) {
-    validate(bookingDto);
+    PeriodValidator.validate(bookingDto);
+    bookingValidator.validateTextFieldsLength(bookingDto);
+
     Long interviewerSlotId = bookingDto.getInterviewerSlotId();
-    InterviewerTimeSlot interviewerSlot = interviewerTimeSlotRepository.findById(interviewerSlotId)
+    InterviewerTimeSlotImpl interviewerSlot = interviewerTimeSlotRepository.findById(interviewerSlotId)
         .orElseThrow(() -> NotFoundException.timeSlot(interviewerSlotId));
 
     checkFitsBookingLimit(interviewerSlot);
 
     Long candidateSlotId = bookingDto.getCandidateSlotId();
-    CandidateTimeSlot candidateSlot = candidateTimeSlotRepository.findById(candidateSlotId)
+    CandidateTimeSlotImpl candidateSlot = candidateTimeSlotRepository.findById(candidateSlotId)
         .orElseThrow(() -> NotFoundException.timeSlot(candidateSlotId));
 
-    Booking booking = BookingMapper.mapToEntity(bookingDto, interviewerSlot, candidateSlot);
-
+    BookingImpl booking = BookingMapper.mapToEntity(bookingDto, interviewerSlot, candidateSlot);
+    bookingValidator.validateSlotOverlapping(booking, booking.getInterviewerSlot(), booking.getCandidateSlot());
     return BookingMapper.mapToDto(bookingRepository.save(booking));
-  }
-
-  /**
-   * Checks time boundaries, length of subject and description of the booking.
-   *
-   * @param bookingDto booking
-   */
-  private void validate(BookingDto bookingDto) {
-    PeriodValidator.validate(bookingDto);
-    validateTextFieldsLength(bookingDto);
-  }
-
-  private void validateTextFieldsLength(BookingDto bookingDto) {
-    if (bookingDto.getSubject().length() > Booking.MAX_SUBJECT_LENGTH) {
-      throw InvalidInputException.subject(bookingDto.getSubject().length());
-    }
-    if (bookingDto.getDescription().length() > Booking.MAX_DESCRIPTION_LENGTH) {
-      throw InvalidInputException.description(bookingDto.getDescription().length());
-    }
   }
 
   /**
@@ -80,7 +65,7 @@ public class BookingService {
    *
    * @param interviewerSlot interviewer time slot
    */
-  private void checkFitsBookingLimit(InterviewerTimeSlot interviewerSlot) {
+  private void checkFitsBookingLimit(InterviewerTimeSlotImpl interviewerSlot) {
     Long interviewerId = interviewerSlot.getInterviewer().getId();
     int weekNum = interviewerSlot.getWeekNum();
 
@@ -115,11 +100,11 @@ public class BookingService {
   }
 
   private int getBookingsCountForWeek(Long interviewerId, int weekNum) {
-    List<InterviewerTimeSlot> weekInterviewerSlots =
+    List<InterviewerTimeSlotImpl> weekInterviewerSlots =
         interviewerTimeSlotRepository.findByInterviewerIdAndWeekNum(interviewerId, weekNum);
 
-    List<Booking> weekInterviewerBookings = new ArrayList<>();
-    for (InterviewerTimeSlot slot : weekInterviewerSlots) {
+    List<BookingImpl> weekInterviewerBookings = new ArrayList<>();
+    for (InterviewerTimeSlotImpl slot : weekInterviewerSlots) {
       weekInterviewerBookings.addAll(bookingRepository.findByInterviewerSlot(slot));
     }
     return weekInterviewerBookings.size();
@@ -134,9 +119,14 @@ public class BookingService {
    * @throws NotFoundException if booking with the specified id is not found
    */
   public BookingDto updateBooking(Long id, BookingDto bookingDto) {
-    validate(bookingDto);
-    Booking booking = bookingRepository.findById(id)
+    PeriodValidator.validate(bookingDto);
+    bookingValidator.validateTextFieldsLength(bookingDto);
+
+    BookingImpl booking = bookingRepository.findById(id)
         .orElseThrow(() -> NotFoundException.booking(id));
+
+    bookingValidator.validateSlotOverlapping(booking, booking.getInterviewerSlot(), booking.getCandidateSlot());
+
     booking.setFrom(bookingDto.getFrom());
     booking.setTo(bookingDto.getTo());
     booking.setSubject(bookingDto.getSubject());
@@ -152,9 +142,10 @@ public class BookingService {
    * @throws NotFoundException if booking with the specified id is not found
    */
   public BookingDto deleteBooking(Long id) {
-    Booking booking = bookingRepository.findById(id)
+    BookingImpl booking = bookingRepository.findById(id)
         .orElseThrow(() -> NotFoundException.booking(id));
     bookingRepository.delete(booking);
     return BookingMapper.mapToDto(booking);
   }
+
 }

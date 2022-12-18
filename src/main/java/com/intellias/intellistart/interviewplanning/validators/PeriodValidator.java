@@ -1,7 +1,7 @@
 package com.intellias.intellistart.interviewplanning.validators;
 
 import com.intellias.intellistart.interviewplanning.exceptions.InvalidInputException;
-import com.intellias.intellistart.interviewplanning.models.interfaces.TimeSlot;
+import com.intellias.intellistart.interviewplanning.models.interfaces.Period;
 import java.time.Duration;
 import java.time.LocalTime;
 
@@ -21,14 +21,14 @@ public class PeriodValidator {
    *
    * @throws InvalidInputException if period is invalid
    */
-  public static void validate(TimeSlot timeSlot) {
-    if (timeSlot.getTo().getMinute() % TIME_STEP != 0 || timeSlot.getFrom().getMinute() % TIME_STEP != 0) {
+  public static void validate(Period period) {
+    if (period.getTo().getMinute() % TIME_STEP != 0 || period.getFrom().getMinute() % TIME_STEP != 0) {
       throw InvalidInputException.minutes();
-    } else if (timeSlot.getFrom().isBefore(WORK_START_TIME_EXCLUSIVE)) {
+    } else if (period.getFrom().isBefore(WORK_START_TIME_EXCLUSIVE)) {
       throw InvalidInputException.timeLowerBound();
-    } else if (timeSlot.getTo().isAfter(WORK_END_TIME_EXCLUSIVE)) {
+    } else if (period.getTo().isAfter(WORK_END_TIME_EXCLUSIVE)) {
       throw InvalidInputException.timeUpperBound();
-    } else if (Duration.between(timeSlot.getFrom(), timeSlot.getTo()).toMinutes() < MIN_PERIOD_IN_MINUTES) {
+    } else if (Duration.between(period.getFrom(), period.getTo()).toMinutes() < MIN_PERIOD_IN_MINUTES) {
       throw InvalidInputException.period();
     }
   }

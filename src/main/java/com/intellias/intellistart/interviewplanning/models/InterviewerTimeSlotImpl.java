@@ -2,7 +2,7 @@ package com.intellias.intellistart.interviewplanning.models;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.intellias.intellistart.interviewplanning.models.interfaces.TimeSlot;
+import com.intellias.intellistart.interviewplanning.models.interfaces.InterviewerTimeSlot;
 import com.intellias.intellistart.interviewplanning.utils.Utils;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -26,16 +26,16 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Interview Time slot.
  */
-@Entity
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
-public class InterviewerTimeSlot implements TimeSlot {
+@Entity(name = "interviewer_time_slot")
+public class InterviewerTimeSlotImpl implements InterviewerTimeSlot {
 
   @ManyToOne
   @JsonIgnore
-  User interviewer;
+  private User interviewer;
   @Id
   @SequenceGenerator(name = "interv_seq", sequenceName = "interviewer_slot_sequence", allocationSize = 5)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "interv_seq")
@@ -46,7 +46,7 @@ public class InterviewerTimeSlot implements TimeSlot {
   @Column(name = "to_time")
   private LocalTime to;
   private DayOfWeek dayOfWeek;
-  private int weekNum;
+  private Integer weekNum;
 
   /**
    * Constructor.
@@ -56,7 +56,7 @@ public class InterviewerTimeSlot implements TimeSlot {
    * @param day     day of week
    * @param weekNum week number
    */
-  public InterviewerTimeSlot(String from, String to, String day, int weekNum) {
+  public InterviewerTimeSlotImpl(String from, String to, String day, Integer weekNum) {
     this.from = LocalTime.parse(from);
     this.to = LocalTime.parse(to);
     this.weekNum = weekNum;
@@ -108,7 +108,7 @@ public class InterviewerTimeSlot implements TimeSlot {
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
       return false;
     }
-    InterviewerTimeSlot that = (InterviewerTimeSlot) o;
+    InterviewerTimeSlotImpl that = (InterviewerTimeSlotImpl) o;
     return id != null && Objects.equals(id, that.id);
   }
 

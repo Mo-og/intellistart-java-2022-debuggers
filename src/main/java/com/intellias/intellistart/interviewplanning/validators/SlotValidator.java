@@ -1,9 +1,9 @@
 package com.intellias.intellistart.interviewplanning.validators;
 
-import com.intellias.intellistart.interviewplanning.controllers.dto.CandidateSlotDto;
-import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
 import com.intellias.intellistart.interviewplanning.exceptions.InvalidInputException;
-import com.intellias.intellistart.interviewplanning.models.interfaces.TimeSlot;
+import com.intellias.intellistart.interviewplanning.models.interfaces.CandidateTimeSlot;
+import com.intellias.intellistart.interviewplanning.models.interfaces.InterviewerTimeSlot;
+import com.intellias.intellistart.interviewplanning.models.interfaces.Period;
 import com.intellias.intellistart.interviewplanning.services.interfaces.WeekService;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
@@ -23,16 +23,16 @@ public class SlotValidator {
   /**
    * Validate interviewer time slot to be created.
    *
-   * @param interviewerSlotDto interviewer time slot
+   * @param interviewerTimeSlot interviewer time slot
    * @throws InvalidInputException if editing slot no to yhe next week
    * @throws InvalidInputException if editing slot on weekend
    */
-  public void validateInterviewerSlot(InterviewerSlotDto interviewerSlotDto) {
+  public void validateInterviewerSlot(InterviewerTimeSlot interviewerTimeSlot) {
     DayOfWeek today = weekService.getCurrentDay();
     if (isWeekend(today)) {
       throw InvalidInputException.dayOfWeek(today);
-    } else if (interviewerSlotDto.getWeekNum() != weekService.getNextWeekNum()) {
-      throw InvalidInputException.slotWeekNum(interviewerSlotDto.getWeekNum());
+    } else if (interviewerTimeSlot.getWeekNum() != weekService.getNextWeekNum()) {
+      throw InvalidInputException.slotWeekNum(interviewerTimeSlot.getWeekNum());
     }
   }
 
@@ -43,13 +43,13 @@ public class SlotValidator {
   /**
    * Validate candidate time slot to be created or updated.
    *
-   * @param candidateSlotDto interviewer time slot
+   * @param candidateTimeSlot candidate time slot
    * @throws InvalidInputException if editing slot on weekend
    */
-  public void validateCandidateSlot(CandidateSlotDto candidateSlotDto) {
+  public void validateCandidateSlot(CandidateTimeSlot candidateTimeSlot) {
     LocalDateTime now = weekService.getCurrentDateTime();
-    LocalDateTime slotDateTime = LocalDateTime.of(candidateSlotDto.getDate(),
-        candidateSlotDto.getFrom());
+    LocalDateTime slotDateTime = LocalDateTime.of(candidateTimeSlot.getDate(),
+        candidateTimeSlot.getFrom());
     if (slotDateTime.isBefore(now)) {
       throw InvalidInputException.dateTime();
     }
@@ -61,7 +61,7 @@ public class SlotValidator {
    * @param slot     time slot
    * @param allSlots list of slots
    */
-  public static void validateSlotOverlapping(TimeSlot slot, List<? extends TimeSlot> allSlots) {
+  public static void validateSlotOverlapping(Period slot, List<? extends Period> allSlots) {
     allSlots.forEach(s -> {
       if (!(s.isAfterOrEqual(slot) || s.isBeforeOrEqual(slot))) {
         throw InvalidInputException.periodOverlapping();

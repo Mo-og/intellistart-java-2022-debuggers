@@ -1,8 +1,8 @@
 package com.intellias.intellistart.interviewplanning.utils.mappers;
 
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
-import com.intellias.intellistart.interviewplanning.models.Booking;
-import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
+import com.intellias.intellistart.interviewplanning.models.BookingImpl;
+import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlotImpl;
 import com.intellias.intellistart.interviewplanning.models.User;
 import java.util.List;
 import lombok.experimental.UtilityClass;
@@ -20,7 +20,7 @@ public class InterviewerSlotMapper {
    * @param bookings BookingDto
    * @return InterviewerSlotDto with bookings
    */
-  public InterviewerSlotDto mapToDtoWithBookings(InterviewerTimeSlot slot, List<Booking> bookings) {
+  public InterviewerSlotDto mapToDtoWithBookings(InterviewerTimeSlotImpl slot, List<BookingImpl> bookings) {
     if (slot == null) {
       return null;
     }
@@ -35,7 +35,7 @@ public class InterviewerSlotMapper {
    * @param slot entity
    * @return InterviewerSlotDto
    */
-  public InterviewerSlotDto mapToDto(InterviewerTimeSlot slot) {
+  public InterviewerSlotDto mapToDto(InterviewerTimeSlotImpl slot) {
     if (slot == null) {
       return null;
     }
@@ -50,11 +50,11 @@ public class InterviewerSlotMapper {
    * @param slotDto     slot dto
    * @return InterviewerSlotDto
    */
-  public InterviewerTimeSlot mapToEntity(User interviewer, InterviewerSlotDto slotDto) {
+  public InterviewerTimeSlotImpl mapToEntity(User interviewer, InterviewerSlotDto slotDto) {
     if (slotDto == null) {
       return null;
     }
-    InterviewerTimeSlot interviewerSlot = new InterviewerTimeSlot();
+    InterviewerTimeSlotImpl interviewerSlot = new InterviewerTimeSlotImpl();
     interviewerSlot.setInterviewer(interviewer);
     interviewerSlot.setDayOfWeek(slotDto.getDayOfWeek());
     interviewerSlot.setWeekNum(slotDto.getWeekNum());

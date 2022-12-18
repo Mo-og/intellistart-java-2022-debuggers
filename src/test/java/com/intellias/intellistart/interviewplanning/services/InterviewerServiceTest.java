@@ -10,9 +10,9 @@ import static org.mockito.Mockito.when;
 import com.intellias.intellistart.interviewplanning.controllers.dto.BookingDto;
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
-import com.intellias.intellistart.interviewplanning.models.Booking;
-import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
-import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
+import com.intellias.intellistart.interviewplanning.models.BookingImpl;
+import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlotImpl;
+import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlotImpl;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
 import com.intellias.intellistart.interviewplanning.repositories.InterviewerTimeSlotRepository;
 import com.intellias.intellistart.interviewplanning.repositories.UserRepository;
@@ -37,26 +37,26 @@ class InterviewerServiceTest {
   private WeekServiceImp weekService;
   private final WeekService actualWeekService = new WeekServiceImp();
   private final int nextWeekNum = actualWeekService.getNextWeekNum();
-  private final InterviewerTimeSlot timeSlot = new InterviewerTimeSlot("09:00", "18:00", "Mon",
+  private final InterviewerTimeSlotImpl timeSlot = new InterviewerTimeSlotImpl("09:00", "18:00", "Mon",
       nextWeekNum);
 
-  private final InterviewerTimeSlot timeSlotWithUser = new InterviewerTimeSlot("09:00", "18:00",
+  private final InterviewerTimeSlotImpl timeSlotWithUser = new InterviewerTimeSlotImpl("09:00", "18:00",
       "Mon",
       nextWeekNum);
-  private final CandidateTimeSlot candidateSlot =
-      new CandidateTimeSlot(CANDIDATE_EMAIL, actualWeekService
+  private final CandidateTimeSlotImpl candidateSlot =
+      new CandidateTimeSlotImpl(CANDIDATE_EMAIL, actualWeekService
           .getDateByWeekNumAndDayOfWeek(nextWeekNum, DayOfWeek.MONDAY)
           .toString(),
           "08:00", "13:00");
   private final InterviewerSlotDto interviewerSlotDto =
-      new InterviewerSlotDto("09:00",
-          "18:00", "Mon", nextWeekNum);
+      new InterviewerSlotDto(1L, nextWeekNum, "Mon",
+          LocalTime.of(9, 0), LocalTime.of(18, 0));
   private final InterviewerSlotDto interviewerSlotDtoWithoutBooking =
-      new InterviewerSlotDto("09:00",
-          "18:00", "Mon", nextWeekNum);
+      new InterviewerSlotDto(2L, nextWeekNum, "Mon",
+          LocalTime.of(9, 0), LocalTime.of(18, 0));
 
-  private final Booking booking =
-      new Booking(
+  private final BookingImpl booking =
+      new BookingImpl(
           LocalTime.of(10, 0),
           LocalTime.of(11, 30),
           candidateSlot,
@@ -109,7 +109,7 @@ class InterviewerServiceTest {
         .findById(1L))
         .thenReturn(Optional.of(interviewer));
     when(interviewerTimeSlotRepository
-        .save(any(InterviewerTimeSlot.class)))
+        .save(any(InterviewerTimeSlotImpl.class)))
         .thenReturn(timeSlot);
 
     when(weekService.getCurrentDay()).thenReturn(DayOfWeek.MONDAY);

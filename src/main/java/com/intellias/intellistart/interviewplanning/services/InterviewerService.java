@@ -6,7 +6,7 @@ import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerS
 import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException;
 import com.intellias.intellistart.interviewplanning.exceptions.ApplicationErrorException.ErrorCode;
 import com.intellias.intellistart.interviewplanning.exceptions.NotFoundException;
-import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
+import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlotImpl;
 import com.intellias.intellistart.interviewplanning.models.User;
 import com.intellias.intellistart.interviewplanning.models.User.UserRole;
 import com.intellias.intellistart.interviewplanning.repositories.BookingRepository;
@@ -45,7 +45,7 @@ public class InterviewerService {
    */
   public InterviewerSlotDto createSlot(Long interviewerId, InterviewerSlotDto interviewerSlotDto) {
     User interviewer = getInterviewerById(interviewerId);
-    InterviewerTimeSlot slot = InterviewerSlotMapper.mapToEntity(interviewer, interviewerSlotDto);
+    InterviewerTimeSlotImpl slot = InterviewerSlotMapper.mapToEntity(interviewer, interviewerSlotDto);
     slotValidator.validateInterviewerSlot(interviewerSlotDto);
     PeriodValidator.validate(interviewerSlotDto);
     validateSlotOverlapping(interviewerSlotDto,
@@ -68,7 +68,7 @@ public class InterviewerService {
   public List<InterviewerSlotDto> getRelevantInterviewerSlots(Long interviewerId) {
     User interviewer = getInterviewerById(interviewerId);
 
-    List<InterviewerTimeSlot> slots = interviewerTimeSlotRepository
+    List<InterviewerTimeSlotImpl> slots = interviewerTimeSlotRepository
         .findByInterviewerIdAndWeekNumGreaterThanEqual(
             interviewer.getId(), weekService.getCurrentWeekNum());
 
@@ -86,7 +86,7 @@ public class InterviewerService {
   public List<InterviewerSlotDto> getSlotsByWeekId(Long interviewerId, int weekId) {
     User interviewer = getInterviewerById(interviewerId);
 
-    List<InterviewerTimeSlot> slots = interviewerTimeSlotRepository
+    List<InterviewerTimeSlotImpl> slots = interviewerTimeSlotRepository
         .findByInterviewerIdAndWeekNum(interviewer.getId(), weekId);
 
     return getInterviewerSlotsWithBookings(slots);
@@ -98,7 +98,7 @@ public class InterviewerService {
    * @param slots interviewer time slots
    * @return a list of interviewer time slots with bookings
    */
-  public List<InterviewerSlotDto> getInterviewerSlotsWithBookings(List<InterviewerTimeSlot> slots) {
+  public List<InterviewerSlotDto> getInterviewerSlotsWithBookings(List<InterviewerTimeSlotImpl> slots) {
     return slots.stream()
         .map(slot -> InterviewerSlotMapper.mapToDtoWithBookings(slot,
             bookingRepository.findByInterviewerSlot(slot)))
@@ -119,7 +119,7 @@ public class InterviewerService {
   public InterviewerSlotDto updateSlot(Long interviewerId, Long slotId,
       InterviewerSlotDto interviewerSlotDto) {
     User interviewer = getInterviewerById(interviewerId);
-    InterviewerTimeSlot slot = getSlotById(interviewer.getId(), slotId);
+    InterviewerTimeSlotImpl slot = getSlotById(interviewer.getId(), slotId);
 
     slotValidator.validateInterviewerSlot(interviewerSlotDto);
     slotValidator.validateInterviewerSlot(InterviewerSlotMapper.mapToDto(slot));
@@ -156,7 +156,7 @@ public class InterviewerService {
    */
   public InterviewerSlotDto deleteSlot(Long userId, Long slotId, User currentUser) {
     User interviewer = getInterviewerById(userId);
-    InterviewerTimeSlot slot = getSlotById(interviewer.getId(), slotId);
+    InterviewerTimeSlotImpl slot = getSlotById(interviewer.getId(), slotId);
 
     if (currentUser.getRole() != UserRole.COORDINATOR) {
       slotValidator.validateInterviewerSlot(InterviewerSlotMapper.mapToDto(slot));
@@ -176,7 +176,7 @@ public class InterviewerService {
    * @param slot interviewer time slot
    * @return true if slot has booking, otherwise - false
    */
-  private boolean hasBooking(InterviewerTimeSlot slot) {
+  private boolean hasBooking(InterviewerTimeSlotImpl slot) {
     return !bookingRepository.findByInterviewerSlot(slot).isEmpty();
   }
 
@@ -188,8 +188,8 @@ public class InterviewerService {
    * @return interviewer slot
    * @throws NotFoundException if no interviewer slot found
    */
-  public InterviewerTimeSlot getSlotById(Long userId, Long slotId) {
-    InterviewerTimeSlot slot = interviewerTimeSlotRepository.findById(slotId)
+  public InterviewerTimeSlotImpl getSlotById(Long userId, Long slotId) {
+    InterviewerTimeSlotImpl slot = interviewerTimeSlotRepository.findById(slotId)
         .orElseThrow(() -> NotFoundException.timeSlot(slotId));
 
     if (!slot.getInterviewer().getId().equals(userId)) {

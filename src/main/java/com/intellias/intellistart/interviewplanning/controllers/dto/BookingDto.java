@@ -2,7 +2,7 @@ package com.intellias.intellistart.interviewplanning.controllers.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonGetter;
-import com.intellias.intellistart.interviewplanning.models.interfaces.TimeSlot;
+import com.intellias.intellistart.interviewplanning.models.interfaces.Booking;
 import com.intellias.intellistart.interviewplanning.utils.Utils;
 import java.time.LocalTime;
 import lombok.AllArgsConstructor;
@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookingDto implements TimeSlot {
+public class BookingDto implements Booking {
 
   private Long id;
   @JsonFormat(pattern = "HH:mm")

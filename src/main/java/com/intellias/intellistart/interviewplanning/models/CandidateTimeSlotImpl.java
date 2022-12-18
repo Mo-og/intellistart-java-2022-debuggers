@@ -1,7 +1,7 @@
 package com.intellias.intellistart.interviewplanning.models;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
-import com.intellias.intellistart.interviewplanning.models.interfaces.TimeSlot;
+import com.intellias.intellistart.interviewplanning.models.interfaces.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.utils.Utils;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -21,12 +21,12 @@ import org.hibernate.Hibernate;
 /**
  * Candidate time slot.
  */
-@Entity
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
-public class CandidateTimeSlot implements TimeSlot {
+@Entity(name = "candidate_time_slot")
+public class CandidateTimeSlotImpl implements CandidateTimeSlot {
 
   @Id
   @SequenceGenerator(name = "cnd_seq", sequenceName = "candidate_slot_sequence", allocationSize = 5)
@@ -49,7 +49,7 @@ public class CandidateTimeSlot implements TimeSlot {
    * @param from  start time
    * @param to    end time
    */
-  public CandidateTimeSlot(String email, String date, String from, String to) {
+  public CandidateTimeSlotImpl(String email, String date, String from, String to) {
     this.email = email;
     this.date = LocalDate.parse(date);
     this.from = LocalTime.parse(from);
@@ -79,7 +79,7 @@ public class CandidateTimeSlot implements TimeSlot {
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
       return false;
     }
-    CandidateTimeSlot that = (CandidateTimeSlot) o;
+    CandidateTimeSlotImpl that = (CandidateTimeSlotImpl) o;
     return id != null && Objects.equals(id, that.id);
   }
 

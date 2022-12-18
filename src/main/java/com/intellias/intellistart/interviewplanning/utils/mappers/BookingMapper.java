@@ -1,9 +1,9 @@
 package com.intellias.intellistart.interviewplanning.utils.mappers;
 
 import com.intellias.intellistart.interviewplanning.controllers.dto.BookingDto;
-import com.intellias.intellistart.interviewplanning.models.Booking;
-import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
-import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
+import com.intellias.intellistart.interviewplanning.models.BookingImpl;
+import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlotImpl;
+import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlotImpl;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,7 +21,7 @@ public class BookingMapper {
    * @param booking entity
    * @return BookingDto
    */
-  public BookingDto mapToDto(Booking booking) {
+  public BookingDto mapToDto(BookingImpl booking) {
     if (booking == null) {
       return null;
     }
@@ -42,12 +42,12 @@ public class BookingMapper {
    * @param bookingDto bookingDto
    * @return Booking
    */
-  public Booking mapToEntity(BookingDto bookingDto, InterviewerTimeSlot interviewerSlot,
-      CandidateTimeSlot candidateSlot) {
+  public BookingImpl mapToEntity(BookingDto bookingDto, InterviewerTimeSlotImpl interviewerSlot,
+      CandidateTimeSlotImpl candidateSlot) {
     if (bookingDto == null) {
       return null;
     }
-    Booking booking = new Booking();
+    BookingImpl booking = new BookingImpl();
     booking.setId(bookingDto.getId());
     booking.setFrom(bookingDto.getFrom());
     booking.setTo(bookingDto.getTo());
@@ -64,10 +64,11 @@ public class BookingMapper {
    * @param bookings entities
    * @return list of BookingDto
    */
-  public List<BookingDto> mapSetToDto(List<Booking> bookings) {
+  public List<BookingDto> mapSetToDto(List<BookingImpl> bookings) {
     return bookings.stream()
         .map(BookingMapper::mapToDto)
         .sorted(Comparator.comparing(BookingDto::getFrom))
         .collect(Collectors.toList());
   }
+
 }

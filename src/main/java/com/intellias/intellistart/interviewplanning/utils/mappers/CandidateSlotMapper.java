@@ -1,8 +1,8 @@
 package com.intellias.intellistart.interviewplanning.utils.mappers;
 
 import com.intellias.intellistart.interviewplanning.controllers.dto.CandidateSlotDto;
-import com.intellias.intellistart.interviewplanning.models.Booking;
-import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
+import com.intellias.intellistart.interviewplanning.models.BookingImpl;
+import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlotImpl;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 
@@ -19,8 +19,8 @@ public class CandidateSlotMapper {
    * @param bookings BookingDto
    * @return CandidateSlotDto
    */
-  public CandidateSlotDto mapToDtoWithBookings(CandidateTimeSlot slot,
-      List<Booking> bookings) {
+  public CandidateSlotDto mapToDtoWithBookings(CandidateTimeSlotImpl slot,
+      List<BookingImpl> bookings) {
     if (slot == null) {
       return null;
     }
@@ -39,7 +39,7 @@ public class CandidateSlotMapper {
    * @param slot entity
    * @return CandidateSlotDto
    */
-  public CandidateSlotDto mapToDto(CandidateTimeSlot slot) {
+  public CandidateSlotDto mapToDto(CandidateTimeSlotImpl slot) {
     if (slot == null) {
       return null;
     }
@@ -58,11 +58,11 @@ public class CandidateSlotMapper {
    * @param slotDto slot dto
    * @return CandidateSlotDto
    */
-  public CandidateTimeSlot mapToEntity(String email, CandidateSlotDto slotDto) {
+  public CandidateTimeSlotImpl mapToEntity(String email, CandidateSlotDto slotDto) {
     if (slotDto == null) {
       return null;
     }
-    CandidateTimeSlot candidateSlot = new CandidateTimeSlot();
+    CandidateTimeSlotImpl candidateSlot = new CandidateTimeSlotImpl();
     candidateSlot.setEmail(email);
     candidateSlot.setDate(slotDto.getDate());
     candidateSlot.setFrom(slotDto.getFrom());
@@ -70,4 +70,5 @@ public class CandidateSlotMapper {
     candidateSlot.setId(slotDto.getId());
     return candidateSlot;
   }
+
 }

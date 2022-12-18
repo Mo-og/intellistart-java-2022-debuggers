@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import com.intellias.intellistart.interviewplanning.exceptions.InvalidInputException;
-import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
-import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
+import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlotImpl;
+import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlotImpl;
 import com.intellias.intellistart.interviewplanning.services.WeekServiceImp;
 import com.intellias.intellistart.interviewplanning.utils.mappers.CandidateSlotMapper;
 import com.intellias.intellistart.interviewplanning.utils.mappers.InterviewerSlotMapper;
@@ -27,8 +27,8 @@ class SlotValidatorTest {
 
   private final SlotValidator slotValidator = new SlotValidator(weekService);
 
-  private final InterviewerTimeSlot interviewerTimeSlot = new InterviewerTimeSlot("10:00", "11:00", "MONDAY", 1);
-  private final CandidateTimeSlot candidateTimeSlot = new CandidateTimeSlot("test@mail.com", "2022-12-12", "10:00", "11:00");
+  private final InterviewerTimeSlotImpl interviewerTimeSlot = new InterviewerTimeSlotImpl("10:00", "11:00", "MONDAY", 1);
+  private final CandidateTimeSlotImpl candidateTimeSlot = new CandidateTimeSlotImpl("test@mail.com", "2022-12-12", "10:00", "11:00");
 
 
   @Test
@@ -69,25 +69,25 @@ class SlotValidatorTest {
 
   @Test
   void validateSlotOverlappingTest() {
-    List<InterviewerTimeSlot> slots = List.of(
-        new InterviewerTimeSlot("08:00", "09:30", "Mon", weekService.getNextWeekNum()),
-        new InterviewerTimeSlot("10:30", "12:30", "Mon", weekService.getNextWeekNum()),
-        new InterviewerTimeSlot("12:30", "14:00", "Mon", weekService.getNextWeekNum()),
-        new InterviewerTimeSlot("14:30", "17:00", "Mon", weekService.getNextWeekNum())
+    List<InterviewerTimeSlotImpl> slots = List.of(
+        new InterviewerTimeSlotImpl("08:00", "09:30", "Mon", weekService.getNextWeekNum()),
+        new InterviewerTimeSlotImpl("10:30", "12:30", "Mon", weekService.getNextWeekNum()),
+        new InterviewerTimeSlotImpl("12:30", "14:00", "Mon", weekService.getNextWeekNum()),
+        new InterviewerTimeSlotImpl("14:30", "17:00", "Mon", weekService.getNextWeekNum())
     );
 
     assertThrows(InvalidInputException.class,
         () -> validateSlotOverlapping(
-            new InterviewerTimeSlot("08:30", "10:30", "Mon", weekService.getNextWeekNum()),
+            new InterviewerTimeSlotImpl("08:30", "10:30", "Mon", weekService.getNextWeekNum()),
             slots));
 
     assertThrows(InvalidInputException.class,
         () -> validateSlotOverlapping(
-            new InterviewerTimeSlot("08:00", "09:30", "Mon", weekService.getNextWeekNum()),
+            new InterviewerTimeSlotImpl("08:00", "09:30", "Mon", weekService.getNextWeekNum()),
             slots));
 
     assertDoesNotThrow(() -> validateSlotOverlapping(
-        new InterviewerTimeSlot("17:00", "20:00", "Mon", weekService.getNextWeekNum()),
+        new InterviewerTimeSlotImpl("17:00", "20:00", "Mon", weekService.getNextWeekNum()),
         slots));
   }
 

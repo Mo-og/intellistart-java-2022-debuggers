@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.intellias.intellistart.interviewplanning.models.interfaces.TimeSlot;
+import com.intellias.intellistart.interviewplanning.models.interfaces.CandidateTimeSlot;
 import com.intellias.intellistart.interviewplanning.utils.Utils;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CandidateSlotDto implements TimeSlot {
+public class CandidateSlotDto implements CandidateTimeSlot {
 
   private Long id;
   @JsonFormat(pattern = "HH:mm")

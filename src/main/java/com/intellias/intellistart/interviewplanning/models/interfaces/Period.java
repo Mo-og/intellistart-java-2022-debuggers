@@ -7,7 +7,7 @@ import java.time.LocalTime;
 /**
  * TimeSlot interface. Represents time slot.
  */
-public interface TimeSlot {
+public interface Period {
 
   LocalTime getFrom();
 
@@ -23,11 +23,11 @@ public interface TimeSlot {
     return Utils.timeAsString(getTo());
   }
 
-  default boolean isAfterOrEqual(TimeSlot slot) {
+  default boolean isAfterOrEqual(Period slot) {
     return getFrom().isAfter(slot.getTo()) || getFrom().equals(slot.getTo());
   }
 
-  default boolean isBeforeOrEqual(TimeSlot slot) {
+  default boolean isBeforeOrEqual(Period slot) {
     return getTo().isBefore(slot.getFrom()) || getTo().equals(slot.getFrom());
   }
 

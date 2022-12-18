@@ -16,8 +16,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.intellias.intellistart.interviewplanning.controllers.dto.BookingDto;
 import com.intellias.intellistart.interviewplanning.controllers.dto.CandidateSlotDto;
 import com.intellias.intellistart.interviewplanning.controllers.dto.InterviewerSlotDto;
-import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlot;
-import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlot;
+import com.intellias.intellistart.interviewplanning.models.CandidateTimeSlotImpl;
+import com.intellias.intellistart.interviewplanning.models.InterviewerTimeSlotImpl;
 import com.intellias.intellistart.interviewplanning.services.CandidateService;
 import com.intellias.intellistart.interviewplanning.services.InterviewerService;
 import com.intellias.intellistart.interviewplanning.services.WeekServiceImp;
@@ -40,10 +40,10 @@ import org.springframework.test.web.servlet.MockMvc;
 @WithCustomUser
 class SlotControllerTest {
 
-  private static final InterviewerTimeSlot interviewerSlot =
-      new InterviewerTimeSlot("08:00", "10:00", "WEDNESDAY", 202240);
-  private static final CandidateTimeSlot candidateSlot =
-      new CandidateTimeSlot(CANDIDATE_EMAIL, "2022-11-03", "08:00", "10:00");
+  private static final InterviewerTimeSlotImpl interviewerSlot =
+      new InterviewerTimeSlotImpl("08:00", "10:00", "WEDNESDAY", 202240);
+  private static final CandidateTimeSlotImpl candidateSlot =
+      new CandidateTimeSlotImpl(CANDIDATE_EMAIL, "2022-11-03", "08:00", "10:00");
   private static final BookingDto bookingDto = BookingDto.builder()
       .from(LocalTime.of(8, 0)).to(LocalTime.of(10, 0))
       .subject("some subject").description("some desc")
